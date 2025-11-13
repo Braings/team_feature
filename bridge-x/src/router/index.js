@@ -4,6 +4,7 @@ import Sign from '../views/sign.vue'
 import Maps from '../views/maps.vue'
 import MyPage from '../views/myPage.vue'
 import Reviews from '../views/reviews.vue'
+import LogIn from '../views/logIn.vue'
 
 const routes = [
   {
@@ -36,7 +37,7 @@ const routes = [
   {
     path: '/login',
     name: 'logIn',
-    component: () => import('../views/logIn.vue') // 필요할 때 로드하는 방식 (Lazy Loading)
+    component: LogIn
   }
 ]
 
