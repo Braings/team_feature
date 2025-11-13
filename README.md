@@ -16,12 +16,16 @@
 > 직접 관련 시설 게시판 사용 가능
 
 ### 기술 체인
-```
+
 **Front-END**
+```
 node js
 Vue js
 Figma
+```
+
 **Back-END**
+```
 java jdk 21
 java spring-boot
 Gleek.io
