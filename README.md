@@ -1,5 +1,6 @@
 ### 국민 체육 데이터를 활용한 연령대별 운동 추천 게시판 프로젝트
 # BRIDGE - X
+<img width="2560" height="1596" alt="image" src="https://github.com/user-attachments/assets/1ec53812-7e87-47cb-b33e-3270f49289a6" />
 
 ### 프로젝트 소개
 > 국민 체육 진흥원에서 제공하는 국민 연령대별 운동 빅데이터를 활용한 연령대별 운동을 추천하는 프로젝트입니다.
