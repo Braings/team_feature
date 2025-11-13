@@ -15,5 +15,13 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style>
+
+@font-face {
+  font-family: 'CC';
+  src: url('/fonts/The Jamsil OTF 6 ExtraBold.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 </style>

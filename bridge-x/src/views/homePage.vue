@@ -4,14 +4,14 @@
     <div class="left-section">
       <div class="content-wrapper">
         <p class="subtitle">맞춤형 운동 추천 솔루션</p>
-        <h1 class="title">BRIDGE-X</h1>
+        <h1 class="title cc-font" >B R I D G E - X</h1>
         <p class="footer-text">Team Braings - 2025</p>
       </div>
     </div>
 
     <div class="right-section">
 
-      <div class="header-login" @click="goToPage('logIn')">Log In</div>
+      <div class="header-login cc-font cursorPointer" @click="goToPage('logIn')">Log In</div>
 
       <div class="graph-area">
         <p class="graph-title">
@@ -20,8 +20,8 @@
         </p>
 
         <div class="chart-mockup">
-          <div class="chart-label great-label">GREAT</div>
-          <div class="chart-status">우수</div>
+          <div class="chart-label cc-font great-label">GREAT</div>
+          <div class="chart-status ">우수</div>
 
           <div class="bar-container">
             <div class="bar-group">
@@ -39,6 +39,7 @@
             <div class="x-axis-line"></div>
             <div class="y-axis-line"></div>
           </div>
+          <p class="under-bar"></p>
         </div>
       </div>
 
@@ -50,12 +51,13 @@
         <div class="recommendation-box">
           <p class="recommendation-text">{{ exercise }}</p>
         </div>
+
       </div>
 
       <div class="side-icons">
-        <div class="icon-placeholder myPage-icon" @click="goToPage('myPage')"></div>
-        <div class="icon-placeholder maps-icon" @click="goToPage('maps')"></div>
-        <div class="icon-placeholder reviews-icon" @click="goToPage('reviews')"></div>
+        <div class="icon-placeholder cursorPointer myPage-icon"  @click="goToPage('myPage')"></div>
+        <div class="icon-placeholder cursorPointer maps-icon" @click="goToPage('maps')"></div>
+        <div class="icon-placeholder cursorPointer reviews-icon" @click="goToPage('reviews')"></div>
       </div>
 
     </div>
@@ -85,11 +87,13 @@ export default {
 
 <style scoped>
 
-.icon-placeholder:hover {
-  opacity: 0.8;
+.cursorPointer {
+    cursor: pointer;
 }
 
-
+.cc-font {
+  font-family: 'CC', sans-serif;
+}
 
 /* 뷰포트 너비(vw)와 높이(vh)를 사용하여 상대 크기 지정 */
 .dashboard-container {
@@ -125,15 +129,15 @@ export default {
 }
 
 .left-section .title {
-  font-size: 4.5vw;
+  font-size: 2.5vw;
   font-weight: bold;
   margin: 0;
-  line-height: 1;
+  line-height: 5vh;
 }
 
 .left-section .footer-text {
   font-size: 0.8vw;
-  margin-top: 10vh;
+  margin-top: 5vh;
 }
 
 /* 2. 오른쪽 섹션 (약 70% 비율) */
@@ -147,8 +151,8 @@ export default {
 /* 상단 "Log In" */
 .header-login {
   position: absolute;
-  top: 3vh;
-  right: 5vw;
+  top: 7vh;
+  right: 10vw;
   font-size: 3vw;
   font-weight: 900;
 }
@@ -161,7 +165,7 @@ export default {
 /* 그래프 영역  수정할꺼임 ㅇㅇ */
 .graph-area {
   position: absolute;
-  top: 10vh;
+  top: 15vh;
   left: 3vw;
   width: 50vw; /* 오른쪽 섹션 내에서 상대적인 크기 */
   height: 45vh;
@@ -170,7 +174,7 @@ export default {
 .graph-area .graph-title {
   font-size: 1.5vw;
   font-weight: 500;
-  line-height: 1.3;
+  line-height: 4vh;
   margin-bottom: 2vh;
 }
 
@@ -179,10 +183,11 @@ export default {
 }
 
 .chart-mockup {
+  border-radius: 5%;
   position: relative;
   width: 60%;
   height: 80%;
-  background-color: black;
+  background-color: #252525;
   /* border-left: 0.1vw solid black;
   border-bottom: 0.1vw solid black; */
 }
@@ -200,8 +205,8 @@ export default {
 .chart-mockup .chart-status {
   position: absolute;
   top: 4vh;
-  right: 2vw;
-  font-size: 3vw;
+  right: 4vw;
+  font-size: 2.5vw;
   font-weight: 900;
   color: #89FFB1;
 }
@@ -228,25 +233,34 @@ export default {
 
 .bar {
     width: 40%; /* 개별 막대의 너비 */
+    border-radius: 5%;
     margin: 0 0.5%;
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    color: black;
+    color: #252525;
     font-size: 1vw;
     font-weight: bold;
     padding-top: 0.5vh;
 }
 
 .pink-bar {
-    background-color: #FF8080;
+  background-color: #FF8080;
 }
 
 .green-bar {
-    background-color: #89FFB1;
+  background-color: #89FFB1;
 }
 
-
+.under-bar {
+  justify-content: bottom;
+  width: 51%;
+  height: 2vh;
+  background-color: #252525;
+  position: fixed;
+  right: 15.5vw;
+  bottom: 6vh;
+}
 
 
 
@@ -266,7 +280,7 @@ export default {
 .recommendation-area .recommendation-title {
   font-size: 1.5vw;
   font-weight: 500;
-  line-height: 1.3;
+  line-height: 4vh;
   margin-bottom: 1.5vh;
 }
 
@@ -274,7 +288,7 @@ export default {
   background-color: #f0f0f0; /* 회색 배경 */
   padding: 3vh 2vw;
   border-radius: 0.5vw;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 2px 2px 5px black;
 }
 
 .recommendation-text {
@@ -291,16 +305,16 @@ export default {
 /* 우측 사이드 아이콘 영역 (자리만 배치) */
 .side-icons {
   position: absolute;
-  top: 20vh;
+  top: 25vh;
   right: 5vw;
   display: flex;
   flex-direction: column;
-  gap: 5vh;
+  gap: 7vh;
 }
 
 .icon-placeholder {
-  width: 3vw;
-  height: 3vw;
+  width: 4vw;
+  height: 4vw;
   border: 0.2vw solid black; /* 아이콘 영역임을 나타냄 */
   border-radius: 50%; /* 원형 테두리 */
   display: flex;
