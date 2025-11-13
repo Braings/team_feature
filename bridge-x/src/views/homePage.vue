@@ -11,7 +11,7 @@
 
     <div class="right-section">
 
-      <div class="header-login">Log In</div>
+      <div class="header-login" @click="goToPage('logIn')">Log In</div>
 
       <div class="graph-area">
         <p class="graph-title">

@@ -8,12 +8,12 @@ import Reviews from '../views/reviews.vue'
 const routes = [
   {
     path: '/',
-    name: 'HomePage',
+    name: 'homePage',
     component: HomePage
   },
   {
     path: '/sign',
-    name: 'Sign',
+    name: 'sign',
     component: Sign
   },
   {
@@ -35,7 +35,7 @@ const routes = [
 
   {
     path: '/login',
-    name: 'Login',
+    name: 'logIn',
     component: () => import('../views/logIn.vue') // 필요할 때 로드하는 방식 (Lazy Loading)
   }
 ]
