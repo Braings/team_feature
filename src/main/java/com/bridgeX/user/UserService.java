@@ -26,7 +26,6 @@ public class UserService {
         if (userRepository.findByUsername(dto.getUsername()).isPresent()) {
             throw new IllegalArgumentException("이미 존재하는 아이디입니다.");
         }
-
         // create User
         SiteUser user = new SiteUser();
         user.setUsername(dto.getUsername());
