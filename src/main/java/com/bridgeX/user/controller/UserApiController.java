@@ -1,11 +1,10 @@
 package com.bridgeX.user.controller;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bridgeX.user.UserService;
@@ -31,12 +30,12 @@ public class UserApiController {
         return ResponseEntity.ok("signup success");
     }
     // sign-up: BAD Request
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public class UsernameDuplicateException extends RuntimeException {
-    	private static final long serialVersionUID = 1L; // warning off :)
-        public UsernameDuplicateException(String message) {
-            super(message);
-        }
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalArgument(IllegalArgumentException e) {
+        // 중복 아이디, 기타 잘못된 입력 → 400 + 메시지
+        return ResponseEntity
+                .badRequest()
+                .body(e.getMessage());   // "이미 존재하는 아이디입니다."
     }
     
     // Login
