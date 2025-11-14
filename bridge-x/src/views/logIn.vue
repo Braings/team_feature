@@ -12,17 +12,19 @@
         <div class="ID-Box">
           <p class="ID-Text">ID</p>
         </div>
-        <div class="LogInToYourAccount cc-font">Log In To Your Account</div>
+        <div class="LogInToYourAccount cc-font ">Log In To Your Account</div>
         <div class="PW-Box">
           <p class="PW-Text">PASSWARD</p>
         </div>
 
-        <div class="LogIn-Box">
+        <div class="LogIn-Box" @click="Sign()">
           <p class="LogIn-Text cc-font">LOG IN</p>
         </div>
 
         <div class="under-bar"></div>
-        <div class="makeAccount">New to Bridge-X? Sign up</div>
+
+        <div class="SignUp-Text cc-font cursorPointer" @click="goToPage('sign')" >New To Bridge-X? Sign up</div>
+
       </div>
 
     </div>
@@ -30,11 +32,20 @@
 </template>
 
 <script>
+import { useRouter } from 'vue-router';
+
 export default {
-  setup () {
+  name: 'logInPage',
+  data() {
+    const router = useRouter();
 
+    const goToPage = (routeName) => {
+            router.push({ name: routeName });
+        };
 
-    return {}
+    return {
+      goToPage,
+    }
   }
 }
 </script>
@@ -167,14 +178,23 @@ export default {
     padding: 0.5vh 0.5vw;
   }
 
-  .makeAccount {
-    position: absolute;
-    top: 60vh;
-    left: 18.5vw;
-    font-size: 1vw;
-    color: black;
-    padding: 0.5vh 0.5vw;
+  .SignUp-Text {
+  text-align: center;
+  position: absolute;
+  top: 60vh;
+
+  left: 0;
+  right: 0;
+
+  font-size: 1vw;
+  color: black;
+  font-weight: 100;
+
+  width: 10vw;
+  margin: 0 auto;
   }
+
+
 
   .LogInToYourAccount {
     position: absolute;

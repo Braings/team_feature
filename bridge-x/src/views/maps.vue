@@ -5,11 +5,20 @@
 </template>
 
 <script>
-export default {
-  setup () {
-    
+import { useRouter } from 'vue-router';
 
-    return {}
+export default {
+  name: 'mapsPage',
+  data() {
+    const router = useRouter();
+
+    const goToPage = (routeName) => {
+            router.push({ name: routeName });
+        };
+
+    return {
+      goToPage,
+    }
   }
 }
 </script>

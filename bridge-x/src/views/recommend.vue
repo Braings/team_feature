@@ -8,7 +8,7 @@
 import { useRouter } from 'vue-router';
 
 export default {
-  name: 'reviewsPage',
+  name: 'recommendPage',
   data() {
     const router = useRouter();
 
@@ -22,6 +22,7 @@ export default {
   }
 }
 </script>
+
 <style lang="scss" scoped>
 
 </style>
