@@ -1,6 +1,7 @@
-package com.bridgeX.user.DTO;
+package com.bridgeX.user.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,6 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class LoginResponse {
 	private boolean success;
 	private String message;

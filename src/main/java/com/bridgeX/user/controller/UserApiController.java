@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bridgeX.user.UserService;
-import com.bridgeX.user.DTO.LoginRequest;
-import com.bridgeX.user.DTO.LoginResponse;
-import com.bridgeX.user.DTO.SignupRequest;
+import com.bridgeX.user.dto.LoginRequest;
+import com.bridgeX.user.dto.LoginResponse;
+import com.bridgeX.user.dto.SignupRequest;
 
 import lombok.RequiredArgsConstructor;
 

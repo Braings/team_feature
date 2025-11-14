@@ -1,4 +1,4 @@
-package com.bridgeX.user.DTO;
+package com.bridgeX.user.dto;
 
 import lombok.Getter;
 import lombok.Setter;
