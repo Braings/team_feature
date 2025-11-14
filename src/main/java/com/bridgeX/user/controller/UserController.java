@@ -1,4 +1,4 @@
-package com.bridgeX.user;
+package com.bridgeX.user.controller;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
@@ -7,12 +7,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.bridgeX.user.UserCreateForm;
+import com.bridgeX.user.UserService;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+// This Controller is Back-end test only.
+
 @RequiredArgsConstructor
 @Controller
-@RequestMapping("/test") // Back-end test only.
+@RequestMapping("/test")
 public class UserController {
 
 	private final UserService userService;

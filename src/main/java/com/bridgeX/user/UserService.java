@@ -6,6 +6,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.bridgeX.DataNotFoundException;
+import com.bridgeX.user.DTO.LoginRequest;
+import com.bridgeX.user.DTO.LoginResponse;
+import com.bridgeX.user.DTO.SignupRequest;
 
 import lombok.RequiredArgsConstructor;
 

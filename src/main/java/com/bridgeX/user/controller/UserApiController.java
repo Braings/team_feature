@@ -1,4 +1,4 @@
-package com.bridgeX.user;
+package com.bridgeX.user.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -6,7 +6,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bridgeX.user.UserService;
+import com.bridgeX.user.DTO.LoginRequest;
+import com.bridgeX.user.DTO.LoginResponse;
+import com.bridgeX.user.DTO.SignupRequest;
+
 import lombok.RequiredArgsConstructor;
+
+//This is API communication controller
 
 @RestController
 @RequestMapping("/api")
