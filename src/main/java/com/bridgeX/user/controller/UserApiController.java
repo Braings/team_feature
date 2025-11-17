@@ -35,7 +35,7 @@ public class UserApiController {
         // 중복 아이디, 기타 잘못된 입력 → 400 + 메시지
         return ResponseEntity
                 .badRequest()
-                .body(e.getMessage());   // "이미 존재하는 아이디입니다."
+                .body(e.getMessage());   // "이미 등록된 사용자입니다." / "이미 등록된 이메일입니다."
     }
     
     // Login

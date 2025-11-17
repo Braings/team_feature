@@ -24,7 +24,10 @@ public class UserService {
     public void signup(SignupRequest dto) {
         // Check ID duplication.
         if (userRepository.findByUsername(dto.getUsername()).isPresent()) {
-            throw new IllegalArgumentException("이미 존재하는 아이디입니다.");
+            throw new IllegalArgumentException("이미 등록된 사용자입니다.");
+        }
+        if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
+        	throw new IllegalArgumentException("이미 등록된 이메일입니다.");
         }
         // create User
         SiteUser user = new SiteUser();

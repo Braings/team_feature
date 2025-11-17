@@ -20,15 +20,31 @@ public class UserApiIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
     
-    // Test02: User name Duplication
+    // Test02: Duplication User
     
     @Test
     void Username_Duplication() throws Exception {
     	
-    	String signupJson2 = """
+    	
+    	String signupJson1 = """
     	        {
     	          "username": "Potato",
-    	          "email": "test2@test.com",
+    	          "email": "test1@test.com",
+    	          "password": "9999"
+    	        }
+    	        """;
+
+    	    mockMvc.perform(
+    	            post("/api/sign")
+    	                    .contentType(MediaType.APPLICATION_JSON)
+    	                    .content(signupJson1)
+    	    ).andExpect(status().isOk());
+    	
+    	
+    	String signupJson2 = """
+    	        {
+    	          "username": "Potato2",
+    	          "email": "test1@test.com",
     	          "password": "9999"
     	        }
     	        """;
@@ -39,7 +55,7 @@ public class UserApiIntegrationTest {
     	                    .content(signupJson2)
     	    )
     	    .andExpect(status().isBadRequest())
-    	    .andExpect(content().string("이미 등록된 사용자입니다."));
+    	    .andExpect(content().string("이미 등록된 이메일입니다."));
     }
 
 
