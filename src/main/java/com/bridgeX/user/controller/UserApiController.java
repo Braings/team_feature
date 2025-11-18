@@ -1,7 +1,6 @@
 package com.bridgeX.user.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,6 +10,8 @@ import com.bridgeX.user.UserService;
 import com.bridgeX.user.dto.LoginRequest;
 import com.bridgeX.user.dto.LoginResponse;
 import com.bridgeX.user.dto.SignupRequest;
+
+import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,22 +26,14 @@ public class UserApiController {
     
     // Sign-up
     @PostMapping("/sign")
-    public ResponseEntity<?> signup(@RequestBody SignupRequest dto) {
+    public ResponseEntity<?> signup(@RequestBody @Valid SignupRequest dto) {
         userService.signup(dto);
         return ResponseEntity.ok("signup success");
-    }
-    // sign-up: BAD Request
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<String> handleIllegalArgument(IllegalArgumentException e) {
-        // 중복 아이디, 기타 잘못된 입력 → 400 + 메시지
-        return ResponseEntity
-                .badRequest()
-                .body(e.getMessage());   // "이미 등록된 사용자입니다." / "이미 등록된 이메일입니다."
     }
     
     // Login
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest dto) {
+    public ResponseEntity<?> login(@RequestBody @Valid LoginRequest dto) {
         LoginResponse result = userService.login(dto);  // Check login success/fail
         return ResponseEntity.ok(result);
     }

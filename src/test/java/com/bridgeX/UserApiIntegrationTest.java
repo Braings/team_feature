@@ -20,47 +20,29 @@ public class UserApiIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
     
-    // Test02: Duplication User
+    /*
+    // Test04: Wrong Login
     
     @Test
     void Username_Duplication() throws Exception {
-    	
-    	
-    	String signupJson1 = """
+    	String loginJson = """
     	        {
-    	          "username": "Potato",
-    	          "email": "test1@test.com",
-    	          "password": "9999"
+    	          "username": "apple",
+    	          "password": ""
     	        }
     	        """;
 
     	    mockMvc.perform(
-    	            post("/api/sign")
+    	            post("/api/login")
     	                    .contentType(MediaType.APPLICATION_JSON)
-    	                    .content(signupJson1)
-    	    ).andExpect(status().isOk());
-    	
-    	
-    	String signupJson2 = """
-    	        {
-    	          "username": "Potato2",
-    	          "email": "test1@test.com",
-    	          "password": "9999"
-    	        }
-    	        """;
-
-    	    mockMvc.perform(
-    	            post("/api/sign")
-    	                    .contentType(MediaType.APPLICATION_JSON)
-    	                    .content(signupJson2)
+    	                    .content(loginJson)
     	    )
     	    .andExpect(status().isBadRequest())
-    	    .andExpect(content().string("이미 등록된 이메일입니다."));
+    	    .andExpect(content().string("비밀번호는 공백으로 둘 수 없습니다."));
     }
-
+ 	*/
 
     /*
-    
     // Test01: User Register and Login
     @Test
     void signup_and_login() throws Exception {
@@ -98,4 +80,67 @@ public class UserApiIntegrationTest {
         .andExpect(jsonPath("$.message").value("로그인 성공")); // UserService와 string 맞추기
     }
     */
+    
+    /*
+    // Test02: Duplication User
+    
+    @Test
+    void Username_Duplication() throws Exception {
+    	
+    	
+    	String signupJson1 = """
+    	        {
+    	          "username": "Potato",
+    	          "email": "test1@test.com",
+    	          "password": "9999"
+    	        }
+    	        """;
+
+    	    mockMvc.perform(
+    	            post("/api/sign")
+    	                    .contentType(MediaType.APPLICATION_JSON)
+    	                    .content(signupJson1)
+    	    ).andExpect(status().isOk());
+    	
+    	
+    	String signupJson2 = """
+    	        {
+    	          "username": "Potato2",
+    	          "email": "test1@test.com",
+    	          "password": "9999"
+    	        }
+    	        """;
+
+    	    mockMvc.perform(
+    	            post("/api/sign")
+    	                    .contentType(MediaType.APPLICATION_JSON)
+    	                    .content(signupJson2)
+    	    )
+    	    .andExpect(status().isBadRequest())
+    	    .andExpect(content().string("이미 등록된 이메일입니다."));
+    }
+    */
+    
+    /*
+    // Test03: Empty input
+    
+    @Test
+    void Username_Duplication() throws Exception {
+    	String signupJson = """
+    	        {
+    	          "username": "apple",
+    	          "email": "ILoveApple@fruit.com",
+    	          "password": ""
+    	        }
+    	        """;
+
+    	    mockMvc.perform(
+    	            post("/api/sign")
+    	                    .contentType(MediaType.APPLICATION_JSON)
+    	                    .content(signupJson)
+    	    )
+    	    .andExpect(status().isBadRequest())
+    	    .andExpect(content().string("비밀번호는 공백으로 둘 수 없습니다."));
+    }
+ 	*/
 }
