@@ -20,14 +20,14 @@ public class UserApiIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
     
-    /*
-    // Test04: Wrong Login
+    
+    // Test04: Empty format Login test
     
     @Test
     void Username_Duplication() throws Exception {
     	String loginJson = """
     	        {
-    	          "username": "apple",
+    	          "username": "TestUser",
     	          "password": ""
     	        }
     	        """;
@@ -40,10 +40,9 @@ public class UserApiIntegrationTest {
     	    .andExpect(status().isBadRequest())
     	    .andExpect(content().string("비밀번호는 공백으로 둘 수 없습니다."));
     }
- 	*/
 
     /*
-    // Test01: User Register and Login
+    // Test01: User Register and Login test
     @Test
     void signup_and_login() throws Exception {
         // 1) 회원가입 요청 JSON  (/api/sign)
@@ -82,7 +81,7 @@ public class UserApiIntegrationTest {
     */
     
     /*
-    // Test02: Duplication User
+    // Test02: Duplication User Signup test
     
     @Test
     void Username_Duplication() throws Exception {
@@ -122,7 +121,7 @@ public class UserApiIntegrationTest {
     */
     
     /*
-    // Test03: Empty input
+    // Test03: Wrong format Signup test
     
     @Test
     void Username_Duplication() throws Exception {
