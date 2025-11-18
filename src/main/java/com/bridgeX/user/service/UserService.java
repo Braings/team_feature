@@ -1,4 +1,4 @@
-package com.bridgeX.user;
+package com.bridgeX.user.service;
 
 import java.util.Optional;
 
@@ -6,9 +6,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.bridgeX.DataNotFoundException;
+import com.bridgeX.user.domain.SiteUser;
 import com.bridgeX.user.dto.LoginRequest;
 import com.bridgeX.user.dto.LoginResponse;
 import com.bridgeX.user.dto.SignupRequest;
+import com.bridgeX.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 

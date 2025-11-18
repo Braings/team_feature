@@ -10,12 +10,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bridgeX.user.SiteUser;
-import com.bridgeX.user.UserService;
+import com.bridgeX.user.domain.SiteUser;
 import com.bridgeX.user.dto.LoginRequest;
 import com.bridgeX.user.dto.LoginResponse;
 import com.bridgeX.user.dto.SignupRequest;
 import com.bridgeX.user.dto.UserInfoResponse;
+import com.bridgeX.user.service.UserService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

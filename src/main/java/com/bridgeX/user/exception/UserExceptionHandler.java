@@ -1,4 +1,4 @@
-package com.bridgeX.user;
+package com.bridgeX.user.exception;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;

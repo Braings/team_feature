@@ -1,4 +1,4 @@
-package com.bridgeX.user;
+package com.bridgeX.user.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;

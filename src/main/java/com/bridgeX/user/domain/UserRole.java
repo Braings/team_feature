@@ -1,4 +1,4 @@
-package com.bridgeX.user;
+package com.bridgeX.user.domain;
 
 import lombok.Getter;
 

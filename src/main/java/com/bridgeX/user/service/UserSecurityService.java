@@ -1,4 +1,4 @@
-package com.bridgeX.user;
+package com.bridgeX.user.service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +11,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import com.bridgeX.user.domain.SiteUser;
+import com.bridgeX.user.domain.UserRole;
+import com.bridgeX.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 

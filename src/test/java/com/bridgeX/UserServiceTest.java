@@ -6,9 +6,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.bridgeX.user.UserService;
 import com.bridgeX.user.dto.LoginRequest;
 import com.bridgeX.user.dto.LoginResponse;
+import com.bridgeX.user.service.UserService;
 
 // API Test
 @SpringBootTest

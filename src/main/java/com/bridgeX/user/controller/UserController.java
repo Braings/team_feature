@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.bridgeX.user.UserCreateForm;
-import com.bridgeX.user.UserService;
+import com.bridgeX.user.dto.UserCreateForm;
+import com.bridgeX.user.service.UserService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
