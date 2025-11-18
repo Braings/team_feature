@@ -69,7 +69,13 @@ public class UserService {
         return response;
     }
 	
-	
+    // User Information Response
+    public SiteUser getUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("유저가 존재하지 않습니다."));
+    }
+    
+    
 	// Back-end Test only.
 	public SiteUser create(String username, String email, String password) {
 		SiteUser user = new SiteUser();
