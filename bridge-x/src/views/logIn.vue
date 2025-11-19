@@ -9,17 +9,24 @@
         </div>
       </div>
       <div class="right-section">
-        <div class="ID-Box">
-          <p class="ID-Text">ID</p>
-        </div>
-        <div class="LogInToYourAccount cc-font ">Log In To Your Account</div>
-        <div class="PW-Box">
-          <p class="PW-Text">PASSWARD</p>
-        </div>
 
-        <div class="LogIn-Box" @click="Sign()">
-          <p class="LogIn-Text cc-font">LOG IN</p>
-        </div>
+        <div class="LogInToYourAccount cc-font">Log In To Your Account</div>
+
+        <input
+          v-model="loginData.ID"
+          placeholder="ID"
+          class="ID-Box cc-font"
+          type="text"/>
+
+        <input
+          v-model="loginData.PW"
+          placeholder="PASSWORD"
+          class="PW-Box cc-font"
+          type="text"/>
+
+        <button class="LogIn-Box cc-font" @click="Sign()">
+          LOG IN
+        </button>
 
         <div class="under-bar"></div>
 
@@ -31,23 +38,35 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { useRouter } from 'vue-router';
+import { reactive } from 'vue'; // reactive를 사용합니다.
 
-export default {
-  name: 'logInPage',
-  data() {
-    const router = useRouter();
+// 1. useRouter를 최상위 레벨에서 호출하고 변수에 할당
+const router = useRouter();
 
-    const goToPage = (routeName) => {
-            router.push({ name: routeName });
-        };
+// 2. loginData를 최상위 레벨에서 reactive로 정의
+const loginData = reactive({
+  ID: '',
+  PW: ''
+});
 
-    return {
-      goToPage,
-    }
-  }
+// 3. Sign 함수: 로그인 로직 처리
+const Sign = () => {
+  console.log('로그인 시도:', loginData.ID, loginData.PW);
+  // 여기에 실제 API 호출 및 로그인 처리 로직을 구현하세요.
+
+  // 예: 로그인 성공 시 메인 페이지로 이동
+  // router.push({ name: 'main' });
 }
+
+// 4. goToPage 함수: 라우트 이동 처리
+const goToPage = (routeName) => {
+  // 정의된 router 변수를 사용하여 라우트 이동
+  router.push({ name: routeName });
+};
+
+// <script setup>을 사용하면 별도로 return 할 필요 없이 최상위 변수와 함수가 템플릿에 노출됩니다.
 </script>
 
 <style lang="scss" scoped>
@@ -120,20 +139,14 @@ export default {
     width: 30vw;
     height: 10vh;
 
-    top: 27vh;
+    top: 34vh;
     right: 10vw;
 
+    padding: 15px 10px;
+
+    border-radius: 0.5vw;
     background-color: #f3f3f3;
     box-shadow: 2px 2px 5px black;
-  }
-
-  .ID-Box .ID-Text{
-    position: absolute;
-    top: 1vh;
-    left: 0.5vw;
-    font-size: 1vw;
-    color: black;
-    padding: 0.5vh 0.5vw;
   }
 
   .PW-Box{
@@ -142,20 +155,14 @@ export default {
     width: 30vw;
     height: 10vh;
 
-    top: 40vh;
+    top: 47vh;
     right: 10vw;
 
+    padding: 15px 10px;
+
+    border-radius: 0.5vw;
     background-color: #f3f3f3;
     box-shadow: 2px 2px 5px black;
-  }
-
-  .PW-Box .PW-Text{
-    position: absolute;
-    top: 1vh;
-    left: 0.5vw;
-    font-size: 1vw;
-    color: black;
-    padding: 0.5vh 0.5vw;
   }
 
   .LogIn-Box{
@@ -164,24 +171,24 @@ export default {
     width: 30vw;
     height: 5vh;
 
-    top: 53vh;
+    top: 60vh;
     right: 10vw;
 
+    border-radius: 0.5vw;
     background-color: #252525;
     box-shadow: 2px 2px 5px black;
-  }
 
-  .LogIn-Box .LogIn-Text{
     text-align: center;
+
     font-size: 1.5vw;
     color: #89FFB1;
     padding: 0.5vh 0.5vw;
   }
-
   .SignUp-Text {
   text-align: center;
   position: absolute;
-  top: 60vh;
+
+  top: 67vh;
 
   left: 0;
   right: 0;
@@ -198,21 +205,21 @@ export default {
 
   .LogInToYourAccount {
     position: absolute;
-    top: 15vh;
+    top: 22vh;
     left: 13vw;
     font-size: 2vw;
     color: black;
     padding: 0.5vh 0.5vw;
   }
 
-  .under-bar {
-    justify-content: bottom;
-    width: 30vw;
-    height: 2vh;
-    background-color: #252525;
-    position: absolute;
-    right: 10vw;
-    top: 90vh;
-  }
+  // .under-bar {
+  //   justify-content: bottom;
+  //   width: 30vw;
+  //   height: 2vh;
+  //   background-color: #252525;
+  //   position: absolute;
+  //   right: 10vw;
+  //   top: 90vh;
+  // }
 
 </style>

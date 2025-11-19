@@ -152,8 +152,8 @@ export default {
 .header-login {
   position: absolute;
   top: 7vh;
-  right: 10vw;
-  font-size: 3vw;
+  right: 5vw;
+  font-size: 2vw;
   font-weight: 900;
 }
 
@@ -263,12 +263,6 @@ export default {
 }
 
 
-
-
-
-
-
-
 /* 추천 운동 영역 */
 .recommendation-area {
   position: absolute;
@@ -296,10 +290,6 @@ export default {
   font-weight: bold;
   margin: 0;
 }
-
-
-
-
 
 
 /* 우측 사이드 아이콘 영역 (자리만 배치) */
