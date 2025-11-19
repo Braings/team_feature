@@ -11,8 +11,6 @@
 
     <div class="right-section">
 
-      <div class="header-login cc-font cursorPointer" @click="goToPage('logIn')">Log In</div>
-
       <div class="graph-area">
         <p class="graph-title">
           <span class="user-name">{{ userName }}</span>님의<br />
@@ -147,19 +145,6 @@ export default {
   position: relative;
   padding: 3vh 3vw;
 }
-
-/* 상단 "Log In" */
-.header-login {
-  position: absolute;
-  top: 7vh;
-  right: 5vw;
-  font-size: 2vw;
-  font-weight: 900;
-}
-
-
-
-
 
 
 /* 그래프 영역  수정할꺼임 ㅇㅇ */
@@ -321,13 +306,13 @@ export default {
 }
 .maps-icon {
   background-image: url('../img/mapsIcon.png');
-  background-size: 75%;
+  background-size: 80%;
   background-position: center;
   background-repeat: no-repeat;
 }
 .reviews-icon {
   background-image: url('../img/reviewsIcon.png');
-  background-size: 90%;
+  background-size: 60%;
   background-position: center;
   background-repeat: no-repeat;
 }

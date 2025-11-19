@@ -22,11 +22,14 @@
           v-model="loginData.PW"
           placeholder="PASSWORD"
           class="PW-Box cc-font"
-          type="text"/>
+          type="password"/>
 
-        <button class="LogIn-Box cc-font" @click="Sign()">
-          LOG IN
+        <button class="LogIn-Box cc-font" @click="Sign()" :disabled="loading">
+          <span v-if="loading">LOGGING IN...</span>
+          <span v-else>LOG IN</span>
         </button>
+
+        <div v-if="error" class="error-text cc-font" style="position:absolute; top:66vh; right:10vw; color: #e74c3c;">{{ error }}</div>
 
         <div class="under-bar"></div>
 
@@ -40,33 +43,55 @@
 
 <script setup>
 import { useRouter } from 'vue-router';
-import { reactive } from 'vue'; // reactive를 사용합니다.
+import { reactive, ref } from 'vue';
+import { post } from '../api.js';
 
-// 1. useRouter를 최상위 레벨에서 호출하고 변수에 할당
+// 라우터와 상태
 const router = useRouter();
+const loginData = reactive({ ID: '', PW: '' });
+const loading = ref(false);
+const error = ref(null);
 
-// 2. loginData를 최상위 레벨에서 reactive로 정의
-const loginData = reactive({
-  ID: '',
-  PW: ''
-});
+// 로그인 함수: 실제 API 호출을 수행합니다.
+// API 경로와 응답 형식은 백엔드에 맞게 변경하세요.
+const Sign = async () => {
+  error.value = null;
+  if (!loginData.ID || !loginData.PW) {
+    error.value = '아이디와 비밀번호를 입력하세요.';
+    return;
+  }
 
-// 3. Sign 함수: 로그인 로직 처리
-const Sign = () => {
-  console.log('로그인 시도:', loginData.ID, loginData.PW);
-  // 여기에 실제 API 호출 및 로그인 처리 로직을 구현하세요.
+  loading.value = true;
+  try {
+    // 예시: POST /auth/login { id, password }
+    const body = { id: loginData.ID, password: loginData.PW };
+    const res = await post('/auth/login', body);
 
-  // 예: 로그인 성공 시 메인 페이지로 이동
-  // router.push({ name: 'main' });
-}
+    // 백엔드 응답에 따라 다릅니다. 토큰을 반환하면 저장 후 이동.
+    if (res && res.token) {
+      localStorage.setItem('authToken', res.token);
+      router.push({ name: 'homePage' });
+      return;
+    }
 
-// 4. goToPage 함수: 라우트 이동 처리
-const goToPage = (routeName) => {
-  // 정의된 router 변수를 사용하여 라우트 이동
-  router.push({ name: routeName });
+    // 성공 플래그로 처리하는 경우
+    if (res && (res.success || res.ok)) {
+      router.push({ name: 'homePage' });
+      return;
+    }
+
+    // 기본: 에러 메시지 표시
+    error.value = res?.message || '로그인에 실패했습니다.';
+  } catch (err) {
+    console.error('로그인 에러', err);
+    error.value = err?.message || '서버 오류가 발생했습니다.';
+  } finally {
+    loading.value = false;
+  }
 };
 
-// <script setup>을 사용하면 별도로 return 할 필요 없이 최상위 변수와 함수가 템플릿에 노출됩니다.
+// 페이지 이동
+const goToPage = (routeName) => router.push({ name: routeName });
 </script>
 
 <style lang="scss" scoped>
@@ -183,10 +208,13 @@ const goToPage = (routeName) => {
     font-size: 1.5vw;
     color: #89FFB1;
     padding: 0.5vh 0.5vw;
+    transition: background-color 0.3s ease;
   }
+
   .SignUp-Text {
   text-align: center;
   position: absolute;
+  display: flex;
 
   top: 67vh;
 

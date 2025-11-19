@@ -2,7 +2,14 @@
   <div>
     <div :class="{ 'title': true, 'flame': true}"></div>
     <router-view />
+    <div class="header-bar">
+      <div class="header-Text cc-font cursorPointer" @click="goToPage('logIn')">Log In</div>
+      <div class="header-Text cc-font cursorPointer" @click="goToPage('homePage')">Home</div>
+    </div>
   </div>
+
+
+
 </template>
 
 <script>
@@ -39,6 +46,34 @@ export default {
   src: url('/fonts/The Jamsil OTF 6 ExtraBold.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
+}
+
+.header-bar {
+  position: absolute;
+  top: 3vh;
+  width: 97vw;
+  height: 10vh;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  z-index: 1000;
+}
+
+.cursorPointer {
+    cursor: pointer;
+}
+
+.cc-font {
+  font-family: 'CC', sans-serif;
+}
+
+/* 상단 "Log In" */
+.header-Text {
+  top: 5vh;
+  right: 5vw;
+  font-size: 2vw;
+  font-weight: 900;
+  padding-inline-end: 2vw;
 }
 
 </style>
