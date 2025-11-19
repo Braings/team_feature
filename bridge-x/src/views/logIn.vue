@@ -206,7 +206,7 @@ const goToPage = (routeName) => router.push({ name: routeName });
     text-align: center;
 
     font-size: 1.5vw;
-    color: #89FFB1;
+    color: black;
     padding: 0.5vh 0.5vw;
     transition: background-color 0.3s ease;
   }
