@@ -3,8 +3,9 @@ package com.bridgeX;
 //import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
+// Only Use Json Return
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,15 +21,14 @@ public class UserApiIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
     
-    
-    // Test04: Empty format Login test
+    // Test05: Bad request: login
     
     @Test
     void Username_Duplication() throws Exception {
     	String loginJson = """
     	        {
-    	          "username": "TestUser",
-    	          "password": ""
+    	          "username": "PotatoLuver",
+    	          "password": "1239"
     	        }
     	        """;
 
@@ -38,7 +38,8 @@ public class UserApiIntegrationTest {
     	                    .content(loginJson)
     	    )
     	    .andExpect(status().isBadRequest())
-    	    .andExpect(content().string("비밀번호는 공백으로 둘 수 없습니다."));
+    	    .andExpect(jsonPath("$.success").value(false))
+            .andExpect(jsonPath("$.message").value("존재하지 않는 아이디입니다."));
     }
 
     /*
@@ -142,4 +143,26 @@ public class UserApiIntegrationTest {
     	    .andExpect(content().string("비밀번호는 공백으로 둘 수 없습니다."));
     }
  	*/
+    
+    /*
+    // Test04: Empty format Login test
+    
+    @Test
+    void Username_Duplication() throws Exception {
+    	String loginJson = """
+    	        {
+    	          "username": "TestUser",
+    	          "password": ""
+    	        }
+    	        """;
+
+    	    mockMvc.perform(
+    	            post("/api/login")
+    	                    .contentType(MediaType.APPLICATION_JSON)
+    	                    .content(loginJson)
+    	    )
+    	    .andExpect(status().isBadRequest())
+    	    .andExpect(content().string("비밀번호는 공백으로 둘 수 없습니다."));
+    }
+	*/
 }

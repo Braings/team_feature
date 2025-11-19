@@ -40,6 +40,9 @@ public class UserApiController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid LoginRequest dto) {
         LoginResponse result = userService.login(dto);  // Check login success/fail
+        if(!result.isSuccess()) {
+        	return ResponseEntity.badRequest().body(result);
+        }
         return ResponseEntity.ok(result);
     }
     
