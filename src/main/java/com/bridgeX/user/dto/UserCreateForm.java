@@ -1,5 +1,7 @@
 package com.bridgeX.user.dto;
 
+// backend test only
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;

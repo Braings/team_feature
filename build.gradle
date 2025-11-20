@@ -20,6 +20,8 @@ dependencies {
 	
 	//Junit Test
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test' // MockUser(Login at test)
+	
 	
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	compileOnly 'org.projectlombok:lombok' 
