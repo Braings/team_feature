@@ -1,253 +1,280 @@
 <template>
-  <div>
-    <div class="backbon">
-      <div class="left-section">
-        <div class="content-wrapper">
-          <p class="subtitle">맞춤형 운동 추천 솔루션</p>
-          <h1 class="title cc-font" >B R I D G E - X</h1>
-          <p class="footer-text">Team Braings - 2025</p>
-        </div>
+  <div class="login-container">
+    <div class="left-section">
+      <div class="content-wrapper">
+        <p class="subtitle">맞춤형 운동 추천 솔루션</p>
+        <h1 class="title">B R I D G E - X</h1>
+        <p class="footer-text">Team Braings - 2025</p>
       </div>
-      <div class="right-section">
+    </div>
 
-        <div class="LogInToYourAccount cc-font">Log In To Your Account</div>
+    <div class="right-section">
+      <div class="login-header">Log In To Your Account</div>
 
-        <input
-          v-model="loginData.ID"
-          placeholder="ID"
-          class="ID-Box cc-font"
-          type="text"/>
+      <form class="form-area" @submit.prevent="handleLogin">
+        <FormField
+          v-model="formData.id"
+          type="text"
+          placeholder="USERNAME"
+          :error="errors.id"
+          @blur="validateField('id')"
+          @input="onIdInput"
+        />
 
-        <input
-          v-model="loginData.PW"
+        <FormField
+          v-model="passwordDisplay"
+          type="password"
           placeholder="PASSWORD"
-          class="PW-Box cc-font"
-          type="password"/>
+          :error="errors.password"
+          @blur="validateField('password')"
+          @input="onPasswordInput"
+        />
 
-        <button class="LogIn-Box cc-font" @click="Sign()" :disabled="loading">
+        <button type="submit" class="login-button" :disabled="loading">
           <span v-if="loading">LOGGING IN...</span>
           <span v-else>LOG IN</span>
         </button>
+      </form>
 
-        <div v-if="error" class="error-text cc-font" style="position:absolute; top:66vh; right:10vw; color: #e74c3c;">{{ error }}</div>
+      <div class="divider"></div>
 
-        <div class="under-bar"></div>
-
-        <div class="SignUp-Text cc-font cursorPointer" @click="goToPage('sign')" >New To Bridge-X? Sign up</div>
-
+      <div class="signup-prompt" @click="goToSignUp">
+        New To Bridge-X?&nbsp;&nbsp;<span class="signup-link">Sign up</span>
       </div>
-
     </div>
   </div>
 </template>
 
 <script setup>
 import { useRouter } from 'vue-router';
-import { reactive, ref } from 'vue';
-import { post } from '../api.js';
+import { reactive, ref, computed } from 'vue';
+import { post } from '@/api.js';
+import FormField from '@/components/FormField.vue';
+import { useFormValidation } from '@/composables/useFormValidation';
 
-// 라우터와 상태
+// ========================
+// Data & State
+// ========================
 const router = useRouter();
-const loginData = reactive({ ID: '', PW: '' });
-const loading = ref(false);
-const error = ref(null);
+const formData = reactive({
+  id: '',
+  password: ''
+});
 
-// 로그인 함수: 실제 API 호출을 수행합니다.
-// API 경로와 응답 형식은 백엔드에 맞게 변경하세요.
-const Sign = async () => {
-  error.value = null;
-  if (!loginData.ID || !loginData.PW) {
-    error.value = '아이디와 비밀번호를 입력하세요.';
+const loading = ref(false);
+
+// ========================
+// Validation Rules
+// ========================
+const VALIDATION_RULES = {
+  id: {
+    minLength: 4,
+    pattern: /^[a-zA-Z0-9_]*$/,
+    messages: {
+      empty: '아이디를 입력하세요.',
+      minLength: '아이디는 4자 이상이어야 합니다.',
+      pattern: '영문, 숫자, 언더스코어(_)만 사용 가능합니다.'
+    }
+  },
+  password: {
+    minLength: 8,
+    messages: {
+      empty: '비밀번호를 입력하세요.',
+      minLength: '비밀번호는 8자 이상이어야 합니다.'
+    }
+  }
+};
+
+// ========================
+// Form Validation
+// ========================
+const { errors, validateField, validateForm } = useFormValidation(VALIDATION_RULES);
+
+// ========================
+// Password Display Logic
+// ========================
+const passwordDisplay = computed({
+  get: () => '*'.repeat(formData.password.length),
+  set: (newVal) => {
+    const prevLength = formData.password.length;
+    const newLength = newVal.length;
+
+    if (newLength > prevLength) {
+      formData.password += newVal[newLength - 1];
+    } else if (newLength < prevLength) {
+      formData.password = formData.password.slice(0, newLength);
+    }
+  }
+});
+
+// ========================
+// Event Handlers
+// ========================
+const onIdInput = () => {
+  // 영문, 숫자, 언더스코어만 필터링
+  formData.id = formData.id.replace(/[^\x20-\x7E]/g, '');
+};
+
+const onPasswordInput = () => {
+  // 비밀번호에서 비ASCII 문자 제거
+  formData.password = formData.password.replace(/[^\x20-\x7E]/g, '');
+};
+
+const handleLogin = async () => {
+  if (!validateForm(formData)) {
+    console.log('❌ 폼 검증 실패');
     return;
   }
 
   loading.value = true;
+
   try {
-    // 예시: POST /auth/login { id, password }
-    const body = { id: loginData.ID, password: loginData.PW };
+    const body = { id: formData.id, password: formData.password };
     const res = await post('/auth/login', body);
 
-    // 백엔드 응답에 따라 다릅니다. 토큰을 반환하면 저장 후 이동.
     if (res && res.token) {
       localStorage.setItem('authToken', res.token);
       router.push({ name: 'homePage' });
       return;
     }
 
-    // 성공 플래그로 처리하는 경우
     if (res && (res.success || res.ok)) {
       router.push({ name: 'homePage' });
       return;
     }
 
-    // 기본: 에러 메시지 표시
-    error.value = res?.message || '로그인에 실패했습니다.';
+    errors.password = res?.message || '로그인에 실패했습니다.';
   } catch (err) {
-    console.error('로그인 에러', err);
-    error.value = err?.message || '서버 오류가 발생했습니다.';
+    console.error('로그인 에러:', err);
+    errors.password = err?.message || '서버 오류가 발생했습니다.';
   } finally {
     loading.value = false;
   }
 };
 
-// 페이지 이동
-const goToPage = (routeName) => router.push({ name: routeName });
+const goToSignUp = () => {
+  router.push({ name: 'sign.id' });
+};
 </script>
 
 <style lang="scss" scoped>
-  .cursorPointer {
-    cursor: pointer;
-  }
+@import '@/styles/_variables.scss';
 
-  .cc-font {
-    font-family: 'CC', sans-serif;
-  }
-
-  .backbon{
-    display: flex;
-    width: 100vw;
-    height: 100vh;
-    font-family: sans-serif; /* 기본 폰트 설정 */
-    overflow: hidden;
-    background-color: white;
-  }
-
-  // 왼쪽 섹션
-  .left-section {
-    width: 50vw;
-    background-color: #1a1a1a;
-    color: white;
-    position: relative;
-    background-image: url('../img/gym.png');
-    background-size: 100%;
-    background-position: center;
-    background-repeat: no-repeat;
-
-  }
-
-  .left-section .content-wrapper {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    padding: 0 3vw 3vh 3vw;
-  }
-
-  .left-section .subtitle {
-    font-size: 1.2vw;
-    margin-bottom: 0.5vh;
-  }
-
-  .left-section .title {
-    font-size: 2.5vw;
-    font-weight: bold;
-    margin: 0;
-    line-height: 5vh;
-  }
-
-  .left-section .footer-text {
-    font-size: 0.8vw;
-    margin-top: 5vh;
-  }
-
-  // 오른쪽 세션
-
-  .right-section{
-    height: 100vh;
-    width: 50vw;
-    background-color: white;
-    position: relative;
-
-  }
-  .ID-Box{
-    border-radius: 0;
-    position: absolute;
-    width: 30vw;
-    height: 10vh;
-
-    top: 34vh;
-    right: 10vw;
-
-    padding: 15px 10px;
-
-    border-radius: 0.5vw;
-    background-color: #f3f3f3;
-    box-shadow: 2px 2px 5px black;
-  }
-
-  .PW-Box{
-    border-radius: 0;
-    position: absolute;
-    width: 30vw;
-    height: 10vh;
-
-    top: 47vh;
-    right: 10vw;
-
-    padding: 15px 10px;
-
-    border-radius: 0.5vw;
-    background-color: #f3f3f3;
-    box-shadow: 2px 2px 5px black;
-  }
-
-  .LogIn-Box{
-    border-radius: 0;
-    position: absolute;
-    width: 30vw;
-    height: 5vh;
-
-    top: 60vh;
-    right: 10vw;
-
-    border-radius: 0.5vw;
-    background-color: #252525;
-    box-shadow: 2px 2px 5px black;
-
-    text-align: center;
-
-    font-size: 1.5vw;
-    color: black;
-    padding: 0.5vh 0.5vw;
-    transition: background-color 0.3s ease;
-  }
-
-  .SignUp-Text {
-  text-align: center;
-  position: absolute;
+.login-container {
   display: flex;
+  width: 100vw;
+  height: 100vh;
+  font-family: 'CC', sans-serif;
+  overflow: hidden;
+  background-color: map-get($colors, 'white');
+}
 
-  top: 67vh;
+// ========================
+// Left Section (Banner)
+// ========================
+.left-section {
+  width: 50vw;
+  background-color: map-get($colors, 'dark-gray');
+  color: map-get($colors, 'white');
+  position: relative;
+  background-image: url('@/img/gym.png');
+  background-size: 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+}
 
+.content-wrapper {
+  position: absolute;
+  bottom: 0;
   left: 0;
-  right: 0;
+  padding: 0 3vw 3vh 3vw;
+}
 
-  font-size: 1vw;
-  color: black;
-  font-weight: 100;
+.subtitle {
+  font-size: 1.2vw;
+  margin-bottom: 0.5vh;
+}
 
-  width: 10vw;
-  margin: 0 auto;
+.title {
+  font-size: 2.5vw;
+  font-weight: bold;
+  margin: 0;
+  line-height: 5vh;
+  letter-spacing: 2px;
+}
+
+.footer-text {
+  font-size: 0.8vw;
+  margin-top: 5vh;
+}
+
+// ========================
+// Right Section (Form)
+// ========================
+.right-section {
+  width: 50vw;
+  background-color: map-get($colors, 'white');
+  position: relative;
+  @include flex-center;
+  flex-direction: column;
+  padding: map-get($spacing, '3xl');
+}
+
+.login-header {
+  font-size: map-get($typography, 'title');
+  font-weight: bold;
+  margin-bottom: map-get($spacing, '3xl');
+  letter-spacing: 2px;
+}
+
+.form-area {
+  @include flex-column;
+  width: 100%;
+  max-width: 350px;
+  gap: map-get($spacing, 'xl');
+}
+
+.login-button {
+  @include button-base;
+  @include flex-center;
+  background-color: map-get($colors, 'black');
+  color: map-get($colors, 'white');
+  padding: map-get($spacing, 'lg') map-get($spacing, 'xl');
+  border-radius: map-get($radius, 'md');
+  font-size: map-get($typography, 'button');
+  margin-top: map-get($spacing, 'xl');
+  width: 100%;
+
+  &:hover:not(:disabled) {
+    background-color: map-get($colors, 'gray-hover');
   }
 
-
-
-  .LogInToYourAccount {
-    position: absolute;
-    top: 22vh;
-    left: 13vw;
-    font-size: 2vw;
-    color: black;
-    padding: 0.5vh 0.5vw;
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
+}
 
-  // .under-bar {
-  //   justify-content: bottom;
-  //   width: 30vw;
-  //   height: 2vh;
-  //   background-color: #252525;
-  //   position: absolute;
-  //   right: 10vw;
-  //   top: 90vh;
-  // }
+.divider {
+  width: 100%;
+  max-width: 350px;
+  height: 1px;
+  background-color: map-get($colors, 'border');
+  margin: map-get($spacing, '2xl') 0;
+}
 
+.signup-prompt {
+  font-size: map-get($typography, 'base');
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.signup-link {
+  color: map-get($colors, 'error');
+  font-weight: bold;
+}
 </style>

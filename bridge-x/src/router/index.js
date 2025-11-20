@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomePage from '../views/homePage.vue'
-import Sign from '../views/signUp.vue'
+import SignUpID from '../views/signUpID.vue'
+import SignUpPrivate from '../views/signUpPrivate.vue'
+import SignUpHealth from '../views/signUpHealth.vue'
 import Maps from '../views/maps.vue'
 import MyPage from '../views/myPage.vue'
 import Reviews from '../views/reviews.vue'
@@ -13,9 +15,19 @@ const routes = [
     component: HomePage
   },
   {
-    path: '/sign',
-    name: 'sign',
-    component: Sign
+    path: '/signup/ID',
+    name: 'sign.id',
+    component: SignUpID
+  },
+    {
+    path: '/signup/private',
+    name: 'sign.private',
+    component: SignUpPrivate
+  },
+    {
+    path: '/sign/health',
+    name: 'sign.health',
+    component: SignUpHealth
   },
   {
     path: '/maps',

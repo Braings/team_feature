@@ -24,5 +24,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+ $wGREEN-color: #4CAF50;
 
+  .map-container {
+    width: 100vw;
+    height: 100vh;
+    background-color: $wGREEN-color;
+  }
 </style>

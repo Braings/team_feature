@@ -1,0 +1,118 @@
+// ========================
+// Global Variables
+// ========================
+
+// Colors
+$colors: (
+  'dark': #121212,
+  'white': #fff,
+  'border': #ccc,
+  'border-light': #ddd,
+  'text-placeholder': #888,
+  'error': #e74c3c,
+  'black': #000,
+  'gray-hover': #333,
+  'dark-gray': #1a1a1a
+);
+
+// Spacing
+$spacing: (
+  'xs': 5px,
+  'sm': 8px,
+  'md': 10px,
+  'lg': 15px,
+  'xl': 20px,
+  '2xl': 40px,
+  '3xl': 50px
+);
+
+// Radius
+$radius: (
+  'sm': 4px,
+  'md': 5px,
+  'lg': 6px,
+  'xl': 20px
+);
+
+// Typography
+$typography: (
+  'sm': 0.9rem,
+  'base': 1rem,
+  'lg': 1.1rem,
+  'title': 3rem,
+  'button': 1.5rem
+);
+
+// Sizes
+$sizes: (
+  'button-width': 120px,
+  'button-height': 60px,
+  'card-width': 400px,
+  'date-input-width': 220px
+);
+
+// Shadows
+$shadows: (
+  'card': 0 4px 15px rgba(0, 0, 0, 0.2),
+  'popover': 0 6px 18px rgba(0, 0, 0, 0.12)
+);
+
+// ========================
+// Global Mixins
+// ========================
+
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+@mixin input-base {
+  width: 100%;
+  padding: map-get($spacing, 'lg') map-get($spacing, 'md');
+  margin-bottom: map-get($spacing, 'xl');
+  border: 1px solid map-get($colors, 'border');
+  border-radius: map-get($radius, 'md');
+  box-sizing: border-box;
+  font-size: map-get($typography, 'base');
+
+  &::placeholder {
+    color: map-get($colors, 'text-placeholder');
+  }
+}
+
+@mixin card {
+  background-color: map-get($colors, 'white');
+  border-radius: map-get($radius, 'xl');
+  box-shadow: map-get($shadows, 'card');
+}
+
+@mixin button-base {
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+@mixin error-text {
+  color: map-get($colors, 'error');
+  padding: map-get($spacing, 'xs') map-get($spacing, 'xs');
+  font-size: map-get($typography, 'sm');
+  margin-top: 5px;
+}
