@@ -31,6 +31,9 @@ public class UserService {
         if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
         	throw new IllegalArgumentException("이미 등록된 이메일입니다.");
         }
+        if (!dto.getPassword().equals(dto.getPasswordCheck())) {
+        	throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
         // create User
         SiteUser user = new SiteUser();
         user.setUsername(dto.getUsername());

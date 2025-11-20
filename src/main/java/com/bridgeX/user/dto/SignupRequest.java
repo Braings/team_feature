@@ -18,6 +18,10 @@ public class SignupRequest {
 	@Size(min = 4, max = 25, message = "비밀번호는 4 ~ 25자 내에서만 가능합니다.")
 	private String password;
 	
+	@NotEmpty(message = "비밀번호 확인은 필수입니다.")
+	@Size(min = 4, max = 25, message = "비밀번호는 4 ~ 25자 내에서만 가능합니다.")
+	private String passwordCheck;
+	
 	@NotEmpty(message = "이메일은 공백으로 둘 수 없습니다.")
 	@Email(message = "잘못된 이메일 형식입니다.")
 	private String email;

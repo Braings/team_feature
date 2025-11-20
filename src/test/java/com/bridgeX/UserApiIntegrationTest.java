@@ -1,11 +1,12 @@
 package com.bridgeX;
 
-//import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-// Only Use Json Return
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+//import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status; 
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,27 +22,29 @@ public class UserApiIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
     
-    // Test05: Bad request: login
+    // Test06: Signup - incorrect password Check
     
     @Test
-    void Username_Duplication() throws Exception {
-    	String loginJson = """
+    void PasswordCheck() throws Exception {
+    	String SignupJson = """
     	        {
-    	          "username": "PotatoLuver",
-    	          "password": "1239"
+    	          "username": "NANANANA",
+    	          "email": "LALALALA@lala.com",
+    	          "password": "12345",
+    	          "passwordCheck": "12345677"
     	        }
     	        """;
 
-    	    mockMvc.perform(
-    	            post("/api/login")
-    	                    .contentType(MediaType.APPLICATION_JSON)
-    	                    .content(loginJson)
-    	    )
-    	    .andExpect(status().isBadRequest())
-    	    .andExpect(jsonPath("$.success").value(false))
-            .andExpect(jsonPath("$.message").value("존재하지 않는 아이디입니다."));
+    	mockMvc.perform(
+	            post("/api/sign")
+	                    .contentType(MediaType.APPLICATION_JSON)
+	                    .content(SignupJson)
+	    )
+	    .andExpect(status().isBadRequest())
+	    .andExpect(content().string("비밀번호가 일치하지 않습니다."));
     }
-
+	
+    
     /*
     // Test01: User Register and Login test
     @Test
@@ -125,7 +128,7 @@ public class UserApiIntegrationTest {
     // Test03: Wrong format Signup test
     
     @Test
-    void Username_Duplication() throws Exception {
+    void Wrong_format_signup() throws Exception {
     	String signupJson = """
     	        {
     	          "username": "apple",
@@ -148,7 +151,7 @@ public class UserApiIntegrationTest {
     // Test04: Empty format Login test
     
     @Test
-    void Username_Duplication() throws Exception {
+    void Empty_format_signup() throws Exception {
     	String loginJson = """
     	        {
     	          "username": "TestUser",
@@ -163,6 +166,29 @@ public class UserApiIntegrationTest {
     	    )
     	    .andExpect(status().isBadRequest())
     	    .andExpect(content().string("비밀번호는 공백으로 둘 수 없습니다."));
+    }
+	*/
+    
+    /*
+    // Test05: Bad request: login
+    
+    @Test
+    void Bad_login_request() throws Exception {
+    	String loginJson = """
+    	        {
+    	          "username": "PotatoLuver",
+    	          "password": "1239"
+    	        }
+    	        """;
+
+    	    mockMvc.perform(
+    	            post("/api/login")
+    	                    .contentType(MediaType.APPLICATION_JSON)
+    	                    .content(loginJson)
+    	    )
+    	    .andExpect(status().isBadRequest())
+    	    .andExpect(jsonPath("$.success").value(false))
+            .andExpect(jsonPath("$.message").value("존재하지 않는 아이디입니다."));
     }
 	*/
 }
