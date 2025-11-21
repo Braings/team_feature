@@ -1,332 +1,212 @@
 <template>
-  <div class="map-page">
-    <div class="map-container">
-      <h1 class="map-title">지역 선택</h1>
-
-      <div class="map-wrapper">
-        <img src="@/img/maps/korea.jpg" alt="Korea Map" class="korea-map" />
-
-        <!-- SVG 오버레이: 각 지역을 클릭 가능하게 함 -->
-        <svg class="map-overlay" viewBox="0 0 1000 1000">
-          <!-- 서울 (대략 좌표) -->
-          <rect x="480" y="200" width="80" height="80" class="region" data-region="seoul" @click="openDropdown('seoul')" />
-
-          <!-- 경기도 -->
-          <polygon points="400,150 560,150 600,250 400,280" class="region" data-region="gyeonggi" @click="openDropdown('gyeonggi')" />
-
-          <!-- 인천 -->
-          <circle cx="350" cy="220" r="50" class="region" data-region="incheon" @click="openDropdown('incheon')" />
-
-          <!-- 강원도 -->
-          <polygon points="560,150 700,200 720,400 550,380" class="region" data-region="gangwon" @click="openDropdown('gangwon')" />
-
-          <!-- 충청북도 -->
-          <polygon points="480,320 600,300 620,420 480,440" class="region" data-region="chungbuk" @click="openDropdown('chungbuk')" />
-
-          <!-- 충청남도 -->
-          <polygon points="380,350 480,340 500,500 350,520" class="region" data-region="chungnam" @click="openDropdown('chungnam')" />
-
-          <!-- 대전 -->
-          <circle cx="420" cy="380" r="40" class="region" data-region="daejeon" @click="openDropdown('daejeon')" />
-
-          <!-- 전라북도 -->
-          <polygon points="280,480 420,440 450,620 280,640" class="region" data-region="jeonbuk" @click="openDropdown('jeonbuk')" />
-
-          <!-- 전라남도 -->
-          <polygon points="200,600 420,580 450,800 150,820" class="region" data-region="jeonnam" @click="openDropdown('jeonnam')" />
-
-          <!-- 광주 -->
-          <circle cx="300" cy="680" r="40" class="region" data-region="gwangju" @click="openDropdown('gwangju')" />
-
-          <!-- 경상북도 -->
-          <polygon points="620,380 750,350 800,600 620,640" class="region" data-region="gyeongbuk" @click="openDropdown('gyeongbuk')" />
-
-          <!-- 대구 -->
-          <circle cx="700" cy="520" r="45" class="region" data-region="daegu" @click="openDropdown('daegu')" />
-
-          <!-- 경상남도 -->
-          <polygon points="620,620 800,580 850,800 600,820" class="region" data-region="gyeongnam" @click="openDropdown('gyeongnam')" />
-
-          <!-- 부산 -->
-          <circle cx="800" cy="750" r="50" class="region" data-region="busan" @click="openDropdown('busan')" />
-
-          <!-- 울산 -->
-          <circle cx="780" cy="650" r="35" class="region" data-region="ulsan" @click="openDropdown('ulsan')" />
-
-          <!-- 제주도 -->
-          <ellipse cx="450" cy="900" rx="70" ry="60" class="region" data-region="jeju" @click="openDropdown('jeju')" />
-        </svg>
-      </div>
+  <div class="map-wrapper">
+    <div id="map-container" style="width: 100%; position: relative;">
+      <strong>지도</strong>
+      <!-- SVG 지도 -->
+      <div class="svg-wrapper" v-html="svgContent" @click="handleMapClick"></div>
 
       <!-- 드롭다운 메뉴 -->
-      <div v-if="selectedRegion" class="dropdown-menu" :style="dropdownPosition">
-        <div class="dropdown-header">
-          <h3>{{ regionNames[selectedRegion] }}</h3>
-          <button class="close-btn" @click="closeDropdown">✕</button>
-        </div>
-        <ul class="dropdown-list">
-          <li v-for="city in regionCities[selectedRegion]" :key="city" @click="selectCity(city)">
+      <div v-if="showDropdown" class="dropdown-menu" :style="dropdownStyle">
+        <button @click="closeDropdown" class="close-btn">×</button>
+        <h3>{{ selectedRegion }}</h3>
+        <div class="city-list">
+          <button
+            v-for="city in regionCities[selectedRegion]"
+            :key="city"
+            @click="selectCity(city)"
+            class="city-item"
+          >
             {{ city }}
-          </li>
-        </ul>
-      </div>
-
-      <!-- 선택된 지역 표시 -->
-      <div v-if="selectedCity" class="selected-info">
-        <p>선택된 지역: <strong>{{ selectedCity }}</strong></p>
-        <button @click="resetSelection">초기화</button>
+          </button>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, reactive, onMounted, computed } from 'vue'
+import svgContent from '@/img/maps/korea_map.svg?raw'
 
-// ========================
-// State
-// ========================
-const selectedRegion = ref(null);
-const selectedCity = ref(null);
-const dropdownPosition = ref({ top: '0px', left: '0px' });
+// 상태 관리
+const showDropdown = ref(false)
+const selectedRegion = ref('')
+const selectedCity = ref('')
+const dropdownPosition = reactive({ top: '0px', left: '0px' })
 
-// ========================
-// Region Data
-// ========================
-const regionNames = {
-  seoul: '서울',
-  gyeonggi: '경기도',
-  incheon: '인천',
-  gangwon: '강원도',
-  chungbuk: '충청북도',
-  chungnam: '충청남도',
-  daejeon: '대전',
-  jeonbuk: '전라북도',
-  jeonnam: '전라남도',
-  gwangju: '광주',
-  gyeongbuk: '경상북도',
-  daegu: '대구',
-  gyeongnam: '경상남도',
-  busan: '부산',
-  ulsan: '울산',
-  jeju: '제주도'
-};
+// 드롭다운 스타일 계산
+const dropdownStyle = computed(() => ({
+  top: dropdownPosition.top,
+  left: dropdownPosition.left
+}))
 
-const regionCities = {
-  seoul: ['강남구', '강동구', '강북구', '강서구', '관악구', '광진구', '구로구', '금천구', '노원구', '도봉구', '동대문구', '동작구', '서대문구', '서초구', '성동구', '성북구', '송파구', '양천구', '영등포구', '용산구', '중구', '중랑구'],
-  gyeonggi: ['수원', '성남', '안양', '안산', '용인', '버스', '의정부', '하남', '오산', '파주', '이천', '안성', '김포', '화성', '광주', '포천', '여주', '연천', '가평', '양평'],
-  incheon: ['중구', '동구', '미추홀구', '연수구', '남동구', '부평구', '계양구', '서구'],
-  gangwon: ['춘천', '원주', '강릉', '동해', '태백', '속초', '삼척', '홍천', '횡성', '영월', '평창', '정선', '인제', '고성', '양양'],
-  chungbuk: ['청주', '충주', '제천', '보은', '옥천', '영동', '증평', '진천', '괴산', '음성', '단양'],
-  chungnam: ['천안', '공주', '보령', '아산', '서산', '논산', '계룡', '당진', '금산', '예산', '홍성', '부여', '청양'],
-  daejeon: ['동구', '중구', '서구', '유성구', '대덕구'],
-  jeonbuk: ['전주', '군산', '익산', '정읍', '남원', '김제', '완주', '진안', '무주', '장수', '임실', '순창', '고창', '부안'],
-  jeonnam: ['목포', '여수', '순천', '나주', '광양', '담양', '곡성', '구례', '고흥', '보성', '화순', '장흥', '강진', '해남', '영암', '무안', '함평', '영광', '장성', '완도', '진도', '신안'],
-  gwangju: ['동구', '서구', '남구', '북구', '광산구'],
-  gyeongbuk: ['포항', '경주', '김천', '안동', '구미', '영천', '상주', '문경', '경산', '군위', '의성', '청송', '영양', '영덕', '청도', '고령', '성주', '칠곡'],
-  daegu: ['중구', '동구', '서구', '남구', '북구', '수성구', '달서구'],
-  gyeongnam: ['창원', '진주', '통영', '사천', '김해', '밀양', '거제', '남해', '하동', '산청', '함양', '거창', '합천'],
-  busan: ['중구', '서구', '동구', '영도구', '부산진구', '동래구', '남구', '북구', '강서구', '연제구', '수영구', '사하구', '금정구', '장안구'],
-  ulsan: ['중구', '남구', '북구', '동구'],
-  jeju: ['제주시', '서귀포시']
-};
+// 지역별 도시/구 데이터
+const regionCities = reactive({
+  '서울': ['강남구', '강동구', '강서구', '관악구', '광진구', '구로구', '금천구', '노원구', '도봉구', '동대문구', '동작구', '마포구', '서대문구', '서초구', '성동구', '성북구', '송파구', '양천구', '영등포구', '용산구', '은평구', '종로구', '중구', '중랑구'],
+  '경기': ['수원시', '성남시', '안양시', '안산시', '용인시', '평택시', '화성시', '남양주시', '오산시', '시흥시', '군포시', '의왕시', '하남시', '이천시', '광명시', '광주시', '여주시', '양평군', '포천시', '연천군', '가평군', '김포시', '파주시', '이평도시'],
+  '인천': ['중구', '동구', '남구', '연수구', '남동구', '부평구', '계양구', '서구', '강화군', '옹진군'],
+  '강원': ['춘천시', '원주시', '강릉시', '동해시', '태백시', '속초시', '삼척시', '홍천군', '횡성군', '영월군', '평창군', '정선군', '철원군', '화천군', '양구군', '인제군', '고성군', '양양군'],
+  '충북': ['청주시', '충주시', '제천시', '보은군', '옥천군', '영동군', '증평군', '진천군', '괴산군'],
+  '충남': ['천안시', '공주시', '보령시', '아산시', '서산시', '논산시', '계룡시', '당진시', '금산군', '부여군', '서천군', '청양군', '홍성군', '예산군', '태안군'],
+  '전북': ['전주시', '군산시', '익산시', '정읍시', '남원시', '김제시', '완주군', '진안군', '무주군', '장수군', '임실군', '순창군', '고창군', '부안군'],
+  '전남': ['목포시', '여수시', '순천시', '나주시', '광양시', '담양군', '곡성군', '구례군', '고흥군', '보성군', '화순군', '장흥군', '강진군', '해남군', '영암군', '무안군', '함평군', '영광군', '장성군', '완도군', '진도군', '신안군'],
+  '경북': ['포항시', '경주시', '김천시', '안동시', '구미시', '영주시', '영천시', '상주시', '문경시', '칠곡군', '군위군', '의성군', '청송군', '영양군', '영덕군', '청도군', '고령군', '성주군', '달성군', '남구'],
+  '경남': ['창원시', '진주시', '통영시', '사천시', '김해시', '밀양시', '거제시', '양산시', '의령군', '함안군', '창녕군', '고성군', '남해군', '하동군', '산청군', '거창군', '합천군'],
+  '부산': ['중구', '서구', '동구', '영도구', '부산진구', '동래구', '남구', '북구', '강서구', '금정구', '연제구', '수영구', '사상구', '기장군'],
+  '울산': ['중구', '남구', '동구', '북구', '울주군'],
+  '광주': ['동구', '서구', '남구', '북구', '광산구'],
+  '대전': ['동구', '중구', '서구', '유성구', '대덕구'],
+  '대구': ['중구', '동구', '서구', '남구', '북구', '수성구', '달서구', '달성군'],
+  '세종': ['세종시'],
+  '제주': ['제주시', '서귀포시']
+})
 
-// ========================
-// Methods
-// ========================
-const openDropdown = (region) => {
-  selectedRegion.value = region;
-  // 클릭 위치 근처에 드롭다운 표시
-  dropdownPosition.value = {
-    top: `${Math.random() * 300 + 200}px`,
-    left: `${Math.random() * 400 + 100}px`
-  };
-};
-
+// 드롭다운 닫기
 const closeDropdown = () => {
-  selectedRegion.value = null;
-};
+  showDropdown.value = false
+}
 
+// 도시 선택
 const selectCity = (city) => {
-  selectedCity.value = city;
-  closeDropdown();
-};
+  selectedCity.value = city
+  // 주석: 여기서 선택된 지역과 도시 정보를 활용하여 다음 단계로 진행하거나
+  // 부모 컴포넌트로 데이터를 전달할 수 있습니다.
+  // 예: emit('region-selected', { region: selectedRegion.value, city: selectedCity.value })
+  closeDropdown()
+}
 
-const resetSelection = () => {
-  selectedCity.value = null;
-  selectedRegion.value = null;
-};
+// SVG 지도 클릭 이벤트 처리
+const handleMapClick = (event) => {
+  const target = event.target
+  const regionGroup = target.closest('[data-name]')
+
+  if (regionGroup) {
+    const region = regionGroup.getAttribute('data-name')
+    // SVG 컨테이너의 위치 기준으로 드롭다운 위치 계산
+    const svgContainer = document.querySelector('.svg-wrapper')
+    const containerRect = svgContainer.getBoundingClientRect()
+
+    // 마우스 위치 (클릭 위치 기준)
+    const mouseX = event.clientX - containerRect.left
+    const mouseY = event.clientY - containerRect.top
+
+    // 드롭다운 위치를 마우스 바로 옆에 고정 (오른쪽 10px, 위쪽과 같은 높이)
+    dropdownPosition.top = mouseY + 'px'
+    dropdownPosition.left = (mouseX + 10) + 'px'
+
+    selectedRegion.value = region
+    selectedCity.value = ''
+    showDropdown.value = true
+  }
+}
+
+// SVG 지도 초기화 (마운트 시 실행)
+const initializeMap = () => {
+  // 주석: SVG가 렌더링된 후 스타일 적용
+  const svgElement = document.querySelector('.svg-wrapper svg')
+  if (svgElement) {
+    svgElement.style.width = '100%'
+    svgElement.style.maxWidth = '800px'
+    svgElement.style.cursor = 'pointer'
+  }
+}
+
+// 컴포넌트 마운트 시 지도 초기화
+onMounted(() => {
+  initializeMap()
+})
 </script>
 
 <style lang="scss" scoped>
-// ========================
-// Variables
-// ========================
-$primary-color: #4CAF50;
-$bg-light: #f5f5f5;
-$border-color: #ddd;
-$text-color: #333;
-$hover-color: #45a049;
-
-// ========================
-// Styles
-// ========================
-.map-page {
-  width: 100vw;
-  min-height: 100vh;
-  background-color: $bg-light;
-  padding: 20px;
-  box-sizing: border-box;
-}
-
-.map-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  background-color: white;
-  padding: 30px;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.map-title {
-  text-align: center;
-  font-size: 2rem;
-  margin-bottom: 30px;
-  color: $text-color;
-}
-
 .map-wrapper {
+  width: 100%;
+  padding: 20px;
+}
+
+.svg-wrapper {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
   position: relative;
-  width: 100%;
-  max-width: 800px;
-  margin: 0 auto 30px;
-  background-color: #f9f9f9;
-  border: 2px solid $border-color;
-  border-radius: 8px;
-  overflow: hidden;
-}
 
-.korea-map {
-  width: 100%;
-  height: auto;
-  display: block;
-}
+  :deep(svg) {
+    width: 100%;
+    height: auto;
+    cursor: pointer;
+    display: block;
 
-.map-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  cursor: pointer;
+    g[data-name] {
+      transition: opacity 0.2s ease;
 
-  .region {
-    fill: transparent;
-    stroke: transparent;
-    transition: all 0.2s ease;
+      &:hover {
+        opacity: 0.7;
+      }
+    }
 
-    &:hover {
-      fill: rgba(76, 175, 80, 0.2);
-      stroke: $primary-color;
-      stroke-width: 2;
+    path, polygon {
+      transition: fill 0.2s ease;
     }
   }
 }
 
 .dropdown-menu {
-  position: fixed;
-  background-color: white;
-  border: 2px solid $primary-color;
+  position: absolute;
+  background: white;
+  border: 1px solid #ddd;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 100;
-  min-width: 250px;
+  padding: 16px;
+  min-width: 200px;
   max-height: 400px;
   overflow-y: auto;
-}
-
-.dropdown-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px;
-  background-color: $primary-color;
-  color: white;
-  border-bottom: 1px solid $border-color;
+  z-index: 1000;
 
   h3 {
-    margin: 0;
-    font-size: 1.2rem;
+    margin: 0 0 12px 0;
+    font-size: 16px;
+    color: #333;
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #999;
+
+    &:hover {
+      color: #333;
+    }
   }
 }
 
-.close-btn {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 1.5rem;
+.city-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.city-item {
+  padding: 8px 12px;
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
   cursor: pointer;
-  padding: 0;
-  line-height: 1;
+  font-size: 14px;
+  color: #333;
+  transition: all 0.2s ease;
 
   &:hover {
-    opacity: 0.8;
-  }
-}
-
-.dropdown-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-
-  li {
-    padding: 12px 15px;
-    border-bottom: 1px solid $border-color;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-
-    &:hover {
-      background-color: rgba(76, 175, 80, 0.1);
-    }
-
-    &:last-child {
-      border-bottom: none;
-    }
-  }
-}
-
-.selected-info {
-  text-align: center;
-  padding: 20px;
-  background-color: rgba(76, 175, 80, 0.1);
-  border: 2px solid $primary-color;
-  border-radius: 8px;
-  margin-top: 20px;
-
-  p {
-    margin: 0 0 15px 0;
-    font-size: 1.1rem;
-    color: $text-color;
-
-    strong {
-      color: $primary-color;
-      font-weight: bold;
-    }
-  }
-
-  button {
-    padding: 10px 20px;
-    background-color: $primary-color;
+    background: #4CAF50;
     color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background-color 0.2s ease;
+    border-color: #4CAF50;
+  }
 
-    &:hover {
-      background-color: $hover-color;
-    }
+  &:active {
+    transform: scale(0.98);
   }
 }
 </style>
