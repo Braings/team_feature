@@ -4,6 +4,8 @@
       <h1 class="title">BRIDGE-X</h1>
 
       <form class="input-area" @submit.prevent="handleNext">
+        <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
+
         <FormField
           v-model="formData.height"
           type="number"
@@ -35,17 +37,21 @@
           <div v-if="errors.experienceLevel" class="error-text">{{ errors.experienceLevel }}</div>
         </div>
 
-        <button type="submit" class="next-button">COMPLETE</button>
+        <button type="submit" class="next-button" :disabled="isLoading">
+          {{ isLoading ? 'LOADING...' : 'COMPLETE' }}
+        </button>
       </form>
     </div>
   </div>
 </template>
 
 <script setup>
-import { reactive } from 'vue';
+import { reactive, ref } from 'vue';
 import router from '@/router';
 import FormField from '@/components/FormField.vue';
 import { useFormValidation } from '@/composables/useFormValidation';
+import { signupFormData } from '@/stores/signupStore';
+import { post } from '@/api';
 
 // ========================
 // Data
@@ -55,6 +61,9 @@ const formData = reactive({
   weight: '',
   experienceLevel: ''
 });
+
+const isLoading = ref(false);
+const errorMessage = ref('');
 
 // ========================
 // Validation Rules
@@ -112,9 +121,39 @@ const handleNext = async () => {
   console.log('✓ 폼 검증 성공');
   console.log('Health Info:', formData);
 
-  // TODO: API 호출 및 에러 처리
-  // 회원가입 완료 후 홈페이지로 이동
-  router.push({ name: 'homePage' });
+  // 전역 store에 건강정보 데이터 저장
+  signupFormData.height = formData.height;
+  signupFormData.weight = formData.weight;
+  signupFormData.experienceLevel = formData.experienceLevel;
+
+  // 모든 회원가입 정보 수집
+  const signupData = {
+    id: signupFormData.id,
+    password: signupFormData.password,
+    email: signupFormData.email,
+    birthday: signupFormData.birthday,
+    height: signupFormData.height,
+    weight: signupFormData.weight,
+    experienceLevel: signupFormData.experienceLevel
+  };
+
+  try {
+    isLoading.value = true;
+    errorMessage.value = '';
+
+    // API로 회원가입 정보 전송
+    const response = await post('/api/sign', signupData);
+    console.log('✓ 회원가입 성공:', response);
+
+    // 회원가입 완료 후 홈페이지로 이동
+    signupFormData.reset(); // 폼 데이터 초기화
+    router.push({ name: 'homePage' });
+  } catch (error) {
+    console.error('❌ 회원가입 실패:', error);
+    errorMessage.value = error.message || '회원가입 중 오류가 발생했습니다.';
+  } finally {
+    isLoading.value = false;
+  }
 };
 </script>
 
@@ -180,6 +219,18 @@ const handleNext = async () => {
   @include error-text;
 }
 
+.error-message {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: map-get($spacing, 'xl');
+  background-color: #ffebee;
+  border-left: 4px solid #e74c3c;
+  border-radius: 4px;
+  color: #c0392b;
+  font-size: 14px;
+  font-weight: 500;
+}
+
 .next-button {
   @include button-base;
   @include flex-center;
@@ -192,9 +243,16 @@ const handleNext = async () => {
   align-self: flex-end;
   width: map-get($sizes, 'button-width');
   height: map-get($sizes, 'button-height');
+  transition: all 0.2s ease;
 
-  &:hover {
+  &:hover:not(:disabled) {
     background-color: map-get($colors, 'gray-hover');
+  }
+
+  &:disabled {
+    background-color: #999;
+    cursor: not-allowed;
+    opacity: 0.7;
   }
 }
 </style>

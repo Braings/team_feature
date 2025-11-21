@@ -47,6 +47,7 @@ import { reactive, ref } from 'vue';
 import router from '@/router';
 import FormField from '@/components/FormField.vue';
 import { useFormValidation } from '@/composables/useFormValidation';
+import { signupFormData } from '@/stores/signupStore';
 
 // ========================
 // Data
@@ -182,7 +183,11 @@ const handleNext = async () => {
   console.log('Email:', formData.email);
   console.log('Birthday:', formData.birthday);
 
-  // TODO: API 호출 및 에러 처리
+  // 전역 store에 데이터 저장
+  signupFormData.email = formData.email;
+  signupFormData.birthday = formData.birthday;
+
+  // 다음 단계로 이동
   router.push({ name: 'sign.Health' });
 };
 </script>

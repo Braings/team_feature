@@ -1,23 +1,51 @@
 <template>
   <div class="map-wrapper">
-    <div id="map-container" style="width: 100%; position: relative;">
-      <strong>지도</strong>
-      <!-- SVG 지도 -->
-      <div class="svg-wrapper" v-html="svgContent" @click="handleMapClick"></div>
+    <div class="container">
+      <!-- 왼쪽 섹션: 지도 -->
+      <div class="map-section">
+        <h2>지도</h2>
+        <div class="map-container" style="position: relative;">
+          <!-- SVG 지도 -->
+          <div class="svg-wrapper" v-html="svgContent" @click="handleMapClick"></div>
 
-      <!-- 드롭다운 메뉴 -->
-      <div v-if="showDropdown" class="dropdown-menu" :style="dropdownStyle">
-        <button @click="closeDropdown" class="close-btn">×</button>
-        <h3>{{ selectedRegion }}</h3>
-        <div class="city-list">
-          <button
-            v-for="city in regionCities[selectedRegion]"
-            :key="city"
-            @click="selectCity(city)"
-            class="city-item"
-          >
-            {{ city }}
-          </button>
+          <!-- 드롭다운 메뉴 -->
+          <div v-if="showDropdown" class="dropdown-menu" :style="dropdownStyle">
+            <button @click="closeDropdown" class="close-btn">×</button>
+            <h3>{{ selectedRegion }}</h3>
+            <div class="city-list">
+              <button
+                v-for="city in regionCities[selectedRegion]"
+                :key="city"
+                @click="selectCity(city)"
+                class="city-item"
+              >
+                {{ city }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 오른쪽 섹션: 선택된 정보 -->
+      <div class="info-section">
+        <h2>선택된 지역</h2>
+        <div class="info-content">
+          <div v-if="selectedCity" class="selected-info">
+            <div class="info-item">
+              <span class="label">지역:</span>
+              <span class="value">{{ selectedRegion }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">시군구:</span>
+              <span class="value">{{ selectedCity }}</span>
+            </div>
+            <div class="info-display">
+              <p>{{ selectedRegion }} {{ selectedCity }} 정보가 여기에 표시됩니다.</p>
+            </div>
+          </div>
+          <div v-else class="empty-state">
+            <p>지도에서 지역을 선택하세요</p>
+          </div>
         </div>
       </div>
     </div>
@@ -69,9 +97,7 @@ const closeDropdown = () => {
 // 도시 선택
 const selectCity = (city) => {
   selectedCity.value = city
-  // 주석: 여기서 선택된 지역과 도시 정보를 활용하여 다음 단계로 진행하거나
-  // 부모 컴포넌트로 데이터를 전달할 수 있습니다.
-  // 예: emit('region-selected', { region: selectedRegion.value, city: selectedCity.value })
+  // 드롭다운 닫기
   closeDropdown()
 }
 
@@ -83,16 +109,32 @@ const handleMapClick = (event) => {
   if (regionGroup) {
     const region = regionGroup.getAttribute('data-name')
     // SVG 컨테이너의 위치 기준으로 드롭다운 위치 계산
-    const svgContainer = document.querySelector('.svg-wrapper')
-    const containerRect = svgContainer.getBoundingClientRect()
+    const mapContainer = document.querySelector('.map-container')
+    const containerRect = mapContainer.getBoundingClientRect()
 
     // 마우스 위치 (클릭 위치 기준)
-    const mouseX = event.clientX - containerRect.left
-    const mouseY = event.clientY - containerRect.top
+    let mouseX = event.clientX - containerRect.left
+    let mouseY = event.clientY - containerRect.top
 
-    // 드롭다운 위치를 마우스 바로 옆에 고정 (오른쪽 10px, 위쪽과 같은 높이)
-    dropdownPosition.top = mouseY + 'px'
-    dropdownPosition.left = (mouseX + 10) + 'px'
+    // 드롭다운 크기 (대략적인 크기로 초기 계산)
+    const dropdownWidth = 200
+    const dropdownHeight = 300
+
+    // 오른쪽 여백 체크: 드롭다운이 컨테이너를 벗어나면 왼쪽에 배치
+    if (mouseX + dropdownWidth + 10 > containerRect.width) {
+      mouseX = Math.max(10, mouseX - dropdownWidth - 10)
+    } else {
+      mouseX = mouseX + 10
+    }
+
+    // 아래쪽 여백 체크: 드롭다운이 컨테이너를 벗어나면 위쪽에 배치
+    if (mouseY + dropdownHeight > containerRect.height) {
+      mouseY = Math.max(10, mouseY - dropdownHeight - 10)
+    }
+
+    // 드롭다운 위치 설정
+    dropdownPosition.top = Math.max(0, mouseY) + 'px'
+    dropdownPosition.left = Math.max(0, mouseX) + 'px'
 
     selectedRegion.value = region
     selectedCity.value = ''
@@ -123,15 +165,41 @@ onMounted(() => {
   padding: 20px;
 }
 
+.container {
+  display: flex;
+  gap: 30px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.map-section {
+  flex: 1;
+  min-width: 0;
+
+  h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 20px;
+    color: #333;
+  }
+}
+
+.map-container {
+  width: 100%;
+  aspect-ratio: 1;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
 .svg-wrapper {
   width: 100%;
-  max-width: 900px;
-  margin: 0 auto;
+  height: 100%;
   position: relative;
 
   :deep(svg) {
     width: 100%;
-    height: auto;
+    height: 100%;
     cursor: pointer;
     display: block;
 
@@ -156,10 +224,12 @@ onMounted(() => {
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   padding: 16px;
-  min-width: 200px;
-  max-height: 400px;
+  min-width: 180px;
+  max-width: 280px;
+  max-height: 350px;
   overflow-y: auto;
   z-index: 1000;
+  pointer-events: auto;
 
   h3 {
     margin: 0 0 12px 0;
@@ -207,6 +277,80 @@ onMounted(() => {
 
   &:active {
     transform: scale(0.98);
+  }
+}
+
+.info-section {
+  flex: 1;
+  min-width: 0;
+
+  h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 20px;
+    color: #333;
+  }
+}
+
+.info-content {
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.selected-info {
+  width: 100%;
+}
+
+.info-item {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 12px;
+  background: white;
+  border-radius: 6px;
+  border-left: 4px solid #4CAF50;
+
+  .label {
+    font-weight: 600;
+    color: #555;
+    min-width: 70px;
+  }
+
+  .value {
+    color: #333;
+    flex: 1;
+  }
+}
+
+.info-display {
+  margin-top: 20px;
+  padding: 16px;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+  text-align: center;
+
+  p {
+    margin: 0;
+    color: #666;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+}
+
+.empty-state {
+  text-align: center;
+  color: #999;
+
+  p {
+    margin: 0;
+    font-size: 16px;
   }
 }
 </style>
