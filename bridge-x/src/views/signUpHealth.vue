@@ -50,8 +50,7 @@ import { reactive, ref } from 'vue';
 import router from '@/router';
 import FormField from '@/components/FormField.vue';
 import { useFormValidation } from '@/composables/useFormValidation';
-import { signupFormData } from '@/stores/signupStore';
-import { post } from '@/api';
+import { signupFormData, submitSignup } from '@/stores/signupStore';
 
 // ========================
 // Data
@@ -126,23 +125,12 @@ const handleNext = async () => {
   signupFormData.weight = formData.weight;
   signupFormData.experienceLevel = formData.experienceLevel;
 
-  // 모든 회원가입 정보 수집
-  const signupData = {
-    id: signupFormData.id,
-    password: signupFormData.password,
-    email: signupFormData.email,
-    birthday: signupFormData.birthday,
-    height: signupFormData.height,
-    weight: signupFormData.weight,
-    experienceLevel: signupFormData.experienceLevel
-  };
-
   try {
     isLoading.value = true;
     errorMessage.value = '';
 
     // API로 회원가입 정보 전송
-    const response = await post('/api/sign', signupData);
+    const response = await submitSignup();
     console.log('✓ 회원가입 성공:', response);
 
     // 회원가입 완료 후 홈페이지로 이동
