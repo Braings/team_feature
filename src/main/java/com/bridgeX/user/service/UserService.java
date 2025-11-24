@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.bridgeX.DataNotFoundException;
 import com.bridgeX.user.domain.SiteUser;
+import com.bridgeX.user.domain.UserRole;
 import com.bridgeX.user.dto.LoginRequest;
 import com.bridgeX.user.dto.LoginResponse;
 import com.bridgeX.user.dto.SignupRequest;
@@ -39,7 +40,9 @@ public class UserService {
         user.setUsername(dto.getUsername());
         user.setEmail(dto.getEmail());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
-
+        
+        // User Role - User
+        user.setRole(UserRole.USER);
 
         userRepository.save(user);
     }

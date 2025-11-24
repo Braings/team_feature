@@ -59,7 +59,8 @@ public class UserApiController {
 
         UserInfoResponse dto = new UserInfoResponse(
                 user.getUsername(),
-                user.getEmail()
+                user.getEmail(),
+                user.getRole().name()
         );
 
         return ResponseEntity.ok(dto);
