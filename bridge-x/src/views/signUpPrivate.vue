@@ -19,8 +19,9 @@
             @blur="validateField('sex')"
           >
             <option value="" disabled selected hidden>select sex</option>
-            <option value="male">male</option>
-            <option value="female">female</option>
+            <option value="MALE">Male</option>
+            <option value="FEMALE">Female</option>
+            <!-- <option value="other">Other</option> -->
           </select>
         <div class="birthday-wrapper">
           <div class="birthday-input-wrapper">
