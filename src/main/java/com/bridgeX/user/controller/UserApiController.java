@@ -58,6 +58,7 @@ public class UserApiController {
         SiteUser user = userService.getUserByUsername(username);
 
         UserInfoResponse dto = new UserInfoResponse(
+        		user.getId(),
                 user.getUsername(),
                 user.getEmail(),
                 user.getRole().name()

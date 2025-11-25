@@ -9,6 +9,7 @@ import lombok.Setter;
 @AllArgsConstructor
 // UserInfo Response DTO
 public class UserInfoResponse {
+	private long id;
 	private String username;		
 	private String email;
 	private String role;
