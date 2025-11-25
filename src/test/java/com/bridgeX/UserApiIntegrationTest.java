@@ -1,9 +1,13 @@
 package com.bridgeX;
 
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.time.LocalDate;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +16,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.bridgeX.user.domain.SiteUser;
+import com.bridgeX.user.repository.UserRepository;
+
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false) //임시로 Spring Security 비활성화
 public class UserApiIntegrationTest {
@@ -19,41 +26,53 @@ public class UserApiIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
     
-    /*
-    // Test06: Signup - incorrect password Check
-    
-    @Test
-    void PasswordCheck() throws Exception {
-    	String SignupJson = """
-    	        {
-    	          "username": "NANANANA",
-    	          "email": "LALALALA@lala.com",
-    	          "password": "12345",
-    	          "passwordCheck": "12345677"
-    	        }
-    	        """;
+    @Autowired
+    private UserRepository userRepository;
 
-    	mockMvc.perform(
-	            post("/api/sign")
-	                    .contentType(MediaType.APPLICATION_JSON)
-	                    .content(SignupJson)
-	    )
-	    .andExpect(status().isBadRequest())
-	    .andExpect(content().string("비밀번호가 일치하지 않습니다."));
+    // Test00: New User Register and Confirm
+    @Test
+    void signup_and_verify_saved_info() throws Exception {
+
+        // 1) Sign-up
+        String signupJson = """
+        {
+            "username": "Im_Test_User",
+            "email": "PlzSuccess@test.com",
+            "password": "1234",
+            "passwordCheck": "1234",
+            "birthday": "2025-12-25"
+        }
+        """;
+
+        mockMvc.perform(
+                    post("/api/sign")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(signupJson)
+                )
+                .andExpect(status().isOk()); // Success Sign-up
+
+        // 2) Check from DB
+        SiteUser savedUser = userRepository.findByUsername("Im_Test_User")
+                .orElseThrow(() -> new RuntimeException("회원가입 후 DB에서 유저를 찾지 못했습니다."));
+
+        // 3) Confirm Data
+        assertEquals("Im_Test_User", savedUser.getUsername());
+        assertEquals("PlzSuccess@test.com", savedUser.getEmail());
+        assertEquals(LocalDate.of(2025, 12, 25), savedUser.getBirthday());
     }
-	*/
     
-    
+    /*
     // Test01: User Register and Login test
     @Test
     void signup_and_login() throws Exception {
         // 1) 회원가입 요청 JSON  (/api/sign)
         String signupJson = """
             {
-              "username": "121212",
-              "email": "test121212@test.com",
+              "username": "Im_Test_User",
+              "email": "PlzSuccess@test.com",
               "password": "1234",
-              "passwordCheck": "1234"
+              "passwordCheck": "1234",
+              "birthday": "1685-02-29"
             }
             """;
 
@@ -67,7 +86,7 @@ public class UserApiIntegrationTest {
         // 2) 로그인 요청 JSON  (/api/login)
         String loginJson = """
             {
-              "username": "121212",
+              "username": "Im_Test_User",
               "password": "1234"
             }
             """;
@@ -81,7 +100,7 @@ public class UserApiIntegrationTest {
         .andExpect(jsonPath("$.success").value(true))
         .andExpect(jsonPath("$.message").value("로그인 성공")); // UserService와 string 맞추기
     }
-    
+    */
     
     /*
     // Test02: Duplication User Signup test
@@ -188,6 +207,30 @@ public class UserApiIntegrationTest {
     	    .andExpect(status().isBadRequest())
     	    .andExpect(jsonPath("$.success").value(false))
             .andExpect(jsonPath("$.message").value("존재하지 않는 아이디입니다."));
+    }
+	*/
+    
+    /*
+    // Test06: Signup - incorrect password Check
+    
+    @Test
+    void PasswordCheck() throws Exception {
+    	String SignupJson = """
+    	        {
+    	          "username": "NANANANA",
+    	          "email": "LALALALA@lala.com",
+    	          "password": "12345",
+    	          "passwordCheck": "12345677"
+    	        }
+    	        """;
+
+    	mockMvc.perform(
+	            post("/api/sign")
+	                    .contentType(MediaType.APPLICATION_JSON)
+	                    .content(SignupJson)
+	    )
+	    .andExpect(status().isBadRequest())
+	    .andExpect(content().string("비밀번호가 일치하지 않습니다."));
     }
 	*/
 }

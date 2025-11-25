@@ -1,5 +1,7 @@
 package com.bridgeX.user.domain;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -27,6 +29,9 @@ public class SiteUser {
 
 	@Column(unique = true)
 	private String email;
+	
+	@Column(name = "birthday")
+	private LocalDate birthday;
 	
 	@Enumerated(EnumType.STRING) // Use e-num
     private UserRole role;

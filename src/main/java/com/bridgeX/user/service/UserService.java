@@ -46,6 +46,7 @@ public class UserService {
         user.setUsername(dto.getUsername());
         user.setEmail(dto.getEmail());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        user.setBirthday(dto.getBirthday());
         
         // User Role - User
         user.setRole(UserRole.USER);
@@ -93,6 +94,7 @@ public class UserService {
                 user.getId(),
                 user.getUsername(),
                 user.getEmail(),
+                user.getBirthday(),
                 user.getRole().name()
         );
     }
