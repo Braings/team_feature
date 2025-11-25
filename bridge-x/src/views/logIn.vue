@@ -134,11 +134,13 @@ const handleLogin = async () => {
 
     if (res && res.token) {
       localStorage.setItem('authToken', res.token);
+      localStorage.setItem('userId', formData.id);
       router.push({ name: 'homePage' });
       return;
     }
 
     if (res && (res.success || res.ok)) {
+      localStorage.setItem('userId', formData.id);
       router.push({ name: 'homePage' });
       return;
     }

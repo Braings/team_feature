@@ -200,7 +200,7 @@ const handleNext = async () => {
   signupFormData.birthday = formData.birthday;
 
   // 다음 단계로 이동
-  router.push({ name: 'sign.Health' });
+  router.push({ name: 'sign.health' });
 };
 </script>
 

@@ -44,7 +44,6 @@ import { signupFormData, submitSignup } from '@/stores/signupStore';
 const formData = reactive({
   height: '',
   weight: '',
-  experienceLevel: ''
 });
 
 const isLoading = ref(false);
@@ -82,11 +81,6 @@ const VALIDATION_RULES = {
       custom: '몸무게는 30~200kg 범위여야 합니다.'
     }
   },
-  experienceLevel: {
-    messages: {
-      empty: '운동 경험 레벨을 선택하세요.'
-    }
-  }
 };
 
 // ========================
@@ -109,7 +103,7 @@ const handleNext = async () => {
   // 전역 store에 건강정보 데이터 저장
   signupFormData.height = formData.height;
   signupFormData.weight = formData.weight;
-  signupFormData.experienceLevel = formData.experienceLevel;
+
 
   try {
     isLoading.value = true;
@@ -128,6 +122,7 @@ const handleNext = async () => {
   } finally {
     isLoading.value = false;
   }
+    router.push({ name: 'logIn' });
 };
 </script>
 
