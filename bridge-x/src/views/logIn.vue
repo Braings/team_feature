@@ -221,7 +221,7 @@ const goToSignUp = () => {
 }
 
 .login-header {
-  font-size: map-get($typography, 'title');
+  font-size: map-get($typography, 'button');
   font-weight: bold;
   margin-bottom: map-get($spacing, '3xl');
   letter-spacing: 2px;

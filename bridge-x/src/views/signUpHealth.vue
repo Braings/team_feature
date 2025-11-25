@@ -22,26 +22,12 @@
           @blur="validateField('weight')"
         />
 
-        <div class="form-group">
-          <label class="label">Experience Level</label>
-          <select
-            v-model="formData.experienceLevel"
-            class="select-field"
-            @blur="validateField('experienceLevel')"
-          >
-            <option value="">Select Level</option>
-            <option value="beginner">Beginner</option>
-            <option value="intermediate">Intermediate</option>
-            <option value="advanced">Advanced</option>
-          </select>
-          <div v-if="errors.experienceLevel" class="error-text">{{ errors.experienceLevel }}</div>
-        </div>
-
         <button type="submit" class="next-button" :disabled="isLoading">
           {{ isLoading ? 'LOADING...' : 'COMPLETE' }}
         </button>
       </form>
     </div>
+
   </div>
 </template>
 
@@ -173,34 +159,6 @@ const handleNext = async () => {
 .input-area {
   @include flex-column;
   width: 100%;
-}
-
-.form-group {
-  width: 100%;
-  margin-bottom: map-get($spacing, 'xl');
-}
-
-.label {
-  display: block;
-  margin-bottom: map-get($spacing, 'sm');
-  font-size: map-get($typography, 'base');
-  font-weight: 500;
-  color: map-get($colors, 'black');
-}
-
-.select-field {
-  width: 100%;
-  padding: map-get($spacing, 'lg') map-get($spacing, 'md');
-  border: 1px solid map-get($colors, 'border');
-  border-radius: map-get($radius, 'md');
-  font-size: map-get($typography, 'base');
-  background-color: map-get($colors, 'white');
-  cursor: pointer;
-
-  &:focus {
-    outline: none;
-    border-color: darken(map-get($colors, 'border'), 10%);
-  }
 }
 
 .error-text {

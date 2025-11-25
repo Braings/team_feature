@@ -25,7 +25,7 @@ const routes = [
     component: SignUpPrivate
   },
     {
-    path: '/sign/health',
+    path: '/signup/health',
     name: 'sign.health',
     component: SignUpHealth
   },

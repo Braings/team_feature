@@ -1,5 +1,7 @@
 <template>
   <div class="signup-page">
+    <!-- moving background image -->
+    <div class="bg" :style="{ backgroundImage: `url(${bgImage})` }"></div>
     <div class="signup-card">
       <h1 class="title">BRIDGE-X</h1>
 
@@ -11,7 +13,15 @@
           :error="errors.email"
           @blur="validateField('email')"
         />
-
+          <select
+            v-model="formData.sex"
+            class="select-field"
+            @blur="validateField('sex')"
+          >
+            <option value="" disabled selected hidden>select sex</option>
+            <option value="male">male</option>
+            <option value="female">female</option>
+          </select>
         <div class="birthday-wrapper">
           <div class="birthday-input-wrapper">
             <input
@@ -48,13 +58,15 @@ import router from '@/router';
 import FormField from '@/components/FormField.vue';
 import { useFormValidation } from '@/composables/useFormValidation';
 import { signupFormData } from '@/stores/signupStore';
+import bgImage from '@/img/gym.png';
 
 // ========================
 // Data
 // ========================
 const formData = reactive({
   email: '',
-  birthday: ''
+  birthday: '',
+  sex: ''
 });
 
 const MIN_AGE = 13;
@@ -197,17 +209,39 @@ const handleNext = async () => {
 
 .signup-page {
   @include flex-center;
+  position: relative; /* for absolute bg */
+  overflow: hidden; /* keep bg inside */
   min-height: 100vh;
   background-color: map-get($colors, 'dark');
 }
 
 .signup-card {
   @include card;
+  position: relative;
+  z-index: 2;
   padding: map-get($spacing, '2xl') map-get($spacing, '3xl');
   width: map-get($sizes, 'card-width');
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+/* moving background element */
+.bg {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background-size: cover;
+  background-position: center;
+  filter: brightness(0.65) blur(1px);
+  transform-origin: center;
+  // animation: bg-pan 5s linear infinite;
+}
+
+@keyframes bg-pan {
+  0% { transform: scale(1) translate3d(0,0,0); }
+  50% { transform: scale(1.06) translate3d(-4%, -2%, 0); }
+  100% { transform: scale(1) translate3d(0,0,0); }
 }
 
 .title {
@@ -282,6 +316,35 @@ const handleNext = async () => {
 
   &:hover {
     background-color: map-get($colors, 'gray-hover');
+  }
+}
+
+.select-field {
+
+  margin-bottom: map-get($spacing, 'xl');
+
+
+  box-sizing: border-box;
+
+
+  &::placeholder {
+    color: map-get($colors, 'text-placeholder');
+  }
+  width: 100%;
+  padding: map-get($spacing, 'lg') map-get($spacing, 'md');
+  border: 1px solid map-get($colors, 'border');
+  border-radius: map-get($radius, 'md');
+  font-size: map-get($typography, 'base');
+  background-color: map-get($colors, 'white');
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+    border-color: darken(map-get($colors, 'border'), 10%);
+  }
+
+  option[value=""] {
+    color: map-get($colors, 'text-placeholder');
   }
 }
 </style>
