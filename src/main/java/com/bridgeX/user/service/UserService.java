@@ -7,10 +7,15 @@ import org.springframework.stereotype.Service;
 
 import com.bridgeX.DataNotFoundException;
 import com.bridgeX.user.domain.SiteUser;
+import com.bridgeX.user.domain.SiteUserBody;
 import com.bridgeX.user.domain.UserRole;
 import com.bridgeX.user.dto.LoginRequest;
 import com.bridgeX.user.dto.LoginResponse;
 import com.bridgeX.user.dto.SignupRequest;
+import com.bridgeX.user.dto.UserBodyInfoRequest;
+import com.bridgeX.user.dto.UserBodyInfoResponse;
+import com.bridgeX.user.dto.UserInfoResponse;
+import com.bridgeX.user.repository.UserBodyRepository;
 import com.bridgeX.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -20,10 +25,11 @@ import lombok.RequiredArgsConstructor;
 public class UserService {
 	// RP code
     private final UserRepository userRepository;
+    private final UserBodyRepository userBodyRepository;
     private final PasswordEncoder passwordEncoder;
 
 
-    // Sign-up
+    // Sign-up Request
     public void signup(SignupRequest dto) {
         // Check ID duplication.
         if (userRepository.findByUsername(dto.getUsername()).isPresent()) {
@@ -48,7 +54,7 @@ public class UserService {
     }
 
 
-    // Login
+    // Login Request
     public LoginResponse login(LoginRequest dto) {
         LoginResponse response = new LoginResponse();
 
@@ -78,13 +84,57 @@ public class UserService {
     }
 	
     // User Information Response
-    public SiteUser getUserByUsername(String username) {
-        return userRepository.findByUsername(username)
+    public UserInfoResponse getMyInfo(String username) {
+    	
+    	SiteUser user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("유저가 존재하지 않습니다."));
+        
+        return new UserInfoResponse(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getRole().name()
+        );
+    }
+    
+    // User Body Information Request
+    public void updateBodyInfo(String username, UserBodyInfoRequest dto) {
+        SiteUser user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("유저가 없습니다."));
+
+        // Not Exist BodyInfo -> Generation
+        SiteUserBody body = userBodyRepository.findByUser(user)
+                .orElseGet(() -> {
+                    SiteUserBody newBody = new SiteUserBody();
+                    newBody.setUser(user);
+                    return newBody;
+                });
+
+        body.setHeight(dto.getHeight());
+        body.setWeight(dto.getWeight());
+        body.setGender(dto.getGender());
+
+        userBodyRepository.save(body);
+    }
+
+    
+    // User Body Information Response
+    public UserBodyInfoResponse getBodyInfo(String username) {
+    	
+    	SiteUserBody user = userBodyRepository.findByUser_Username(username)
+                .orElseThrow(() -> new RuntimeException("유저가 존재하지 않습니다."));
+        
+        return new UserBodyInfoResponse(
+                user.getHeight(),
+                user.getWeight(),
+                user.getGender().name()
+        );
     }
     
     
+    
 	// Back-end Test only.
+    // Dummy Function
 	public SiteUser create(String username, String email, String password) {
 		SiteUser user = new SiteUser();
 		user.setUsername(username);
@@ -99,7 +149,7 @@ public class UserService {
 		if (siteUser.isPresent()) {
 			return siteUser.get();
 		} else {
-			throw new DataNotFoundException("siteuser not found");
+			throw new DataNotFoundException("유저가 존재하지 않습니다.");
 		}
 	}
 }

@@ -6,14 +6,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bridgeX.user.domain.SiteUser;
 import com.bridgeX.user.dto.LoginRequest;
 import com.bridgeX.user.dto.LoginResponse;
 import com.bridgeX.user.dto.SignupRequest;
+import com.bridgeX.user.dto.UserBodyInfoRequest;
+import com.bridgeX.user.dto.UserBodyInfoResponse;
 import com.bridgeX.user.dto.UserInfoResponse;
 import com.bridgeX.user.service.UserService;
 
@@ -49,23 +51,43 @@ public class UserApiController {
     // User Info Response
     @GetMapping("/me")
     public ResponseEntity<UserInfoResponse> getMyInfo(Principal principal) {
+    	// 로그인 안 됐을 때
         if (principal == null) {
-            // 로그인 안 됐을 때
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        String username = principal.getName();   // 여기서 로그인한 사람 user name get
-        SiteUser user = userService.getUserByUsername(username);
+        String username = principal.getName();
+        UserInfoResponse MyInfo = userService.getMyInfo(username);
 
-        UserInfoResponse dto = new UserInfoResponse(
-        		user.getId(),
-                user.getUsername(),
-                user.getEmail(),
-                user.getRole().name()
-        );
-
-        return ResponseEntity.ok(dto);
+        return ResponseEntity.ok(MyInfo);
     }
 
+    // User BodyInfo Request (edit)
+    @PutMapping("/me/body")
+    public ResponseEntity<?> putMyBodyInfo(Principal principal, @RequestBody @Valid UserBodyInfoRequest dto){
+    	// 로그인 안 됐을 때
+    	if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        String username = principal.getName();
+        userService.updateBodyInfo(username, dto);
+        
+        return ResponseEntity.ok().build();
+    }
+    
+    // User BodyInfo Response
+    @GetMapping("/me/body")
+    public ResponseEntity<UserBodyInfoResponse> getMyBodyInfo(Principal principal){
+    	// 로그인 안 됐을 때
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        
+        String username = principal.getName();
+        UserBodyInfoResponse UserBodyInfo = userService.getBodyInfo(username);
+
+        return ResponseEntity.ok(UserBodyInfo);        
+    }
 }
 
