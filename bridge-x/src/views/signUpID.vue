@@ -5,12 +5,12 @@
 
       <form class="input-area" @submit.prevent="handleNext">
         <FormField
-          v-model="formData.id"
+          v-model="formData.username"
           label="ID"
           type="text"
           placeholder="ID"
-          :error="errors.id"
-          @blur="validateField('id')"
+          :error="errors.username"
+          @blur="validateField('username')"
         />
 
         <FormField
@@ -50,7 +50,7 @@ import { signupFormData } from '@/stores/signupStore';
 // Data
 // ========================
 const formData = reactive({
-  id: '',
+  username: '',
   password: '',
   passwordCheck: ''
 });
@@ -59,7 +59,7 @@ const formData = reactive({
 // Validation Rules
 // ========================
 const VALIDATION_RULES = {
-  id: {
+  username: {
     minLength: 4,
     maxLength: 20,
     pattern: /^[a-zA-Z0-9_]+$/,
@@ -111,10 +111,10 @@ const handleNext = async () => {
   }
 
   console.log('✓ 폼 검증 성공');
-  console.log('ID:', formData.id);
+  console.log('Username:', formData.username);
 
   // 전역 store에 데이터 저장
-  signupFormData.id = formData.id;
+  signupFormData.username = formData.username;
   signupFormData.password = formData.password;
 
   // 다음 단계로 이동

@@ -60,6 +60,7 @@ import svgContent from '@/img/maps/korea_map.svg?raw'
 const showDropdown = ref(false)
 const selectedRegion = ref('')
 const selectedCity = ref('')
+const selectedRegionElement = ref(null)
 const dropdownPosition = reactive({ top: '0px', left: '0px' })
 
 // 드롭다운 스타일 계산
@@ -107,7 +108,27 @@ const handleMapClick = (event) => {
   const regionGroup = target.closest('[data-name]')
 
   if (regionGroup) {
+    // 이전 선택 영역 스타일 제거
+    if (selectedRegionElement.value) {
+      const prevPaths = selectedRegionElement.value.querySelectorAll('path, polygon')
+      prevPaths.forEach(el => {
+        el.style.stroke = ''
+        el.style.strokeWidth = ''
+        el.style.fill = ''
+      })
+    }
+
+    // 새로운 영역 선택
     const region = regionGroup.getAttribute('data-name')
+    selectedRegionElement.value = regionGroup
+
+    // 선택된 영역 내 모든 path/polygon에 스타일 적용
+    const paths = regionGroup.querySelectorAll('path, polygon')
+    paths.forEach(el => {
+      el.style.fill = '#4caf50'
+      el.style.stroke = 'none'
+    })
+
     // SVG 컨테이너의 위치 기준으로 드롭다운 위치 계산
     const mapContainer = document.querySelector('.map-container')
     const containerRect = mapContainer.getBoundingClientRect()

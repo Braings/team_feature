@@ -4,12 +4,14 @@ import { post } from '@/api'
 // Signup 폼 데이터 전역 상태
 export const signupFormData = reactive({
   // Step 1: ID & Password
-  id: '',
+  username: '',
   password: '',
+  passwordcheck: '',
 
-  // Step 2: Email & Birthday
+  // Step 2: Email & Birthday & Sex
   email: '',
   birthday: '',
+  sex: '',
 
   // Step 3: Health Info
   height: '',
@@ -18,10 +20,11 @@ export const signupFormData = reactive({
 
   // Reset 함수
   reset() {
-    this.id = ''
+    this.username = ''
     this.password = ''
     this.email = ''
     this.birthday = ''
+    this.sex = ''
     this.height = ''
     this.weight = ''
     this.experienceLevel = ''
@@ -36,10 +39,11 @@ export const signupFormData = reactive({
 export async function submitSignup() {
   // 회원가입 데이터 구성
   const signupData = {
-    id: signupFormData.id,
+    username: signupFormData.username,
     password: signupFormData.password,
     email: signupFormData.email,
     birthday: signupFormData.birthday,
+    sex: signupFormData.sex,
     height: parseInt(signupFormData.height),
     weight: parseInt(signupFormData.weight),
     experienceLevel: signupFormData.experienceLevel

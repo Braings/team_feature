@@ -1,26 +1,35 @@
 <template>
   <div>
-    <div :class="{ 'title': true, 'flame': true}"></div>
-    <router-view />
-    <div v-if="!isSignUpRoute" class="header-bar">
-      <div class="header-Text cc-font cursorPointer" @click="handleHeaderClick">{{ userDisplay }}</div>
-      <div class="header-Text cc-font cursorPointer" @click="goToPage('homePage')">Home</div>
+     <div :class="{ 'title': true, 'flame': true}"></div>
+    <div class="router-wrapper">
+      <router-view />
     </div>
+    <div class="header-bar" :style="headerBarStyle">
+      <div v-if="!isSignUpRoute" class="header-Text cc-font cursorPointer" @click="handleHeaderClick">{{ userDisplay }}</div>
+      <div class="header-Text cc-font cursorPointer" @click="goToPage('homePage')">Home</div>
+     </div>
   </div>
-
-
-
 </template>
+
 
 <script>
 import { useRouter, useRoute } from 'vue-router';
-import { provide, computed, ref, onMounted } from 'vue';
+import { provide, computed, ref, onMounted, watch } from 'vue';
 
 export default {
   setup () {
     const router = useRouter();
     const route = useRoute();
     const userId = ref('Log In');
+
+    const headerBarStyle = ref({
+      backgroundColor: 'transparent' // 기본 배경색
+    });
+
+    const updateHeaderColor = (colorValue) => {
+      console.log(`헤더 색상 변경 요청 수신: ${colorValue}`);
+      headerBarStyle.value.backgroundColor = colorValue;
+    };
 
     const goToPage = (routeName) => {
       router.push({ name: routeName });
@@ -49,16 +58,36 @@ export default {
     });
 
     provide('movePageKey', goToPage);
+    provide('updateHeaderColorKey', updateHeaderColor);
 
-    // 회원가입 관련 라우트에서 헤더 숨김
     const isSignUpRoute = computed(() => {
       return route.name && String(route.name).startsWith('sign');
     });
 
+    // route 변경 시 강제 갱신
+    watch(() => route.name, () => {
+      console.log('라우트 변경:', route.name);
+    });
+
+    // 라우트 변경 감시 및 스타일 자동 변경 로직
+    watch(() => route.name, (newRouteName) => {
+      console.log('라우트 변경 감지:', newRouteName);
+
+      // 조건 정의
+      if (newRouteName === 'myPage') {
+        headerBarStyle.value.color = 'white';
+      } else if (String(newRouteName).startsWith('sign')) {
+        headerBarStyle.value.color = 'white';
+      } else {
+        headerBarStyle.value.backgroundColor = 'transparent';
+        headerBarStyle.value.color = 'black';
+      }
+    }, { immediate: true }); // 컴포넌트 마운트 시 초기 라우트 검사.
     return {
       goToPage,
       handleHeaderClick,
       userDisplay,
+      headerBarStyle,
       isSignUpRoute
     }
   }
@@ -72,6 +101,11 @@ export default {
   src: url('/fonts/The Jamsil OTF 6 ExtraBold.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
+}
+
+.router-wrapper {
+  width: 100%;
+  height: 100%;
 }
 
 .header-bar {

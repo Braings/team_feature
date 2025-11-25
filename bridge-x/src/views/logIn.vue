@@ -13,12 +13,12 @@
 
       <form class="form-area" @submit.prevent="handleLogin">
         <FormField
-          v-model="formData.id"
+          v-model="formData.username"
           type="text"
           placeholder="USERNAME"
-          :error="errors.id"
-          @blur="validateField('id')"
-          @input="onIdInput"
+          :error="errors.username"
+          @blur="validateField('username')"
+          @input="onUsernameInput"
         />
 
         <FormField
@@ -57,7 +57,7 @@ import { useFormValidation } from '@/composables/useFormValidation';
 // ========================
 const router = useRouter();
 const formData = reactive({
-  id: '',
+  username: '',
   password: ''
 });
 
@@ -67,7 +67,7 @@ const loading = ref(false);
 // Validation Rules
 // ========================
 const VALIDATION_RULES = {
-  id: {
+  username: {
     minLength: 4,
     pattern: /^[a-zA-Z0-9_]*$/,
     messages: {
@@ -110,9 +110,9 @@ const passwordDisplay = computed({
 // ========================
 // Event Handlers
 // ========================
-const onIdInput = () => {
+const onUsernameInput = () => {
   // 영문, 숫자, 언더스코어만 필터링
-  formData.id = formData.id.replace(/[^\x20-\x7E]/g, '');
+  formData.username = formData.username.replace(/[^\x20-\x7E]/g, '');
 };
 
 const onPasswordInput = () => {
@@ -129,18 +129,18 @@ const handleLogin = async () => {
   loading.value = true;
 
   try {
-    const body = { id: formData.id, password: formData.password };
+    const body = { username: formData.username, password: formData.password };
     const res = await post('/auth/login', body);
 
     if (res && res.token) {
       localStorage.setItem('authToken', res.token);
-      localStorage.setItem('userId', formData.id);
+      localStorage.setItem('userId', formData.username);
       router.push({ name: 'homePage' });
       return;
     }
 
     if (res && (res.success || res.ok)) {
-      localStorage.setItem('userId', formData.id);
+      localStorage.setItem('userId', formData.username);
       router.push({ name: 'homePage' });
       return;
     }
