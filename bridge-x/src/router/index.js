@@ -3,9 +3,11 @@ import HomePage from '../views/homePage.vue'
 import SignUpID from '../views/signUpID.vue'
 import SignUpPrivate from '../views/signUpPrivate.vue'
 import SignUpHealth from '../views/signUpHealth.vue'
-import Maps from '../views/maps.vue'
+import Maps from '../views/mapsPage.vue'
 import MyPage from '../views/myPage.vue'
-import Reviews from '../views/reviews.vue'
+import Reviews from '../views/reviewsPage.vue'
+import ReviewDetail from '../views/reviewDetail.vue'
+import ReviewsWrite from '../views/reviewsWritePage.vue'
 import LogIn from '../views/logIn.vue'
 
 const routes = [
@@ -40,12 +42,26 @@ const routes = [
     component: MyPage
   },
 
-    {
+  {
     path: '/reviews',
     name: 'reviews',
     component: Reviews
   },
-
+  {
+    path: '/reviews/:username',
+    name: 'reviewDetail',
+    component: ReviewDetail
+  },
+  {
+    path: '/reviews/write',
+    name: 'reviewsWrite',
+    component: ReviewsWrite
+  },
+  {
+    path: '/reviews/write/:username',
+    name: 'reviewsEdit',
+    component: ReviewsWrite
+  },
   {
     path: '/login',
     name: 'logIn',
