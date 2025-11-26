@@ -123,116 +123,50 @@ const handleNext = async () => {
 </script>
 
 <style lang="scss" scoped>
-// ========================
-// Variables
-// ========================
-$colors: (
-  'dark': #121212,
-  'white': #fff,
-  'border': #ccc,
-  'text-placeholder': #888,
-  'error': #e74c3c,
-  'black': #000,
-  'gray-hover': #333
-);
-
-$spacing: (
-  'xl': 20px,
-  '2xl': 40px,
-  '3xl': 50px
-);
-
-$radius: (
-  'md': 5px,
-  'xl': 20px
-);
-
-$sizes: (
-  'button-width': 120px,
-  'button-height': 60px,
-  'card-width': 400px
-);
-
-$typography: (
-  'title': 3rem,
-  'button': 1.5rem
-);
-
-$shadows: (
-  'card': 0 4px 15px rgba(0, 0, 0, 0.2)
-);
-
-// ========================
-// Mixins
-// ========================
-@mixin flex-center {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-@mixin card {
-  background-color: map-get($colors, 'white');
-  border-radius: map-get($radius, 'xl');
-  box-shadow: map-get($shadows, 'card');
-}
-
-// ========================
-// Styles
-// ========================
-
+@import '@/styles/_variables.scss';
 
 .signup-page {
   @include flex-center;
   min-height: 100vh;
   background-color: map-get($colors, 'dark');
-}
 
-.signup-card {
-  @include card;
-  padding: map-get($spacing, '2xl') map-get($spacing, '3xl');
-  width: map-get($sizes, 'card-width');
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+  .signup-card {
+    @include card;
+    padding: map-get($spacing, '2xl') map-get($spacing, '3xl');
+    width: map-get($sizes, 'card-width');
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 
-.title {
-  font-size: map-get($typography, 'title');
-  font-weight: bold;
-  margin-bottom: map-get($spacing, '2xl');
-  letter-spacing: 5px;
-}
+    .title {
+      font-size: map-get($typography, 'title');
+      font-weight: bold;
+      margin-bottom: map-get($spacing, '2xl');
+      letter-spacing: 5px;
+    }
 
-.input-area {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  width: 100%;
-}
+    .input-area {
+      @include flex-column;
+      width: 100%;
+    }
 
-.next-button {
-  @include flex-center;
-  background-color: map-get($colors, 'black');
-  color: map-get($colors, 'white');
-  padding: 15px 30px;
-  border: none;
-  border-radius: map-get($radius, 'md');
-  font-size: map-get($typography, 'button');
-  font-weight: bold;
-  cursor: pointer;
-  margin-top: map-get($spacing, 'xl');
-  align-self: flex-end;
-  width: map-get($sizes, 'button-width');
-  height: map-get($sizes, 'button-height');
-  transition: background-color 0.2s ease;
+    .next-button {
+      @include button-base;
+      @include flex-center;
+      background-color: map-get($colors, 'black');
+      color: map-get($colors, 'white');
+      padding: 15px 30px;
+      border-radius: map-get($radius, 'md');
+      font-size: map-get($typography, 'button');
+      margin-top: map-get($spacing, 'xl');
+      align-self: flex-end;
+      width: map-get($sizes, 'button-width');
+      height: map-get($sizes, 'button-height');
 
-  &:hover {
-    background-color: map-get($colors, 'gray-hover');
-  }
-
-  &:focus {
-    outline: none;
+      &:hover {
+        background-color: map-get($colors, 'gray-hover');
+      }
+    }
   }
 }
 </style>

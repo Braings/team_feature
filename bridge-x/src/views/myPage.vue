@@ -14,7 +14,7 @@
         <!-- 기본 정보 -->
         <div class="info-section">
           <h2 class="section-title">기본 정보</h2>
-          <div class="info-grid">
+          <div class="info-grname">
             <div class="info-item">
               <span class="label">이름</span>
               <span class="value">{{ userProfile.username || 'N/A' }}</span>
@@ -33,7 +33,7 @@
         <!-- 건강 정보 -->
         <div class="info-section">
           <h2 class="section-title">건강 정보</h2>
-          <div class="health-grid">
+          <div class="health-grname">
             <div class="health-item">
               <span class="label">키</span>
               <span class="value">{{ userProfile.height || '-' }} cm</span>
@@ -92,17 +92,17 @@ const userProfile = reactive({
 });
 
 const userExercise = reactive({
-  Recommend: ''
+  recommend: ''
 });
 
 const userInitial = computed(() => {
-  const userId = localStorage.getItem('userId') || 'U';
-  return userId.charAt(0).toUpperCase();
+  const username = localStorage.getItem('username') || 'U';
+  return username.charAt(0).toUpperCase();
 });
 
 onMounted(() => {
   // 저장된 회원가입 정보를 global store에서 로드
-  userProfile.username = signupFormData.username || localStorage.getItem('userId') || 'User';
+  userProfile.username = signupFormData.username || localStorage.getItem('username') || 'User';
   userProfile.email = signupFormData.email || 'N/A';
   userProfile.birthday = signupFormData.birthday || '';
   userProfile.sex = signupFormData.sex || '';
@@ -132,7 +132,7 @@ const calculateBMI = () => {
 
 const handleLogout = () => {
   localStorage.removeItem('authToken');
-  localStorage.removeItem('userId');
+  localStorage.removeItem('username');
   router.push({ name: 'homePage' });
 };
 </script>
@@ -204,7 +204,7 @@ const handleLogout = () => {
 .info-section {
   margin-bottom: map-get($spacing, '2xl');
   padding-bottom: map-get($spacing, '2xl');
-  border-bottom: 1px solid map-get($colors, 'border-light');
+  border-bottom: 1px solname map-get($colors, 'border-light');
 
   &:last-of-type {
     border-bottom: none;
@@ -218,7 +218,7 @@ const handleLogout = () => {
   color: map-get($colors, 'black');
 }
 
-.info-grid {
+.info-grname {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: map-get($spacing, 'lg');
@@ -242,7 +242,7 @@ const handleLogout = () => {
   font-weight: bold;
 }
 
-.health-grid {
+.health-grname {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: map-get($spacing, 'lg');

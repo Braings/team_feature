@@ -34,6 +34,18 @@
               <div class="bar pink-bar" style="height: 10%;">21</div>
               <div class="bar green-bar" style="height: 40%;">108</div>
             </div>
+                         <div class="bar-group">
+              <div class="bar pink-bar" style="height: 10%;">21</div>
+              <div class="bar green-bar" style="height: 40%;">108</div>
+            </div>
+                         <div class="bar-group">
+              <div class="bar pink-bar" style="height: 10%;">21</div>
+              <div class="bar green-bar" style="height: 40%;">108</div>
+            </div>
+                         <div class="bar-group">
+              <div class="bar pink-bar" style="height: 10%;">21</div>
+              <div class="bar green-bar" style="height: 40%;">108</div>
+            </div>
             <div class="x-axis-line"></div>
             <div class="y-axis-line"></div>
           </div>
@@ -83,7 +95,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 
 .cursorPointer {
     cursor: pointer;
@@ -168,9 +180,9 @@ export default {
 }
 
 .chart-mockup {
-  border-radius: 5%;
+  border-radius: 15px;
   position: relative;
-  width: 60%;
+  width: 100%;
   height: 80%;
   background-color: #252525;
   /* border-left: 0.1vw solid black;

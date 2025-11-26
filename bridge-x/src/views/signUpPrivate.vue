@@ -210,142 +210,132 @@ const handleNext = async () => {
 
 .signup-page {
   @include flex-center;
-  position: relative; /* for absolute bg */
-  overflow: hidden; /* keep bg inside */
+  position: relative;
+  overflow: hidden;
   min-height: 100vh;
   background-color: map-get($colors, 'dark');
-}
 
-.signup-card {
-  @include card;
-  position: relative;
-  z-index: 2;
-  padding: map-get($spacing, '2xl') map-get($spacing, '3xl');
-  width: map-get($sizes, 'card-width');
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+  .bg {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background-size: cover;
+    background-position: center;
+    filter: brightness(0.65) blur(1px);
+    transform-origin: center;
 
-/* moving background element */
-.bg {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  background-size: cover;
-  background-position: center;
-  filter: brightness(0.65) blur(1px);
-  transform-origin: center;
-  // animation: bg-pan 5s linear infinite;
-}
-
-@keyframes bg-pan {
-  0% { transform: scale(1) translate3d(0,0,0); }
-  50% { transform: scale(1.06) translate3d(-4%, -2%, 0); }
-  100% { transform: scale(1) translate3d(0,0,0); }
-}
-
-.title {
-  font-size: map-get($typography, 'title');
-  font-weight: bold;
-  margin-bottom: map-get($spacing, '2xl');
-  letter-spacing: 5px;
-}
-
-.input-area {
-  @include flex-column;
-  width: 100%;
-}
-
-.birthday-wrapper {
-  width: 100%;
-  margin-bottom: map-get($spacing, 'xl');
-}
-
-.birthday-input-wrapper {
-  width: 100%;
-  display: flex;
-  gap: map-get($spacing, 'sm');
-  align-items: center;
-  position: relative;
-}
-
-.birthday-field {
-  margin-bottom: 0;
-}
-
-.date-picker-popover {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  background: map-get($colors, 'white');
-  padding: map-get($spacing, 'sm');
-  border: 1px solid map-get($colors, 'border-light');
-  border-radius: map-get($radius, 'lg');
-  box-shadow: map-get($shadows, 'popover');
-  z-index: 10;
-}
-
-.date-input {
-  width: map-get($sizes, 'date-input-width');
-  padding: map-get($spacing, 'sm') map-get($spacing, 'md');
-  border: 1px solid map-get($colors, 'border');
-  border-radius: map-get($radius, 'sm');
-}
-
-.input-field {
-  @include input-base;
-}
-
-.error-text {
-  @include error-text;
-  margin-bottom: map-get($spacing, 'lg');
-}
-
-.next-button {
-  @include button-base;
-  @include flex-center;
-  background-color: map-get($colors, 'black');
-  color: map-get($colors, 'white');
-  padding: 15px 30px;
-  border-radius: map-get($radius, 'md');
-  font-size: map-get($typography, 'button');
-  margin-top: map-get($spacing, 'xl');
-  align-self: flex-end;
-  width: map-get($sizes, 'button-width');
-  height: map-get($sizes, 'button-height');
-
-  &:hover {
-    background-color: map-get($colors, 'gray-hover');
-  }
-}
-
-.select-field {
-
-  margin-bottom: map-get($spacing, 'xl');
-
-
-  box-sizing: border-box;
-
-
-  &::placeholder {
-    color: map-get($colors, 'text-placeholder');
-  }
-  width: 100%;
-  padding: map-get($spacing, 'lg') map-get($spacing, 'md');
-  border: 1px solid map-get($colors, 'border');
-  border-radius: map-get($radius, 'md');
-  font-size: map-get($typography, 'base');
-  background-color: map-get($colors, 'white');
-  cursor: pointer;
-
-  &:focus {
-    outline: none;
-    border-color: darken(map-get($colors, 'border'), 10%);
+    @keyframes bg-pan {
+      0% { transform: scale(1) translate3d(0,0,0); }
+      50% { transform: scale(1.06) translate3d(-4%, -2%, 0); }
+      100% { transform: scale(1) translate3d(0,0,0); }
+    }
   }
 
-  option[value=""] {
-    color: map-get($colors, 'text-placeholder');
+  .signup-card {
+    @include card;
+    position: relative;
+    z-index: 2;
+    padding: map-get($spacing, '2xl') map-get($spacing, '3xl');
+    width: map-get($sizes, 'card-width');
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .title {
+      font-size: map-get($typography, 'title');
+      font-weight: bold;
+      margin-bottom: map-get($spacing, '2xl');
+      letter-spacing: 5px;
+    }
+
+    .input-area {
+      @include flex-column;
+      width: 100%;
+
+      .select-field {
+        width: 100%;
+        padding: map-get($spacing, 'lg') map-get($spacing, 'md');
+        margin-bottom: map-get($spacing, 'xl');
+        border: 1px solid map-get($colors, 'border');
+        border-radius: map-get($radius, 'md');
+        font-size: map-get($typography, 'base');
+        background-color: map-get($colors, 'white');
+        cursor: pointer;
+        box-sizing: border-box;
+
+        &:focus {
+          outline: none;
+          border-color: darken(map-get($colors, 'border'), 10%);
+        }
+
+        option[value=""] {
+          color: map-get($colors, 'text-placeholder');
+        }
+      }
+
+      .input-field {
+        @include input-base;
+
+        &.birthday-field {
+          margin-bottom: 0;
+        }
+      }
+
+      .error-text {
+        @include error-text;
+        margin-bottom: map-get($spacing, 'lg');
+      }
+
+      .birthday-wrapper {
+        width: 100%;
+        margin-bottom: map-get($spacing, 'xl');
+
+        .birthday-input-wrapper {
+          width: 100%;
+          display: flex;
+          gap: map-get($spacing, 'sm');
+          align-items: center;
+          position: relative;
+
+          .date-picker-popover {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: map-get($colors, 'white');
+            padding: map-get($spacing, 'sm');
+            border: 1px solid map-get($colors, 'border-light');
+            border-radius: map-get($radius, 'lg');
+            box-shadow: map-get($shadows, 'popover');
+            z-index: 10;
+
+            .date-input {
+              width: map-get($sizes, 'date-input-width');
+              padding: map-get($spacing, 'sm') map-get($spacing, 'md');
+              border: 1px solid map-get($colors, 'border');
+              border-radius: map-get($radius, 'sm');
+            }
+          }
+        }
+      }
+
+      .next-button {
+        @include button-base;
+        @include flex-center;
+        background-color: map-get($colors, 'black');
+        color: map-get($colors, 'white');
+        padding: 15px 30px;
+        border-radius: map-get($radius, 'md');
+        font-size: map-get($typography, 'button');
+        margin-top: map-get($spacing, 'xl');
+        align-self: flex-end;
+        width: map-get($sizes, 'button-width');
+        height: map-get($sizes, 'button-height');
+
+        &:hover {
+          background-color: map-get($colors, 'gray-hover');
+        }
+      }
+    }
   }
 }
 </style>
