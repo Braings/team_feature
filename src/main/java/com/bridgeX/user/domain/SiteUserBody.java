@@ -1,5 +1,6 @@
 package com.bridgeX.user.domain;
 
+import groovy.transform.builder.Builder;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -12,6 +13,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@Builder
 @Entity
 public class SiteUserBody {
 	@Id

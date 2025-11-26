@@ -42,14 +42,13 @@ public class UserService {
         	throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
         // create User
-        SiteUser user = new SiteUser();
-        user.setUsername(dto.getUsername());
-        user.setEmail(dto.getEmail());
-        user.setPassword(passwordEncoder.encode(dto.getPassword()));
-        user.setBirthday(dto.getBirthday());
-        
-        // User Role - User
-        user.setRole(UserRole.USER);
+        SiteUser user = SiteUser.builder()
+        		.username(dto.getUsername())
+        		.password(passwordEncoder.encode(dto.getPassword()))
+        		.email(dto.getEmail())
+        		.birthday(dto.getBirthday())
+        		.role(UserRole.USER) // Default user role - User
+        		.build();
 
         userRepository.save(user);
     }
@@ -138,10 +137,12 @@ public class UserService {
 	// Back-end Test only.
     // Dummy Function
 	public SiteUser create(String username, String email, String password) {
-		SiteUser user = new SiteUser();
-		user.setUsername(username);
-		user.setEmail(email);
-		user.setPassword(passwordEncoder.encode(password));
+		SiteUser user = SiteUser.builder()
+				.username(username)
+				.email(email)
+				.password(passwordEncoder.encode(password))
+				.build();
+				
 		this.userRepository.save(user);
 		return user;
 	}

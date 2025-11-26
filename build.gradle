@@ -18,12 +18,14 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	
-	//Junit Test
+	// Junit Test
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test' // MockUser(Login at test)
 	
 	
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	
+	// Lombok
 	compileOnly 'org.projectlombok:lombok' 
 	annotationProcessor 'org.projectlombok:lombok'
 	
@@ -31,7 +33,7 @@ dependencies {
 	runtimeOnly 'com.h2database:h2'
 	implementation 'org.mariadb.jdbc:mariadb-java-client:3.3.3'
 	
-	// Thymeleaf
+	// Thymeleaf (Backend Test Only)
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-web'
 	

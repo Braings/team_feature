@@ -10,12 +10,20 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
+
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@Builder
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 public class SiteUser {
 
 	@Id
