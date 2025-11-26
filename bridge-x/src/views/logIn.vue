@@ -47,19 +47,17 @@
 
 <script setup>
 import { useRouter } from 'vue-router';
-import { reactive, ref, computed } from 'vue';
+import { ref, computed } from 'vue';
 import { post } from '@/api.js';
 import FormField from '@/components/FormField.vue';
 import { useFormValidation } from '@/composables/useFormValidation';
+import { loginFormData } from '@/stores/loginStore.js';
 
 // ========================
 // Data & State
 // ========================
 const router = useRouter();
-const formData = reactive({
-  username: '',
-  password: ''
-});
+const formData = loginFormData;
 
 const loading = ref(false);
 
@@ -130,17 +128,17 @@ const handleLogin = async () => {
 
   try {
     const body = { username: formData.username, password: formData.password };
-    const res = await post('/auth/login', body);
+    const res = await post('/api/login', body);
 
     if (res && res.token) {
       localStorage.setItem('authToken', res.token);
-      localStorage.setItem('userId', formData.username);
+      localStorage.setItem('username', formData.username);
       router.push({ name: 'homePage' });
       return;
     }
 
     if (res && (res.success || res.ok)) {
-      localStorage.setItem('userId', formData.username);
+      localStorage.setItem('username', formData.username);
       router.push({ name: 'homePage' });
       return;
     }

@@ -52,10 +52,10 @@ export async function submitSignup() {
   try {
     // API 호출
     const response = await post('/api/sign', signupData)
-    console.log('✓ 회원가입 성공:', response)
+    console.log('회원가입 성공:', response)
     return response
   } catch (error) {
-    console.error('❌ 회원가입 실패:', error)
+    console.error('회원가입 실패:', error)
     throw error
   }
 }
