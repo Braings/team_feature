@@ -40,7 +40,9 @@ public class UserApiIntegrationTest {
             "email": "PlzSuccess@test.com",
             "password": "1234",
             "passwordCheck": "1234",
-            "birthday": "2025-12-25"
+            "birthday": "2025-12-25",
+            "height": "190",
+            "weight": "108"
         }
         """;
 
@@ -59,6 +61,8 @@ public class UserApiIntegrationTest {
         assertEquals("Im_Test_User", savedUser.getUsername());
         assertEquals("PlzSuccess@test.com", savedUser.getEmail());
         assertEquals(LocalDate.of(2025, 12, 25), savedUser.getBirthday());
+        assertEquals(190, savedUser.getBodyInfo().getHeight());
+        assertEquals(108, savedUser.getBodyInfo().getWeight());
     }
     
     /*

@@ -1,6 +1,5 @@
 package com.bridgeX.user.domain;
 
-import groovy.transform.builder.Builder;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -8,13 +7,20 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
+
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 @Getter
 @Setter
 @Builder
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 public class SiteUserBody {
 	@Id
     private Long id;

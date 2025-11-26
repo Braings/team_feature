@@ -33,11 +33,10 @@ public class SignupRequest {
 	@NotEmpty(message = "이메일은 공백으로 둘 수 없습니다.")
 	@Email(message = "잘못된 이메일 형식입니다.")
 	private String email;
-	/*
+	
 	@Min(value = 1, message = "키는 0 이하일 수 없습니다.")
 	private int height;
 	
 	@Min(value = 1, message = "체중은 0 이하일 수 없습니다.")
 	private int weight;
-	*/
 }

@@ -2,6 +2,7 @@ package com.bridgeX.user.domain;
 
 import java.time.LocalDate;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -44,6 +45,6 @@ public class SiteUser {
 	@Enumerated(EnumType.STRING) // Use e-num
     private UserRole role;
 	
-	@OneToOne(mappedBy = "user")
+	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private SiteUserBody bodyInfo;
 }

@@ -50,7 +50,14 @@ public class UserService {
         		.role(UserRole.USER) // Default user role - User
         		.build();
 
+        SiteUserBody body = SiteUserBody.builder()
+        		.height(dto.getHeight())
+        		.weight(dto.getWeight())
+        		.user(user)
+        		.build();
+        
         userRepository.save(user);
+        userBodyRepository.save(body);
     }
 
 
@@ -106,8 +113,10 @@ public class UserService {
         // Not Exist BodyInfo -> Generation
         SiteUserBody body = userBodyRepository.findByUser(user)
                 .orElseGet(() -> {
-                    SiteUserBody newBody = new SiteUserBody();
-                    newBody.setUser(user);
+                    SiteUserBody newBody = SiteUserBody.builder()
+                    		.user(user)
+                    		.build();
+                    
                     return newBody;
                 });
 
