@@ -1,7 +1,7 @@
 ### 국민 체육 데이터를 활용한 연령대별 운동 추천 게시판 프로젝트
 # BRIDGE - X
 <img width="2516" height="1320" alt="image" src="https://github.com/user-attachments/assets/1dca84ca-5884-4c8f-89c4-24bdbfd49040" />
-![Architecture](https://raw.githubusercontent.com/Braings/team_feature/main/BridgeX_Architecture.svg)
+<img src="https://raw.githubusercontent.com/Braings/team_feature/main/BridgeX_Architecture.svg" width="2516" />
 
 
 ### 프로젝트 소개
