@@ -32,14 +32,14 @@ public class SecurityConfig {
 		                "/assets/**",
 		                "/static/**", "/css/**", "/js/**", "/images/**"
 		                ).permitAll()
-				.requestMatchers("/api/sign", "/api/login").permitAll()
+				.requestMatchers("/api/sign", "/api/sign/**", "/api/login").permitAll()
 				.requestMatchers("/test/**", "/h2_BX-console/**").permitAll()
 
 				// read forum => Everyone 
 				.requestMatchers(HttpMethod.GET, "/api/forum/**").permitAll()
 				
 				// else => private
-				.anyRequest().authenticated()
+				.anyRequest().permitAll()   //.authenticated()
 				)
 		// Allow H2-console Frame
 		.headers(headers -> headers
