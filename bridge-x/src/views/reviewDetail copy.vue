@@ -12,7 +12,7 @@
         <button class="back" @click="goBack">◀ 목록으로</button>
       </section>
 
-      <div class="review-write-wrapper" v-if="post">
+      <!-- <div class="review-write-wrapper" v-if="post">
 
       </div>
 
@@ -22,42 +22,39 @@
         <div v-else class="post-list">
 
         </div>
-      </template>
+      </template> -->
 
+      <form class="write-form" @submit.prevent="submit">
+        <div class="row">
+          <select v-model="form.tag" :disabled="loading">
+            <option value="">말머리 선택</option>
+            <option value="질문">질문</option>
+            <option value="정보">정보</option>
+            <option value="잡담">잡담</option>
+          </select>
+
+          <input v-model="form.title" placeholder="제목을 입력하세요" :disabled="loading" />
+        </div>
+
+        <textarea v-model="form.content" placeholder="내용을 입력하세요" rows="12" :disabled="loading"></textarea>
+
+        <div class="actions">
+          <button type="submit" class="btn primary" :disabled="loading">
+            {{ loading ? '처리 중...' : (isEditMode ? '수정완료' : '작성완료') }}
+          </button>
+          <button type="button" class="btn" @click="goBack" :disabled="loading">취소</button>
+        </div>
+      </form>
     </div>
-
-    <aside class="gallery-side">
-      <div class="category-padding" :style="{ height: '9.8rem'}"></div>
-      <div class="trending-box" :style="{ boxShadow: '1px 1px 3px black'}">
-        <h3 :style="{ paddingBottom: '18px', borderBottom: '2px solid #ccc', fontSize: '20px' }" > &nbsp;&nbsp; 인기글</h3>
-        <ul class="trending-list">
-          <li v-for="post in trendingPosts" :key="post.username" @click="openPost(post)">
-            <span class="trending-title" :style="{ fontFamily: 'SCDream5'}">{{ post.title }}</span>
-            <span class="trending-count">{{ post.recommend }}</span>
-          </li>
-        </ul>
-      </div>
-      <div class="category-padding"></div>
-      <div class="recent-box" :style="{ boxShadow: '1px 1px 3px black'}">
-        <h3 :style="{ paddingBottom: '18px', borderBottom: '2px solid #ccc', fontSize: '20px'}" > &nbsp;&nbsp; 최근글</h3>
-        <ul class="recent-list">
-          <li v-for="post in recentPosts" :key="post.username" @click="openPost(post)">
-            <span class="recent-title" :style="{ fontFamily: 'SCDream5'}">{{ post.title }}</span>
-            <span class="recent-date">{{ post.date }}</span>
-          </li>
-        </ul>
-      </div>
-    </aside>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { getReviews, getReviewDetail, deleteReview } from '@/api.js';
+import { useRoute } from 'vue-router';
+import { getReviews, getReviewDetail } from '@/api.js';
 
 const route = useRoute();
-const router = useRouter();
 
 
 // 목록 관련 상태
@@ -74,9 +71,6 @@ const error = ref(null);
 // 라우트 파라미터를 사용하여 상세 보기 여부를 결정합니다.
 const username = computed(() => route.params.username || '');
 const post = ref(null); // 상세 게시물 데이터
-
-// 추천 상태
-const isRecommended = ref(false);
 
 // 목록 로직
 async function loadReviews() {
@@ -119,32 +113,6 @@ async function loadReviews() {
   }
 }
 
-
-function doSearch() {
-  page.value = 1;
-
-  const newQuery = {
-    searchType: search.value.type,
-    query: search.value.query,
-    category: selectedCategory.value
-  };
-
-  router.push({
-    name: 'reviews',
-    query: newQuery
-  }).catch(() => {});
-}
-
-
-function handleSearchAndBlur(event) {
-  doSearch();
-
-  if (event && event.currentTarget) {
-    event.currentTarget.blur();
-  }
-}
-
-
 // 상세 보기 로직
 async function loadPost(id) {
   loading.value = true;
@@ -177,64 +145,6 @@ async function loadPost(id) {
     loading.value = false;
   }
 }
-
-// 추천 토글 함수 추가
-async function toggleRecommend() {
-  if (!post.value) return;
-
-  // 1. UI 즉시 업데이트 (낙관적 업데이트)
-  const isCurrentlyRecommended = isRecommended.value;
-  isRecommended.value = !isCurrentlyRecommended;
-  post.value.recommend += isCurrentlyRecommended ? -1 : 1;
-
-  const action = isRecommended.value ? '추천' : '추천 취소';
-
-  try {
-    // 2. 서버에 추천 상태 변경 요청
-    // 실제 API: await toggleRecommendApi(post.value.username, !isCurrentlyRecommended);
-    console.log(`[Mock API] ${action} 요청: Post ${post.value.username}`);
-    // 성공 시: 그대로 유지
-    alert(`${action}되었습니다! (현재 추천 수: ${post.value.recommend})`);
-
-  } catch (err) {
-    // 3. 실패 시 상태 롤백 (롤백 로직)
-    isRecommended.value = isCurrentlyRecommended;
-    post.value.recommend += isCurrentlyRecommended ? 1 : -1;
-    alert('추천/추천 취소에 실패했습니다: ' + err.message);
-    console.error('추천 토글 실패:', err);
-  }
-}
-
-// 상세 보기에서 목록으로 돌아가기 (라우트 파라미터 제거)
-function goBack() {
-  router.push({ name: 'reviews' }).catch(()=>{});
-}
-
-function goToEdit() {
-  if (post.value) router.push({ name: 'reviewsWrite', params: { username: post.value.username } }).catch(()=>{});
-}
-
-async function deletePost() {
-  if (!post.value || !confirm('정말 삭제하시겠습니까?')) return;
-  try {
-    await deleteReview(post.value.username);
-    alert('삭제되었습니다.');
-    router.push({ name: 'reviews' }).catch(()=>{});
-  } catch (err) {
-    alert('삭제 실패: ' + err.message);
-    console.error('삭제 실패:', err);
-  }
-}
-
-const trendingPosts = computed(() => {
-  // 추천수(recommend) 기반으로 정렬
-  return [...posts.value].sort((a, b) => (b.recommend || 0) - (a.recommend || 0)).slice(0, 5);
-});
-
-const recentPosts = computed(() => {
-  // 최신 순서(no 또는 date)로 정렬
-  return [...posts.value].slice(0, 5);
-});
 
 
 // Watch 및 Mounted (모드 전환 로직)

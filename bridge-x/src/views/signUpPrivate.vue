@@ -32,7 +32,7 @@
               @blur="validateField('birthday')"
               @click="toggleDatePicker"
               inputmode="numeric"
-              placeholder="YYYYMMDD"
+              placeholder="YYYY-MM-DD"
               class="input-field birthday-field"
             />
             <div v-if="showDatePicker" class="date-picker-popover">
@@ -181,6 +181,7 @@ const onDatePickerChange = (e) => {
   datePickerValue.value = v;
   formData.birthday = v;
   errors.birthday = '';
+  showDatePicker.value = false;
 };
 
 // ========================
@@ -200,7 +201,7 @@ const handleNext = async () => {
   // 전역 store에 데이터 저장
   signupFormData.email = formData.email;
   signupFormData.birthday = formData.birthday;
-  signupFormData.sex = formData.birthday;
+  signupFormData.sex = formData.sex;
 
   // 다음 단계로 이동
   router.push({ name: 'sign.health' });

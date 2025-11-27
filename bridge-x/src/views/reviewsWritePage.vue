@@ -3,27 +3,7 @@
     <div class="container">
       <button class="back" @click="goBack">◀ 목록으로</button>
 
-      <form class="write-form" @submit.prevent="submit">
-        <div class="row">
-          <select v-model="form.tag" :disabled="loading">
-            <option value="">말머리 선택</option>
-            <option value="질문">질문</option>
-            <option value="정보">정보</option>
-            <option value="잡담">잡담</option>
-          </select>
 
-          <input v-model="form.title" placeholder="제목을 입력하세요" :disabled="loading" />
-        </div>
-
-        <textarea v-model="form.content" placeholder="내용을 입력하세요" rows="12" :disabled="loading"></textarea>
-
-        <div class="actions">
-          <button type="submit" class="btn primary" :disabled="loading">
-            {{ loading ? '처리 중...' : (isEditMode ? '수정완료' : '작성완료') }}
-          </button>
-          <button type="button" class="btn" @click="goBack" :disabled="loading">취소</button>
-        </div>
-      </form>
     </div>
   </div>
 </template>
