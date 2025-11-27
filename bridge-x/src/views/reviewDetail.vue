@@ -10,14 +10,14 @@
 
       <section class="controls">
         <button class="back" @click="goBack">◀ 목록으로</button>
-        <div class="search-area" >
-          <select v-model="search.type" :style="{ textAlign: 'center'}">
+        <div class="search-area">
+          <select v-model="search.type" class="select">
             <option value="all">전체</option>
             <option value="title">제목</option>
             <option value="author">작성자</option>
           </select>
-          <input v-model="search.query" placeholder="검색어 입력" />
-          <button class="search-btn" @click="handleSearchAndBlur($event)">검색</button>
+          <input v-model="search.query" placeholder="검색어 입력" class="search-input"/>
+          <button class="search-btn" @click=handleSearchAndBlur($event)>검색</button>
         </div>
       </section>
 
@@ -420,18 +420,37 @@ watch(username, (newUsername) => {
 
       .search-area { display:flex; gap:0.5rem; align-items:center; cursor: pointer; position: relative;
 
-          background-color: map.get($colors,'white');
-          padding: 0.6rem; border-radius:4px;
-          border:1px solid map.get($colors,'border');
-        .search-btn {
+        background-color: map.get($colors,'white');
+        padding: 0.6rem; border-radius:4px;
+        border:1px solid map.get($colors,'border');
 
+        .search-input {
+          border: none;
+          outline: none;
+          font-size: 0.9rem;
+          width: 150px;
+        }
+
+        .select {
+          text-align: center;
+          border: none;
+          outline: none;
+          font-size: 0.9rem;
+          padding: 0.1rem;
+        }
+
+        .search-btn {
           font-weight: bold;
           transition: background-color 0.1s ease;
 
-          &:focus {
-            outline: none;
-            color: map.get($colors, 'gray-hover');
-          }
+          &:hover {
+          box-shadow: map.get($shadows,'sm');
+        }
+
+        &:focus {
+          outline: none;
+          color: map.get($colors, 'gray-hover');
+        }
         }
       }
     }
