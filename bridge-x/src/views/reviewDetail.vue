@@ -8,22 +8,22 @@
         </div>
       </header>
 
-
+      <section class="controls">
+        <button class="back" @click="goBack">◀ 목록으로</button>
+        <div class="search-area" >
+          <select v-model="search.type" :style="{ textAlign: 'center'}">
+            <option value="all">전체</option>
+            <option value="title">제목</option>
+            <option value="author">작성자</option>
+          </select>
+          <input v-model="search.query" placeholder="검색어 입력" />
+          <button class="search-btn" @click="handleSearchAndBlur($event)">검색</button>
+        </div>
+      </section>
 
       <div class="review-detail-wrapper" v-if="post">
         <div class="container">
-          <section class="controls">
-            <button class="back" @click="goBack">◀ 목록으로</button>
-            <div class="search-area" >
-              <select v-model="search.type" :style="{ textAlign: 'center'}">
-                <option value="all">전체</option>
-                <option value="title">제목</option>
-                <option value="author">작성자</option>
-              </select>
-              <input v-model="search.query" placeholder="검색어 입력" />
-              <button class="search-btn" @click="handleSearchAndBlur($event)">검색</button>
-            </div>
-          </section>
+
           <article class="post-card" :style="{ boxShadow: '1px 1px 3px black'}">
             <header class="post-header">
               <h1 class="post-title">{{ post.title }}</h1>
@@ -54,8 +54,8 @@
       </div>
 
       <template v-else>
-        <div v-if="loading">게시물을 로드하는 중...</div>
-        <div v-else-if="error">게시물을 로드하는 데 실패했습니다: {{ error }}</div>
+        <div v-if="loading" class="list-status">게시물을 로드하는 중...</div>
+        <div v-else-if="error" class="list-status">게시물을 로드하는 데 실패했습니다: {{ error }}</div>
         <div v-else class="post-list">
           <table class="posts-table" :style="{ boxShadow: '1px 1px 3px black'}">
             <thead>
@@ -343,6 +343,26 @@ watch(username, (newUsername) => {
 @use '@/styles/_variables' as *;
 
 
+.list-status {
+    box-shadow: 1px 1px 2px black;
+    min-height: 200px; /* 메시지가 보일 영역의 최소 높이 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    color: map.get($colors, 'muted');
+    border: 1px solid map.get($colors, 'border');
+    border-radius: map.get($radius, 'sm');
+    background: map.get($colors, 'white');
+    padding: 2rem;
+    text-align: center;
+
+    &.error {
+      color: map.get($colors, 'error');
+      font-weight: bold;
+    }
+}
+
 .gallery-page {
   display: flex;
   min-height: 100vh;
@@ -392,7 +412,7 @@ watch(username, (newUsername) => {
 
     .controls {
       position: relative;
-      bottom: 10px;
+      margin-bottom: 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -403,32 +423,14 @@ watch(username, (newUsername) => {
           background-color: map.get($colors,'white');
           padding: 0.6rem; border-radius:4px;
           border:1px solid map.get($colors,'border');
-        // select, input {
-        //   font-size: 0.9rem;
-        //   padding: 0.3rem 0.5rem;
-        //   border: 1px solid map.get($colors,'border');
-        //   border-radius:4px;
-
-        //   &:focus {
-        //     outline: none;
-        //     border-color: map.get($colors, 'black');
-        //     box-shadow: 0 0 5px map.get($colors, 'gray-hover');
-        //   }
-        // }
         .search-btn {
-          // background-color: map.get($colors, 'black');
-          // color: map.get($colors, 'white');
-          // border: 1px solid map.get($colors,'black');
-          // font-size: 0.9rem;
-          // padding: 0.3rem 0.8rem;
-          // cursor: pointer;
+
           font-weight: bold;
           transition: background-color 0.1s ease;
 
           &:focus {
             outline: none;
-            background-color: map.get($colors, 'gray-hover');
-            color: map.get($colors, 'white');
+            color: map.get($colors, 'gray-hover');
           }
         }
       }
@@ -477,7 +479,6 @@ watch(username, (newUsername) => {
     // 상세 보기 전용 스타일
     .review-detail-wrapper {
       position: relative;
-      padding: 10px 0;
 
     .container {
       max-width: 100%;

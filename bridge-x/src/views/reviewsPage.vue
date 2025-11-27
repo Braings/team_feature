@@ -22,50 +22,52 @@
 
 
         <div class="search-area">
-          <select v-model="search.type">
+          <select v-model="search.type" class="select">
             <option value="all">전체</option>
             <option value="title">제목</option>
             <option value="author">작성자</option>
           </select>
-          <input v-model="search.query" placeholder="검색어 입력" />
+          <input v-model="search.query" placeholder="검색어 입력" class="search-input"/>
           <button class="search-btn" @click=handleSearchAndBlur($event)>검색</button>
         </div>
       </section>
 
       <section class="post-list">
-        <table class="posts-table" :style="{  boxShadow: '1px 1px 3px black'}">
-          <thead :style="{ borderBottom: '3px solid #ccc' }">
-            <tr>
-              <th class="col-no">번호</th>
-              <th class="col-tag">태그</th>
-              <th class="col-title" :style="{ textAlign: 'center' }" >제목</th>
-              <th class="col-author">글쓴이</th>
-              <th class="col-date">작성일</th>
-              <th class="col-views">조회</th>
-              <th class="col-rec">추천</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(post) in pagedPosts" :key="post.username" :style="{ fontFamily: 'SCDream5'}"  @click="openPost(post)">
-              <td class="col-no">{{ post.no }}</td>
-              <td class="col-tag">{{ post.tag }}</td>
-              <td class="col-title">{{ post.title }}</td>
-              <td class="col-author">{{ post.author }}</td>
-              <td class="col-date">{{ post.date }}</td>
-              <td class="col-views">{{ post.views }}</td>
-              <td class="col-rec">{{ post.recommend }}</td>
-            </tr>
-          </tbody>
-        </table>
+        <div v-if="loading" class="list-status">게시물을 로드하는 중...</div>
+        <!-- <div v-else-if="error" class="list-status error">게시물을 로드하는 데 실패했습니다: **{{ error }}**</div> -->
+        <div v-else-if="pagedPosts.length === 0" class="list-status no-posts">게시물이 없습니다.</div>
 
-        <div class="pagination">
+          <table v-else class="posts-table" :style="{  boxShadow: '1px 1px 3px black'}">
+            <thead :style="{ borderBottom: '3px solid #ccc' }">
+              <tr>
+                <th class="col-no">번호</th>
+                <th class="col-tag">태그</th>
+                <th class="col-title" :style="{ textAlign: 'center' }" >제목</th>
+                <th class="col-author">글쓴이</th>
+                <th class="col-date">작성일</th>
+                <th class="col-views">조회</th>
+                <th class="col-rec">추천</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(post) in pagedPosts" :key="post.username" :style="{ fontFamily: 'SCDream5'}"  @click="openPost(post)" >
+                <td class="col-no">{{ post.no }}</td>
+                <td class="col-tag">{{ post.tag }}</td>
+                <td class="col-title">{{ post.title }}</td>
+                <td class="col-author">{{ post.author }}</td>
+                <td class="col-date">{{ post.date }}</td>
+                <td class="col-views">{{ post.views }}</td>
+                <td class="col-rec">{{ post.recommend }}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="pagination" v-if="pagedPosts.length > 0" >
           <button @click="prevPage" :disabled="page === 1">이전</button>
           <span :style="{cursor: 'default'}"> {{ page }} / {{ totalPages }} </span>
           <button @click="nextPage" :disabled="page === totalPages">다음</button>
-
-
+          <button class="write-btn" @click="goToWrite">글쓰기</button>
         </div>
-        <button class="write-btn" @click="goToWrite">글쓰기</button>
 
       </section>
 
@@ -268,10 +270,8 @@ onMounted(() => {
 
 
   .write-btn {
-      position: relative;
-      bottom: 25px;
-      left: 53rem;
-      text-align:right;
+      position: absolute;
+      right: 5px;
       background-color: map.get($colors, 'black');
       color: map.get($colors, 'white');
       border: 1px solid map.get($colors,'black');
@@ -329,32 +329,62 @@ onMounted(() => {
         .tab.padding {background: transparent; border: none; cursor: default;}
       }
 
-      .search-area { display:flex; gap:0.5rem; align-items:center; cursor: pointer;
-        select, input {
+      .search-area { display:flex; gap:0.5rem; align-items:center; cursor: pointer; position: relative;
 
-          background-color: map.get($colors,'white');
-          padding: 0.6rem; border-radius:4px;
-          border:1px solid map.get($colors,'border');
+        background-color: map.get($colors,'white');
+        padding: 0.6rem; border-radius:4px;
+        border:1px solid map.get($colors,'border');
+
+        .search-input {
+          border: none;
+          outline: none;
+          font-size: 0.9rem;
+          width: 150px;
+        }
+        .select {
+          text-align: center;
+          border: none;
+          outline: none;
+          font-size: 0.9rem;
+          padding: 0.1rem;
         }
         .search-btn {
-          background-color: map.get($colors,'white');
-          padding: 0.6rem; border-radius:4px;
-          border:1px solid map.get($colors,'border');
-
-
           font-weight: bold;
           transition: background-color 0.1s ease;
 
-          &:focus {
-            outline: none;
-            background-color: map.get($colors, 'gray-hover');
-            color: map.get($colors, 'white');
-          }
+          &:hover {
+          box-shadow: map.get($shadows,'sm');
+        }
+
+        &:focus {
+          outline: none;
+          color: map.get($colors, 'gray-hover');
+        }
         }
       }
     }
 
     .post-list { margin-top: map.get($spacing, 'md');
+      .list-status {
+        box-shadow: 1px 1px 2px black;
+        min-height: 200px; /* 메시지가 보일 영역의 최소 높이 */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.2rem;
+        color: map.get($colors, 'muted');
+        border: 1px solid map.get($colors, 'border');
+        border-radius: map.get($radius, 'sm');
+        background: map.get($colors, 'white');
+        padding: 2rem;
+        text-align: center;
+
+        &.error {
+          color: map.get($colors, 'error');
+          font-weight: bold;
+        }
+      }
+
       .posts-table { width: 100%; border-collapse: collapse;
         background: map.get($colors,'white');
         border-radius: map.get($radius,'sm');
@@ -377,7 +407,7 @@ onMounted(() => {
         .col-views, .col-rec { width:8%; text-align:center; }
       }
 
-      .pagination { position: relative; top: 5px; cursor: outo; display:flex; justify-content:center; align-items:center; gap:1rem; margin-top:1rem; }
+      .pagination { align-items: center; justify-content: center; position: relative; top: 5px; cursor: outo; display:flex; gap:1rem; margin-top:1rem; }
     }
   }
 
