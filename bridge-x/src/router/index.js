@@ -7,7 +7,8 @@ import Maps from '../views/mapsPage.vue'
 import MyPage from '../views/myPage.vue'
 import Reviews from '../views/reviewsPage.vue'
 import ReviewDetail from '../views/reviewDetail.vue'
-import ReviewsWrite from '../views/reviewsWritePage.vue'
+import ReviewsWrite from '../views/reviewDetail copy.vue'
+// import ReviewsWrite from '../views/reviewsWritePage.vue'
 import LogIn from '../views/logIn.vue'
 
 const routes = [
