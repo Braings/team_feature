@@ -146,6 +146,10 @@ async function loadReviews() {
   loading.value = true;
   error.value = null;
 
+  search.value.type = route.query.searchType || 'all';
+  search.value.query = route.query.query || '';
+
+  selectedCategory.value = route.query.category || 'all';
   try {
     // API 호출 (실제 환경에서는 서버가 필터링 및 페이지네이션을 처리해야 합니다)
     const data = await getReviews({
@@ -178,22 +182,26 @@ async function loadReviews() {
 
 function doSearch() {
   page.value = 1;
-  loadReviews();
+
+  const newQuery = {
+    searchType: search.value.type,
+    query: search.value.query,
+    category: selectedCategory.value
+  };
+
+  router.push({
+    name: 'reviews',
+    query: newQuery
+  }).catch(() => {});
 }
 
 
 function handleSearchAndBlur(event) {
   doSearch();
+
   if (event && event.currentTarget) {
     event.currentTarget.blur();
   }
-}
-
-
-// 목록 항목 클릭 시 상세 보기로 전환
-function openPost(p) {
-  // 'reviewDetail' 라우트로 이동하여 URL 파라미터를 변경
-  router.push({ name: 'reviewDetail', params: { username: p.username } }).catch(()=>{});
 }
 
 
@@ -230,7 +238,7 @@ async function loadPost(id) {
   }
 }
 
-// 💡 추천 토글 함수 추가
+// 추천 토글 함수 추가
 async function toggleRecommend() {
   if (!post.value) return;
 
@@ -278,32 +286,6 @@ async function deletePost() {
   }
 }
 
-// 💡 Computed 속성 (목록용)
-const filteredPosts = computed(() => {
-  let result = posts.value;
-
-  // 카테고리 필터
-  if (selectedCategory.value !== 'all') {
-    const categoryMap = { question: '질문', info: '정보', review: '리뷰', chat: '잡담' };
-    const cat = categoryMap[selectedCategory.value];
-    if (cat) result = result.filter(p => p.tag === cat);
-  }
-
-  // 검색 필터
-  if (search.value.query) {
-    const q = search.value.query.toLowerCase();
-    result = result.filter(p => {
-      const titleMatch = (p.title || '').toLowerCase().includes(q);
-      const authorMatch = (p.author || '').toLowerCase().includes(q);
-      if (search.value.type === 'title') return titleMatch;
-      if (search.value.type === 'author') return authorMatch;
-      return titleMatch || authorMatch;
-    });
-  }
-
-  return result;
-});
-
 const trendingPosts = computed(() => {
   // 추천수(recommend) 기반으로 정렬
   return [...posts.value].sort((a, b) => (b.recommend || 0) - (a.recommend || 0)).slice(0, 5);
@@ -315,19 +297,8 @@ const recentPosts = computed(() => {
 });
 
 
-const pagedPosts = computed(() => {
-  const start = (page.value - 1) * pageSize;
-  return filteredPosts.value.slice(start, start + pageSize);
-});
-
 // Watch 및 Mounted (모드 전환 로직)
-
-// 1. 검색 조건이 바뀌면 목록을 다시 로드 (상세 모드가 아닐 때만)
-watch(search, () => {
-  if (!username.value) doSearch();
-}, { deep: true });
-
-// 2. **핵심**: 라우트 파라미터 변경을 감시하여 상세 보기/목록 보기 전환 처리
+// **핵심**: 라우트 파라미터 변경을 감시하여 상세 보기/목록 보기 전환 처리
 watch(username, (newUsername) => {
   if (newUsername) {
     loadPost(newUsername); // 상세 보기 로드
@@ -336,6 +307,16 @@ watch(username, (newUsername) => {
     loadReviews(); // 목록 로드 (URL 변경을 통한 목록으로 돌아가기 처리)
   }
 }, { immediate: true }); // 컴포넌트 마운트 시 초기 파라미터 검사
+
+watch(() => route.query, (newQuery, oldQuery) => {
+    // 1. 현재 라우트가 목록 페이지('reviews')이고
+    // 2. 상세 게시물(username)이 로드되지 않은 상태일 때만
+    if (!username.value && route.name === 'reviews' && JSON.stringify(newQuery) !== JSON.stringify(oldQuery)) {
+        // 검색 쿼리가 변경되었으므로 목록을 다시 로드합니다.
+        loadReviews();
+    }
+}, { deep: true }); // route.query 내부의 변경 사항을 감지하기 위해 deep: true 사용
+
 </script>
 
 <style lang="scss" scoped>
@@ -364,315 +345,270 @@ watch(username, (newUsername) => {
 }
 
 .gallery-page {
-  display: flex;
-  min-height: 100vh;
-  min-width: 100vw;
-  gap: 2vw;
-  padding: 2vh 3vw;
-  font-family: 'TheJamsilOTF6ExtraBold', sans-serif;
-  background-color: map.get($colors, 'table');
+    display: flex;
+    min-height: 100vh;
+    min-width: 100vw;
+    gap: 2vw;
+    padding: 2vh 3vw;
+    font-family: 'TheJamsilOTF6ExtraBold', sans-serif;
+    background-color: map.get($colors, 'table');
 
-  .gallery-main {
-    flex: 1 1 auto;
+    .gallery-main {
+      flex: 1 1 auto;
 
-    // 글쓰기 버튼 스타일
-    .write-btn {
-      display: block;
-      margin-top: 1rem;
-      margin-left: auto;
+      .gallery-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: map.get($spacing, 'md') map.get($spacing, 'lg');
+        background: transparent;
+        border-radius: map.get($radius, 'md');
+        box-shadow: map.get($shadows, 'sm');
 
-      background-color: map.get($colors, 'black');
-      color: map.get($colors, 'white');
-      border: 1px solid map.get($colors,'black');
-      font-size: 1rem;
-      padding: 0.3rem 0.8rem;
-      cursor: pointer;
-      transition: background-color 0.1s ease;
-      border-radius:4px;
-
-      &:hover {
-        background-color: map.get($colors, 'dark');
-        color: map.get($colors, 'white');
-      }
-    }
-
-
-    .gallery-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: map.get($spacing, 'md') map.get($spacing, 'lg');
-      background: transparent;
-      border-radius: map.get($radius, 'md');
-      box-shadow: map.get($shadows, 'sm');
-
-      .gallery-title { font-size: 2rem; margin: 0; }
-      .gallery-sub { color: map.get($colors, 'muted'); margin: 0; }
-    }
-
-    .controls {
-      position: relative;
-      margin-bottom: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: map.get($spacing, 'md');
-
-      .search-area { display:flex; gap:0.5rem; align-items:center; cursor: pointer; position: relative;
-
-        background-color: map.get($colors,'white');
-        padding: 0.6rem; border-radius:4px;
-        border:1px solid map.get($colors,'border');
-
-        .search-input {
-          border: none;
-          outline: none;
-          font-size: 0.9rem;
-          width: 150px;
-        }
-
-        .select {
-          text-align: center;
-          border: none;
-          outline: none;
-          font-size: 0.9rem;
-          padding: 0.1rem;
-        }
-
-        .search-btn {
-          font-weight: bold;
-          transition: background-color 0.1s ease;
-
-          &:hover {
-          box-shadow: map.get($shadows,'sm');
-        }
-
-        &:focus {
-          outline: none;
-          color: map.get($colors, 'gray-hover');
-        }
-        }
-      }
-    }
-
-    .post-list {
-      margin-top: map.get($spacing, 'md');
-      .posts-table {
-        width: 100%;
-        border-collapse: collapse;
-        background: map.get($colors,'white');
-        border-radius: map.get($radius,'sm');
-        overflow: hidden;
-        box-shadow: map.get($shadows,'xs');
-
-        th, td {
-          font-size: 0.9rem;
-          padding: 0.9rem 1rem;
-          text-align: center;
-          border-bottom: 1px solid map.get($colors,'border');
-        }
-        thead {
-          background: map.get($colors,'light');
-          color: map.get($colors,'dark');
-        }
-        tbody tr { cursor: pointer; }
-        .col-no { width:7%; }
-        .col-tag { width:8%; }
-        .col-title { width:50%; text-align: left;}
-        .col-author { width:10%; }
-        .col-date { width:10%; }
-        .col-views, .col-rec { width:8%; text-align:center; }
+        .gallery-title { font-size: 2rem; margin: 0; }
+        .gallery-sub { color: map.get($colors, 'muted'); margin: 0; }
       }
 
-      .pagination {
-        cursor: default;
-        display:flex;
-        justify-content:center;
-        align-items:center;
-        gap:1rem;
-        margin-top:1rem;
-      }
-    }
-  }
-
-    // 상세 보기 전용 스타일
-    .review-detail-wrapper {
-      position: relative;
-
-    .container {
-      max-width: 100%;
-      margin: 0 auto;
-
-      .back {
+      .controls {
         position: relative;
-        top: 20px;
-        left: 20px;
-        background: transparent; border: none;
-        color: map.get($colors,'muted');
-        cursor: pointer;
-        margin-bottom: 1rem;
-      }
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: map.get($spacing, 'md');
 
-      .post-card {
-        min-height: 60vh;
-        background: map.get($colors,'white');
-        padding: map.get($spacing,'lg');
-        border-radius: map.get($radius,'md');
-        box-shadow: map.get($shadows,'sm');
+        .search-area { display:flex; gap:0.5rem; align-items:center; cursor: pointer; position: relative;
 
-        .post-header {
-          position: relative;
-          display:flex; justify-content:space-between; align-items:flex-start;
-          border-bottom: 2px solid map.get($colors,'border');
-          .post-title { margin:0; font-size:2rem; }
-          .post-meta { position: relative; top:20px; color: map.get($colors,'muted'); font-size:0.9rem; display:flex; gap:0.8rem; }
-        }
+          background-color: map.get($colors,'white');
+          padding: 0.6rem; border-radius:4px;
+          border:1px solid map.get($colors,'border');
 
-        .post-body {
-          margin-top:1rem;
-          min-height: 40vh;
-          .tag {
-            display:inline-block;
-            background: map.get($colors,'light');
-            padding:0.2rem 0.5rem;
-            border-radius:4px;
-            margin-bottom:0.8rem;
+          .search-input {
+            border: none;
+            outline: none;
+            font-size: 0.9rem;
+            width: 150px;
           }
-        }
 
-        .post-actions {
-          margin-top:1.2rem;
-          display:flex;
-          gap:0.8rem;
-          justify-content: flex-end; // 버튼 오른쪽 정렬
+          .select {
+            text-align: center;
+            border: none;
+            outline: none;
+            font-size: 0.9rem;
+            padding: 0.1rem;
+          }
 
-          .btn {
-            background-color: map.get($colors, 'black');
-            color: map.get($colors, 'white');
-            border: 1px solid map.get($colors,'black');
-            font-size: 1rem;
-            padding: 0.3rem 0.8rem;
-            cursor: pointer;
+          .search-btn {
+            font-weight: bold;
             transition: background-color 0.1s ease;
-            border-radius:4px;
-            box-shadow: 1px 1px 3px black;
 
             &:hover {
-              background-color: map.get($colors, 'dark');
-              color: map.get($colors, 'white');
+            box-shadow: map.get($shadows,'sm');
+          }
+
+          &:focus {
+            outline: none;
+            color: map.get($colors, 'gray-hover');
+          }
+          }
+        }
+      }
+
+      .post-list {
+        margin-top: map.get($spacing, 'md');
+        .posts-table {
+          width: 100%;
+          border-collapse: collapse;
+          background: map.get($colors,'white');
+          border-radius: map.get($radius,'sm');
+          overflow: hidden;
+          box-shadow: map.get($shadows,'xs');
+
+          th, td {
+            font-size: 0.9rem;
+            padding: 0.9rem 1rem;
+            text-align: center;
+            border-bottom: 1px solid map.get($colors,'border');
+          }
+          thead {
+            background: map.get($colors,'light');
+            color: map.get($colors,'dark');
+          }
+          tbody tr { cursor: pointer; }
+          .col-no { width:7%; }
+          .col-tag { width:8%; }
+          .col-title { width:50%; text-align: left;}
+          .col-author { width:10%; }
+          .col-date { width:10%; }
+          .col-views, .col-rec { width:8%; text-align:center; }
+        }
+      }
+    }
+
+      // 상세 보기 전용 스타일
+      .review-detail-wrapper {
+        position: relative;
+
+      .container {
+        max-width: 100%;
+        margin: 0 auto;
+
+        .back {
+          position: relative;
+          top: 20px;
+          left: 20px;
+          background: transparent; border: none;
+          color: map.get($colors,'muted');
+          cursor: pointer;
+          margin-bottom: 1rem;
+        }
+
+        .post-card {
+          min-height: 60vh;
+          background: map.get($colors,'white');
+          padding: map.get($spacing,'lg');
+          border-radius: map.get($radius,'md');
+          box-shadow: map.get($shadows,'sm');
+
+          .post-header {
+            position: relative;
+            display:flex; justify-content:space-between; align-items:flex-start;
+            border-bottom: 2px solid map.get($colors,'border');
+            .post-title { margin:0; font-size:2rem; }
+            .post-meta { position: relative; top:20px; color: map.get($colors,'muted'); font-size:0.9rem; display:flex; gap:0.8rem; }
+          }
+
+          .post-body {
+            margin-top:1rem;
+            min-height: 40vh;
+            .tag {
+              display:inline-block;
+              background: map.get($colors,'light');
+              padding:0.2rem 0.5rem;
+              border-radius:4px;
+              margin-bottom:0.8rem;
             }
           }
-          .recommend-btn {
-            margin-right: auto; // 오른쪽 버튼들과 분리하여 왼쪽으로 이동
 
-            background-color: map.get($colors, 'white');
-            color: map.get($colors, 'black');
-            border: 1px solid map.get($colors,'border');
+          .post-actions {
+            margin-top:1.2rem;
+            display:flex;
+            gap:0.8rem;
+            justify-content: flex-end; // 버튼 오른쪽 정렬
 
-            &.active {
-              background-color: map.get($colors, 'dark');
+            .btn {
+              background-color: map.get($colors, 'black');
               color: map.get($colors, 'white');
-              border-color: transparent;
+              border: 1px solid map.get($colors,'black');
+              font-size: 1rem;
+              padding: 0.3rem 0.8rem;
+              cursor: pointer;
+              transition: background-color 0.1s ease;
+              border-radius:4px;
+              box-shadow: 1px 1px 3px black;
 
+              &:hover {
+                background-color: map.get($colors, 'dark');
+                color: map.get($colors, 'white');
+              }
+            }
+            .recommend-btn {
+              margin-right: auto; // 오른쪽 버튼들과 분리하여 왼쪽으로 이동
+
+              background-color: map.get($colors, 'white');
+              color: map.get($colors, 'black');
+              border: 1px solid map.get($colors,'border');
+
+              &.active {
+                background-color: map.get($colors, 'dark');
+                color: map.get($colors, 'white');
+                border-color: transparent;
+
+                &:hover {
+                  background-color: darken(map.get($colors,'error'), 10%);
+                }
+              }
+
+              &:hover:not(.active) {
+                background-color: map.get($colors, 'gray-hover');
+                color: map.get($colors, 'black');
+              }
+            }
+
+            .danger {
+              background: map.get($colors,'error');
+              border-color: map.get($colors,'error');
               &:hover {
                 background-color: darken(map.get($colors,'error'), 10%);
               }
             }
-
-            &:hover:not(.active) {
-              background-color: map.get($colors, 'gray-hover');
-              color: map.get($colors, 'black');
-            }
-          }
-
-          .danger {
-            background: map.get($colors,'error');
-            border-color: map.get($colors,'error');
-            &:hover {
-              background-color: darken(map.get($colors,'error'), 10%);
-            }
           }
         }
       }
     }
-  }
 
     .gallery-side { width: 18vw; display:flex; flex-direction:column;
 
-    .category-padding { height: 2rem; }
-    .category-box, .trending-box, .recent-box, .login-panel, .ad-box {
-      background: map.get($colors,'white');
-      padding: map.get($spacing,'md');
-      border-radius: map.get($radius,'md');
-      box-shadow: map.get($shadows,'sm');
+      .category-padding { height: 2rem; }
+      .trending-box, .recent-box {
+        background: map.get($colors,'white');
+        padding: map.get($spacing,'md');
+        border-radius: map.get($radius,'md');
+        box-shadow: map.get($shadows,'sm');
 
-      h3, h4 { margin: 10px 0 0.8rem 0; font-size: 1rem; }
-    }
+        h3, h4 { margin: 10px 0 0.8rem 0; font-size: 1rem; }
+      }
 
-    .category-list, .trending-list, .recent-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
 
-      li {
-        padding: 0.5rem 0;
-        border-bottom: 1px solid map.get($colors,'border');
+      .trending-list, .recent-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
 
-        &:last-child { border-bottom: none; }
+        li {
+          padding: 0.5rem 0;
+          border-bottom: 1px solid map.get($colors,'border');
 
-        a {
-          color: map.get($colors,'dark');
-          text-decoration: none;
-          cursor: pointer;
+          &:last-child { border-bottom: none; }
+        }
+      }
 
-          &:hover { color: map.get($colors,'black'); font-weight: bold; }
+      .trending-list li {
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:0.5rem;
+        cursor: pointer;
+
+        &:hover { background:map.get($colors,'light'); padding-left:0.3rem; }
+
+        .trending-title { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .trending-count {
+          background: map.get($colors,'black');
+          color: white;
+          padding:0.2rem 0.5rem;
+          border-radius:12px;
+          font-size:0.8rem;
+          font-weight:bold;
+        }
+      }
+
+      .recent-list li {
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:0.5rem;
+        cursor: pointer;
+
+        &:hover { background:map.get($colors,'light'); padding-left:0.3rem; }
+
+        .recent-title { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .recent-date {
+          color: map.get($colors,'muted');
+          font-size:0.8rem;
+          white-space:nowrap;
         }
       }
     }
-
-    .trending-list li {
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:0.5rem;
-      cursor: pointer;
-
-      &:hover { background:map.get($colors,'light'); padding-left:0.3rem; }
-
-      .trending-title { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-      .trending-count {
-        background: map.get($colors,'black');
-        color: white;
-        padding:0.2rem 0.5rem;
-        border-radius:12px;
-        font-size:0.8rem;
-        font-weight:bold;
-      }
-    }
-
-    .recent-list li {
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:0.5rem;
-      cursor: pointer;
-
-      &:hover { background:map.get($colors,'light'); padding-left:0.3rem; }
-
-      .recent-title { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-      .recent-date {
-        color: map.get($colors,'muted');
-        font-size:0.8rem;
-        white-space:nowrap;
-      }
-    }
-
-    .ad-placeholder { height: 150px;
-      background: map.get($colors,'light');
-      display:flex; align-items:center; justify-content:center;
-      color: map.get($colors,'muted');
-    }
-    .side-btn { @include button-base; width:100%; }
-  }
 }
 </style>
