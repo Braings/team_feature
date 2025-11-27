@@ -21,7 +21,10 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 	@Bean
 	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http.authorizeHttpRequests(auth -> auth
+		http
+			.csrf(csrf -> csrf.disable())
+			.authorizeHttpRequests(auth -> auth
+				
 				// root, sign & login => Everyone 
 				.requestMatchers(
 						"/", "/index.html",
@@ -37,8 +40,11 @@ public class SecurityConfig {
 				
 				// else => private
 				.anyRequest().authenticated()
-			);
-		
+				)
+		// Allow H2-console Frame
+		.headers(headers -> headers
+				.frameOptions(frame -> frame.sameOrigin())
+				);
 		return http.build();
 	}
 
