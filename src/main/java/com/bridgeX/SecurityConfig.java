@@ -2,7 +2,11 @@ package com.bridgeX;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import org.springframework.http.HttpMethod;
+
 import org.springframework.security.authentication.AuthenticationManager;
+
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -10,8 +14,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -19,15 +21,24 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 public class SecurityConfig {
 	@Bean
 	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http.authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
-				.requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
-				.csrf((csrf) -> csrf.ignoringRequestMatchers(new AntPathRequestMatcher("/h2_BX-console/**")))
-				.headers((headers) -> headers.addHeaderWriter(
-						new XFrameOptionsHeaderWriter(XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)))
-				// login
-				.formLogin((formLogin) -> formLogin.loginPage("/test/login").defaultSuccessUrl("/")) // Test: (/test/login), Run: (/api/login)
-				.logout((logout) -> logout.logoutRequestMatcher(new AntPathRequestMatcher("/test/logout"))
-						.logoutSuccessUrl("/").invalidateHttpSession(true));
+		http.authorizeHttpRequests(auth -> auth
+				// root, sign & login => Everyone 
+				.requestMatchers(
+						"/", "/index.html",
+		                "/favicon.ico",
+		                "/assets/**",
+		                "/static/**", "/css/**", "/js/**", "/images/**"
+		                ).permitAll()
+				.requestMatchers("/api/sign", "/api/login").permitAll()
+				.requestMatchers("/test/**", "/h2_BX-console/**").permitAll()
+
+				// read forum => Everyone 
+				.requestMatchers(HttpMethod.GET, "/api/forum/**").permitAll()
+				
+				// else => private
+				.anyRequest().authenticated()
+			);
+		
 		return http.build();
 	}
 
