@@ -102,7 +102,7 @@ export default {
 }
 
 .cc-font {
-  font-family: 'CC', sans-serif;
+  font-family: 'TheJamsilOTF6ExtraBold', sans-serif;
 }
 
 /* 뷰포트 너비(vw)와 높이(vh)를 사용하여 상대 크기 지정 */

@@ -164,7 +164,7 @@ const goToSignUp = () => {
   display: flex;
   width: 100vw;
   height: 100vh;
-  font-family: 'CC', sans-serif;
+  font-family: 'TheJamsilOTF6ExtraBold', sans-serif;
   overflow: hidden;
   background-color: map-get($colors, 'white');
 }

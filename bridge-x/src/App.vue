@@ -97,8 +97,29 @@ export default {
 <style>
 
 @font-face {
-  font-family: 'CC';
-  src: url('/fonts/The Jamsil OTF 6 ExtraBold.otf') format('opentype');
+  font-family: 'TheJamsilOTF6ExtraBold';
+  src: url('../public/fonts/The Jamsil OTF 6 ExtraBold.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'SCDream3';
+  src: url('../public/fonts/SCDream3.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'SCDream4';
+  src: url('../public/fonts/SCDream4.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'SCDream5';
+  src: url('../public/fonts/SCDream5.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
 }
@@ -124,7 +145,7 @@ export default {
 }
 
 .cc-font {
-  font-family: 'CC', sans-serif;
+  font-family: 'TheJamsilOTF6ExtraBold', sans-serif;
 }
 
 /* 상단 "Log In" */
