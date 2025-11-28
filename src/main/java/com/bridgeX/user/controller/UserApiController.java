@@ -16,6 +16,7 @@ import com.bridgeX.user.dto.LoginResponse;
 import com.bridgeX.user.dto.SignupRequest;
 import com.bridgeX.user.dto.UserBodyInfoRequest;
 import com.bridgeX.user.dto.UserBodyInfoResponse;
+import com.bridgeX.user.dto.UserInfoModifyRequest;
 import com.bridgeX.user.dto.UserInfoResponse;
 import com.bridgeX.user.service.UserService;
 
@@ -46,6 +47,17 @@ public class UserApiController {
         	return ResponseEntity.badRequest().body(result);
         }
         return ResponseEntity.ok(result);
+    }
+    
+    // User Info Modify
+    @PostMapping("/me/modify")
+    public ResponseEntity<UserInfoResponse> modifyInfo(Principal principal, @Valid @RequestBody UserInfoModifyRequest request) {
+    	// User 정보 꺼내오기
+        String username = principal.getName();
+        // 변경 요청
+        userService.modifyUserInfo(username, request);
+
+        return ResponseEntity.noContent().build();
     }
     
     // User Info Response

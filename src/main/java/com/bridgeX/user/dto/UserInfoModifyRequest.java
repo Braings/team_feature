@@ -2,39 +2,34 @@ package com.bridgeX.user.dto;
 
 import java.time.LocalDate;
 
+import com.bridgeX.user.domain.SiteUser;
+import com.bridgeX.user.domain.SiteUserBody;
 import com.bridgeX.user.domain.UserGender;
-import jakarta.validation.constraints.NotNull;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
+
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-// Sign-up Request DTO
-public class SignupRequest {
-	// @NotEmpty(message = "ID는 공백으로 둘 수 없습니다.") // 프론트엔드 미구현으로 임시 주석 처리 (공백 시 오류 방지)
+@Builder
+public class UserInfoModifyRequest {
+	// 입력이 없는 대상은 변경하지 않음
+	
 	@Size(min = 1, max = 25, message = "닉네임은 25자 내에서만 가능합니다.")
 	private String nickname;
-	
-	@NotEmpty(message = "ID는 공백으로 둘 수 없습니다.")
-	@Size(min = 1, max = 25, message = "ID는 25자 내에서만 가능합니다.")
-	private String username;
 
-	@NotEmpty(message = "비밀번호는 공백으로 둘 수 없습니다.")
 	@Size(min = 4, max = 25, message = "비밀번호는 4 ~ 25자 내에서만 가능합니다.")
 	private String password;
 
-	@NotNull
 	private LocalDate birthday;
 
-	@NotNull
 	private UserGender sex;
 
-	@NotEmpty(message = "이메일은 공백으로 둘 수 없습니다.")
 	@Email(message = "잘못된 이메일 형식입니다.")
 	private String email;
 

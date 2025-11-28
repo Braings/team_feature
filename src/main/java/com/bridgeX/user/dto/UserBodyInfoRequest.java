@@ -12,10 +12,10 @@ import lombok.Setter;
 @Setter
 public class UserBodyInfoRequest {
 	@Min(1)
-	private int height;
+	private Integer height;
 
 	@Min(1)
-	private int weight;
+	private Integer weight;
 
 	@NotNull
 	private UserGender gender; // e-num { MALE, FEMALE }
