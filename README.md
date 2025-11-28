@@ -1,6 +1,8 @@
 ### 국민 체육 데이터를 활용한 연령대별 운동 추천 게시판 프로젝트
 # BRIDGE - X
 <img width="2516" height="1320" alt="image" src="https://github.com/user-attachments/assets/1dca84ca-5884-4c8f-89c4-24bdbfd49040" />
+<img src="https://raw.githubusercontent.com/Braings/team_feature/main/BridgeX_Architecture.svg" width="2516" />
+
 
 ### 프로젝트 소개
 > 국민 체육 진흥원에서 제공하는 국민 연령대별 운동 빅데이터를 활용한 연령대별 운동을 추천하는 프로젝트입니다.
@@ -31,7 +33,16 @@ java jdk 21
 java spring-boot
 Gleek.io
 mariaDB 10.5.29
+flask 3.1.0
 ```
+
+### AI Feature Dependencies
+```bash
+# pip package
+pip install google-genai pandas python-dotenv
+```
+> GoogleAi-API key required in .env
+
 ### License
 ```
 MIT License
