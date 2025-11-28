@@ -38,3 +38,5 @@ out/
 
 ###Data###
 .env
+venv/
+*.csv

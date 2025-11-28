@@ -35,6 +35,14 @@ Gleek.io
 mariaDB 10.5.29
 flask 3.1.0
 ```
+
+### AI Feature Dependencies
+```bash
+# pip package
+pip install google-genai pandas python-dotenv
+```
+> GoogleAi-API key required in .env
+
 ### License
 ```
 MIT License
