@@ -1,6 +1,6 @@
 import google.generativeai as genai
 import os
-import pandas as pd  # Pandas 라이브러리 임포트
+import pandas as pd
 from dotenv import load_dotenv
 
 def get_exercise_recommendation():
@@ -18,29 +18,36 @@ def get_exercise_recommendation():
         print(f"API 설정 중 오류: {e}")
         return
 
-    # --- 2. 사용자 요청 정의 ---
-    target_height = 180
-    target_weight = 60
-    target_age_group = '성인'
-    target_gender = 'M'
-    
-    question = f"키 {target_height}cm, 몸무게 {target_weight}kg인 {target_age_group} {target_gender}의 추천 운동을 알려줘."
-    print(f"요청: {question}\n")
+    # --- 2. 사용자 요청 입력 ---
+    try:
+        target_gender = input("성별을 입력하세요 (M/F): ").strip().upper()
+        target_height = float(input("키를 입력하세요 (cm): ").strip())
+        target_weight = float(input("몸무게를 입력하세요 (kg): ").strip())
+        target_age_group = input("연령대를 입력하세요 (예: 성인, 청소년, 노인): ").strip()
+    except ValueError:
+        print("잘못된 입력입니다. 숫자 값을 정확히 입력해주세요.")
+        return
 
+    question = f"키 {target_height}cm, 몸무게 {target_weight}kg인 {target_age_group} {target_gender}의 추천 운동을 알려줘."
+    
     # --- 3. 로컬 CSV에서 관련 데이터 '검색' (RAG의 Retrieve 단계) ---
     csv_file_path = 'EX-HALF.csv'
     example_exercises_string = ""
     
     try:
-        df = pd.read_csv(csv_file_path)
+        # ⭐️ 최적화: 필요한 열만 로드하고 데이터 타입 지정
+        required_cols = ['AGRDE_FLAG_NM', 'SEXDSTN_FLAG_CD', 'MESURE_IEM_001_VALUE', 'MESURE_IEM_002_VALUE', 'MVM_PRSCRPTN_CN']
+        dtype_dict = {
+            'AGRDE_FLAG_NM': 'string',
+            'SEXDSTN_FLAG_CD': 'string',
+            'MESURE_IEM_001_VALUE': 'float32',
+            'MESURE_IEM_002_VALUE': 'float32',
+            'MVM_PRSCRPTN_CN': 'string'
+        }
 
-        # ⭐️ 중요: 사용할 열을 숫자형으로 변환 (오류 발생 시 NaN으로)
-        # 키: MESURE_IEM_001_VALUE, 체중: MESURE_IEM_002_VALUE
-        df['MESURE_IEM_001_VALUE'] = pd.to_numeric(df['MESURE_IEM_001_VALUE'], errors='coerce')
-        df['MESURE_IEM_002_VALUE'] = pd.to_numeric(df['MESURE_IEM_002_VALUE'], errors='coerce')
+        df = pd.read_csv(csv_file_path, usecols=required_cols, dtype=dtype_dict)
 
         # 필터링에 필요한 열에 NaN 값이 없는 행만 선택
-        required_cols = ['AGRDE_FLAG_NM', 'SEXDSTN_FLAG_CD', 'MESURE_IEM_001_VALUE', 'MESURE_IEM_002_VALUE', 'MVM_PRSCRPTN_CN']
         df = df.dropna(subset=required_cols)
 
         # '유사한' 사용자 필터링 (질문 조건 기준)
@@ -59,15 +66,10 @@ def get_exercise_recommendation():
         
         if not example_exercises_list:
             example_exercises_string = "유사한 사용자를 CSV에서 찾지 못했습니다."
-            print("CSV에서 유사한 데이터를 찾지 못했습니다. API가 일반적인 추천을 시도합니다.")
         else:
             # 중복 제거 및 문자열로 결합 (API에 컨텍스트로 제공)
             unique_exercises = list(set(example_exercises_list))
             example_exercises_string = "\n\n".join(unique_exercises)
-            print(f"--- CSV에서 찾은 {len(unique_exercises)}개의 유사 사례 운동 루틴 ---")
-            print(example_exercises_string)
-            print("--------------------------------------")
-
 
     except FileNotFoundError:
         print(f"오류: '{csv_file_path}' 파일을 찾을 수 없습니다.")
@@ -75,38 +77,141 @@ def get_exercise_recommendation():
     except KeyError as e:
         print(f"오류: CSV에 필요한 열({e})이 없습니다. 열 이름을 확인하세요.")
         return
-    except Exception as e:
-        print(f"CSV 처리 중 오류: {e}")
-        return
+import google.generativeai as genai
+import os
+import pandas as pd
+from dotenv import load_dotenv
+import google.generativeai as genai
+import os
+import pandas as pd
+from dotenv import load_dotenv
 
-    # --- 4. API에 '검색된 정보'와 함께 질문 (RAG의 Generate 단계) ---
+def get_exercise_recommendation(target_gender, target_height, target_weight, target_age_group):
+    # --- 1. API 키 및 모델 설정 ---
+    load_dotenv()
+    api_key = os.getenv("GOOGLE_API_KEY")
+    if not api_key:
+        return "오류: GOOGLE_API_KEY를 .env 파일에서 찾을 수 없습니다."
+
+    try:
+        genai.configure(api_key=api_key)
+        model = genai.GenerativeModel('gemini-2.0-flash')
+    except Exception as e:
+        return f"API 설정 중 오류: {e}"
+
+    question = f"키 {target_height}cm, 몸무게 {target_weight}kg인 {target_age_group} {target_gender}의 추천 운동을 알려줘."
     
+    # --- 3. 로컬 CSV에서 관련 데이터 '검색' (RAG의 Retrieve 단계) ---
+    csv_file_path = 'EX-HALF.csv'
+    example_exercises_string = ""
+    average_stats_string = ""
+    
+    try:
+        # ⭐️ 최적화: 필요한 열만 로드하고 데이터 타입 지정
+        # 007: 악력, 012: 앉아윗몸앞으로굽히기, 019: 교차윗몸일으키기, 022: 제자리멀리뛰기
+        required_cols = [
+            'AGRDE_FLAG_NM', 'SEXDSTN_FLAG_CD', 
+            'MESURE_IEM_001_VALUE', 'MESURE_IEM_002_VALUE', 'MVM_PRSCRPTN_CN',
+            'MESURE_IEM_007_VALUE', 'MESURE_IEM_012_VALUE', 'MESURE_IEM_019_VALUE', 'MESURE_IEM_022_VALUE'
+        ]
+        dtype_dict = {
+            'AGRDE_FLAG_NM': 'string',
+            'SEXDSTN_FLAG_CD': 'string',
+            'MESURE_IEM_001_VALUE': 'float32',
+            'MESURE_IEM_002_VALUE': 'float32',
+            'MVM_PRSCRPTN_CN': 'string',
+            'MESURE_IEM_007_VALUE': 'float32',
+            'MESURE_IEM_012_VALUE': 'float32',
+            'MESURE_IEM_019_VALUE': 'float32',
+            'MESURE_IEM_022_VALUE': 'float32'
+        }
+
+        df = pd.read_csv(csv_file_path, usecols=required_cols, dtype=dtype_dict)
+
+        # 필터링에 필요한 열에 NaN 값이 없는 행만 선택 (운동 처방 및 기본 신체 정보)
+        df = df.dropna(subset=['AGRDE_FLAG_NM', 'SEXDSTN_FLAG_CD', 'MESURE_IEM_001_VALUE', 'MESURE_IEM_002_VALUE', 'MVM_PRSCRPTN_CN'])
+
+        # --- 평균 운동 능력 계산 ---
+        # 동일 연령대 및 성별 그룹 필터링
+        group_df = df[
+            (df['AGRDE_FLAG_NM'] == target_age_group) &
+            (df['SEXDSTN_FLAG_CD'] == target_gender)
+        ]
+
+        if not group_df.empty:
+            avg_grip = group_df['MESURE_IEM_007_VALUE'].mean()
+            avg_flex = group_df['MESURE_IEM_012_VALUE'].mean()
+            avg_situp = group_df['MESURE_IEM_019_VALUE'].mean()
+            avg_jump = group_df['MESURE_IEM_022_VALUE'].mean()
+
+            average_stats_string = f"""
+            [동일 연령대({target_age_group}) 및 성별({target_gender}) 평균 운동 수행 능력]
+            - 악력: {avg_grip:.1f} kg
+            - 앉아윗몸앞으로굽히기 (유연성): {avg_flex:.1f} cm
+            - 교차윗몸일으키기 (근지구력): {avg_situp:.1f} 회
+            - 제자리멀리뛰기 (순발력): {avg_jump:.1f} cm
+            """
+        else:
+            average_stats_string = "해당 연령대 및 성별의 평균 운동 데이터를 찾을 수 없습니다."
+
+        # --- '유사한' 사용자 필터링 (질문 조건 기준) ---
+        height_min, height_max = target_height - 5, target_height + 5  # 키 ±5cm
+        weight_min, weight_max = target_weight - 5, target_weight + 5  # 몸무게 ±5kg
+
+        filtered_df = df[
+            (df['AGRDE_FLAG_NM'] == target_age_group) &
+            (df['SEXDSTN_FLAG_CD'] == target_gender) &
+            (df['MESURE_IEM_001_VALUE'].between(height_min, height_max)) &
+            (df['MESURE_IEM_002_VALUE'].between(weight_min, weight_max))
+        ]
+
+        # 'MVM_PRSCRPTN_CN' (추천운동) 열의 내용을 리스트로 추출
+        example_exercises_list = filtered_df['MVM_PRSCRPTN_CN'].tolist()
+        
+        if not example_exercises_list:
+            example_exercises_string = "유사한 사용자를 CSV에서 찾지 못했습니다."
+        else:
+            # 중복 제거 및 문자열로 결합 (API에 컨텍스트로 제공)
+            unique_exercises = list(set(example_exercises_list))
+            example_exercises_string = "\n\n".join(unique_exercises)
+
+    except FileNotFoundError:
+        return f"오류: '{csv_file_path}' 파일을 찾을 수 없습니다."
+    except KeyError as e:
+        return f"오류: CSV에 필요한 열({e})이 없습니다. 열 이름을 확인하세요."
+    
+    # --- 4. 프롬프트 구성 (RAG의 Augment 단계) ---
     prompt = f"""
-    당신은 헬스케어 데이터 분석가입니다.
+    사용자 정보: {question}
     
+    {average_stats_string}
+
     다음은 내 CSV 데이터에서 찾은, 사용자의 요청과 유사한 신체 조건을 가진 사람들의 실제 운동 추천 내역입니다.
     
     ---[참고 데이터: 유사 사례 운동 추천]----
     {example_exercises_string}
-    ---[참고 데이터 끝]----
     
-    이 참고 데이터를 바탕으로, 다음 사용자를 위한 맞춤형 운동 루틴을 (준비운동, 본운동, 마무리운동으로 나누어) 새로 생성해주세요.
-    
-    사용자 요청: "{question}"
-    
-    (만약 참고 데이터가 "찾지 못했습니다"라면, 해당 신체조건에 맞는 일반적인 건강 정보를 바탕으로 추천해주세요.)
+    위 정보를 바탕으로 사용자에게 적합한 운동을 추천해주세요.
+    특히, 위에서 제공된 '평균 운동 수행 능력'을 언급하며 사용자가 목표로 삼을 수 있는 수치를 제시해주세요.
+    만약 유사한 운동 데이터가 없다면, 일반적인 운동을 추천하되, 사용자 정보에 맞춰 조언해주세요.
     """
 
     # --- 5. API 호출 및 응답 ---
     try:
-        print("\n... API에 맞춤형 추천 요청 중 ...")
+        # print("\n데이터에 기반해 AI 응답을 생성하고 있습니다...") # API 모드에서는 로그 생략 가능
         response = model.generate_content(prompt)
-        
-        print("\n[Gemini 맞춤형 응답]")
-        print(response.text)
+        return response.text
 
     except Exception as e:
-        print(f"API 호출 중 오류 발생: {e}")
+        return f"API 호출 중 오류 발생: {e}"
 
 if __name__ == "__main__":
-    get_exercise_recommendation()
+    # 테스트용 코드
+    try:
+        g = input("성별(M/F): ").strip().upper()
+        h = float(input("키(cm): ").strip())
+        w = float(input("몸무게(kg): ").strip())
+        a = input("연령대: ").strip()
+        print(get_exercise_recommendation(g, h, w, a))
+    except ValueError:
+        print("입력 오류")
