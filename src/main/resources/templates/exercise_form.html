@@ -1,111 +1,187 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <title>AI 운동 추천</title>
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f4f9;
+        body,
+        html {
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            height: 100%;
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            color: white;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            font-size: 24px;
+            z-index: 1000;
         }
-        .container {
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 600px;
+
+        /* Split Layout */
+        .split-container {
+            display: flex;
+            height: 100%;
         }
-        h1 {
-            text-align: center;
-            color: #333;
+
+        .profile-section {
+            width: 30%;
+            background-color: #1a1a1a;
+            /* Dark frame */
+            color: white;
+            padding: 40px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .result-section {
+            width: 70%;
+            background-color: #f4f4f9;
+            padding: 40px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .profile-item {
             margin-bottom: 20px;
+            font-size: 18px;
+            border-bottom: 1px solid #444;
+            padding-bottom: 10px;
         }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
+
+        .profile-label {
+            font-weight: bold;
+            color: #aaa;
             display: block;
             margin-bottom: 5px;
-            color: #666;
         }
-        input, select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
-        button {
-            width: 100%;
-            padding: 12px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+
+        .result-content {
             font-size: 16px;
-            margin-top: 10px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .result {
-            margin-top: 30px;
-            padding: 20px;
-            background-color: #e9ecef;
-            border-radius: 5px;
-            white-space: pre-wrap; /* 줄바꿈 보존 */
-        }
-        .error {
-            color: red;
-            text-align: center;
-            margin-top: 10px;
+
+        h2 {
+            margin-top: 0;
+            color: #333;
         }
     </style>
 </head>
+
 <body>
 
-<div class="container">
-    <h1>AI 맞춤 운동 추천</h1>
-    <form action="/exercise" method="post">
-        <div class="form-group">
-            <label for="gender">성별</label>
-            <select id="gender" name="gender" required>
-                <option value="M" th:selected="${gender == 'M'}">남성</option>
-                <option value="F" th:selected="${gender == 'F'}">여성</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="height">키 (cm)</label>
-            <input type="number" id="height" name="height" step="0.1" required th:value="${height}">
-        </div>
-        <div class="form-group">
-            <label for="weight">몸무게 (kg)</label>
-            <input type="number" id="weight" name="weight" step="0.1" required th:value="${weight}">
-        </div>
-        <div class="form-group">
-            <label for="age">나이 (만)</label>
-            <input type="number" id="age" name="age" required th:value="${age}">
-        </div>
-        <button type="submit">추천 받기</button>
-    </form>
-
-    <div th:if="${error}" class="error">
-        <p th:text="${error}"></p>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        사용자 맞춤 응답을 구성하고 있습니다...
     </div>
 
-    <div th:if="${recommendation}" class="result">
-        <h3>추천 결과:</h3>
-        <p th:text="${recommendation}"></p>
+    <!-- Main Content -->
+    <div class="split-container" id="mainContent" style="display: none;">
+        <!-- Left: Profile Section (30%) -->
+        <div class="profile-section">
+            <h2 style="color: white;">사용자 프로필</h2>
+            <div class="profile-item">
+                <span class="profile-label">성별</span>
+                <span th:text="${gender == 'M' ? '남성' : '여성'}"></span>
+            </div>
+            <div class="profile-item">
+                <span class="profile-label">키</span>
+                <span th:text="${height} + ' cm'"></span>
+            </div>
+            <div class="profile-item">
+                <span class="profile-label">몸무게</span>
+                <span th:text="${weight} + ' kg'"></span>
+            </div>
+            <div class="profile-item">
+                <span class="profile-label">나이</span>
+                <span th:text="${age} + '세'"></span>
+            </div>
+        </div>
+
+        <!-- Right: Result Section (70%) -->
+        <div class="result-section">
+            <div id="resultContent" class="result-content">
+                <!-- AI Response will be injected here -->
+            </div>
+        </div>
     </div>
-</div>
+
+    <!-- Hidden inputs for JS to grab -->
+    <input type="hidden" id="gender" th:value="${gender}">
+    <input type="hidden" id="height" th:value="${height}">
+    <input type="hidden" id="weight" th:value="${weight}">
+    <input type="hidden" id="age" th:value="${age}">
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const gender = document.getElementById('gender').value;
+            const height = parseFloat(document.getElementById('height').value);
+            const weight = parseFloat(document.getElementById('weight').value);
+            const age = parseInt(document.getElementById('age').value);
+
+            const requestData = {
+                gender: gender,
+                height: height,
+                weight: weight,
+                age: age
+            };
+
+            fetch('/api/exercise/recommend', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const loadingOverlay = document.getElementById('loadingOverlay');
+                    const mainContent = document.getElementById('mainContent');
+                    const resultContent = document.getElementById('resultContent');
+
+                    if (data.recommendation) {
+                        resultContent.textContent = data.recommendation;
+                    } else if (data.error) {
+                        resultContent.textContent = "오류 발생: " + data.error;
+                        resultContent.style.color = "red";
+                    } else {
+                        resultContent.textContent = "알 수 없는 오류가 발생했습니다.";
+                    }
+
+                    // Hide loading, show content
+                    loadingOverlay.style.display = 'none';
+                    mainContent.style.display = 'flex';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    const loadingOverlay = document.getElementById('loadingOverlay');
+                    loadingOverlay.textContent = "서버 통신 중 오류가 발생했습니다.";
+                    loadingOverlay.style.color = "red";
+                });
+        });
+    </script>
 
 </body>
+
 </html>
