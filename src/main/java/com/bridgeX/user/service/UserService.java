@@ -40,6 +40,7 @@ public class UserService {
         }
         // create User
         SiteUser user = SiteUser.builder()
+        		.nickname(dto.getNickname())
         		.username(dto.getUsername())
         		.password(passwordEncoder.encode(dto.getPassword()))
         		.email(dto.getEmail())

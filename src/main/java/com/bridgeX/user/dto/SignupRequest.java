@@ -16,6 +16,10 @@ import lombok.Setter;
 @Setter
 // Sign-up Request DTO
 public class SignupRequest {
+	// @NotEmpty(message = "ID는 공백으로 둘 수 없습니다.") // 프론트엔드 미구현으로 임시 주석 처리 (공백 시 오류 방지)
+	@Size(min = 1, max = 25, message = "닉네임은 25자 내에서만 가능합니다.")
+	private String nickname;
+	
 	@NotEmpty(message = "ID는 공백으로 둘 수 없습니다.")
 	@Size(min = 1, max = 25, message = "ID는 25자 내에서만 가능합니다.")
 	private String username;
