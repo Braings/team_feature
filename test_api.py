@@ -6,7 +6,7 @@ data = {
     "gender": "M",
     "height": 180,
     "weight": 75,
-    "age_group": "성인"
+    "age": 25
 }
 
 try:

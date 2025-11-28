@@ -3,90 +3,7 @@ import os
 import pandas as pd
 from dotenv import load_dotenv
 
-def get_exercise_recommendation():
-    # --- 1. API 키 및 모델 설정 ---
-    load_dotenv()
-    api_key = os.getenv("GOOGLE_API_KEY")
-    if not api_key:
-        print("오류: GOOGLE_API_KEY를 .env 파일에서 찾을 수 없습니다.")
-        return
-
-    try:
-        genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-2.0-flash')
-    except Exception as e:
-        print(f"API 설정 중 오류: {e}")
-        return
-
-    # --- 2. 사용자 요청 입력 ---
-    try:
-        target_gender = input("성별을 입력하세요 (M/F): ").strip().upper()
-        target_height = float(input("키를 입력하세요 (cm): ").strip())
-        target_weight = float(input("몸무게를 입력하세요 (kg): ").strip())
-        target_age_group = input("연령대를 입력하세요 (예: 성인, 청소년, 노인): ").strip()
-    except ValueError:
-        print("잘못된 입력입니다. 숫자 값을 정확히 입력해주세요.")
-        return
-
-    question = f"키 {target_height}cm, 몸무게 {target_weight}kg인 {target_age_group} {target_gender}의 추천 운동을 알려줘."
-    
-    # --- 3. 로컬 CSV에서 관련 데이터 '검색' (RAG의 Retrieve 단계) ---
-    csv_file_path = 'EX-HALF.csv'
-    example_exercises_string = ""
-    
-    try:
-        # ⭐️ 최적화: 필요한 열만 로드하고 데이터 타입 지정
-        required_cols = ['AGRDE_FLAG_NM', 'SEXDSTN_FLAG_CD', 'MESURE_IEM_001_VALUE', 'MESURE_IEM_002_VALUE', 'MVM_PRSCRPTN_CN']
-        dtype_dict = {
-            'AGRDE_FLAG_NM': 'string',
-            'SEXDSTN_FLAG_CD': 'string',
-            'MESURE_IEM_001_VALUE': 'float32',
-            'MESURE_IEM_002_VALUE': 'float32',
-            'MVM_PRSCRPTN_CN': 'string'
-        }
-
-        df = pd.read_csv(csv_file_path, usecols=required_cols, dtype=dtype_dict)
-
-        # 필터링에 필요한 열에 NaN 값이 없는 행만 선택
-        df = df.dropna(subset=required_cols)
-
-        # '유사한' 사용자 필터링 (질문 조건 기준)
-        height_min, height_max = target_height - 5, target_height + 5  # 키 ±5cm
-        weight_min, weight_max = target_weight - 5, target_weight + 5  # 몸무게 ±5kg
-
-        filtered_df = df[
-            (df['AGRDE_FLAG_NM'] == target_age_group) &
-            (df['SEXDSTN_FLAG_CD'] == target_gender) &
-            (df['MESURE_IEM_001_VALUE'].between(height_min, height_max)) &
-            (df['MESURE_IEM_002_VALUE'].between(weight_min, weight_max))
-        ]
-
-        # 'MVM_PRSCRPTN_CN' (추천운동) 열의 내용을 리스트로 추출
-        example_exercises_list = filtered_df['MVM_PRSCRPTN_CN'].tolist()
-        
-        if not example_exercises_list:
-            example_exercises_string = "유사한 사용자를 CSV에서 찾지 못했습니다."
-        else:
-            # 중복 제거 및 문자열로 결합 (API에 컨텍스트로 제공)
-            unique_exercises = list(set(example_exercises_list))
-            example_exercises_string = "\n\n".join(unique_exercises)
-
-    except FileNotFoundError:
-        print(f"오류: '{csv_file_path}' 파일을 찾을 수 없습니다.")
-        return
-    except KeyError as e:
-        print(f"오류: CSV에 필요한 열({e})이 없습니다. 열 이름을 확인하세요.")
-        return
-import google.generativeai as genai
-import os
-import pandas as pd
-from dotenv import load_dotenv
-import google.generativeai as genai
-import os
-import pandas as pd
-from dotenv import load_dotenv
-
-def get_exercise_recommendation(target_gender, target_height, target_weight, target_age_group):
+def get_exercise_recommendation(target_gender, target_height, target_weight, target_age):
     # --- 1. API 키 및 모델 설정 ---
     load_dotenv()
     api_key = os.getenv("GOOGLE_API_KEY")
@@ -99,7 +16,15 @@ def get_exercise_recommendation(target_gender, target_height, target_weight, tar
     except Exception as e:
         return f"API 설정 중 오류: {e}"
 
-    question = f"키 {target_height}cm, 몸무게 {target_weight}kg인 {target_age_group} {target_gender}의 추천 운동을 알려줘."
+    # --- 연령대 매핑 ---
+    if target_age < 19:
+        target_age_group = '청소년'
+    elif target_age < 65:
+        target_age_group = '성인'
+    else:
+        target_age_group = '어르신'
+
+    question = f"키 {target_height}cm, 몸무게 {target_weight}kg인 {target_age}세({target_age_group}) {target_gender}의 추천 운동을 알려줘."
     
     # --- 3. 로컬 CSV에서 관련 데이터 '검색' (RAG의 Retrieve 단계) ---
     csv_file_path = 'EX-HALF.csv'
@@ -211,7 +136,7 @@ if __name__ == "__main__":
         g = input("성별(M/F): ").strip().upper()
         h = float(input("키(cm): ").strip())
         w = float(input("몸무게(kg): ").strip())
-        a = input("연령대: ").strip()
+        a = int(input("나이(만): ").strip())
         print(get_exercise_recommendation(g, h, w, a))
     except ValueError:
-        print("입력 오류")
+        print("입력 오류: 숫자를 입력해주세요.")
