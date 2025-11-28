@@ -33,6 +33,7 @@ java jdk 21
 java spring-boot
 Gleek.io
 mariaDB 10.5.29
+flask 3.1.0
 ```
 ### License
 ```
