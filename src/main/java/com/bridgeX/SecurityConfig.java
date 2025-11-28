@@ -39,7 +39,7 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.GET, "/api/forum/**").permitAll()
 				
 				// else => private
-				.anyRequest().permitAll()   //.authenticated()
+				.anyRequest().authenticated()
 				)
 		// Allow H2-console Frame
 		.headers(headers -> headers
