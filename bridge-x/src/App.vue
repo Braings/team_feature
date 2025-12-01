@@ -20,7 +20,7 @@ export default {
   setup () {
     const router = useRouter();
     const route = useRoute();
-    const userId = ref('Log In');
+    const username = ref('Log In');
 
     const headerBarStyle = ref({
       backgroundColor: 'transparent' // 기본 배경색
@@ -37,23 +37,23 @@ export default {
     };
 
     const handleHeaderClick = () => {
-      if (userId.value === 'Log In') {
+      if (username.value === 'Log In') {
         router.push({ name: 'logIn' });
       } else {
         // 로그아웃 처리
         localStorage.removeItem('authToken');
-        localStorage.removeItem('userId');
-        userId.value = 'Log In';
+        localStorage.removeItem('username');
+        username.value = 'Log In';
         router.push({ name: 'homePage' });
       }
     };
 
-    const userDisplay = computed(() => userId.value);
+    const userDisplay = computed(() =>username.value);
 
     onMounted(() => {
-      const stored = localStorage.getItem('userId');
+      const stored = localStorage.getItem('username');
       if (stored) {
-        userId.value = stored;
+        username.value = stored;
       }
     });
 
