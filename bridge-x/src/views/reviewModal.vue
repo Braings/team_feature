@@ -39,18 +39,18 @@
 <script setup>
 import { reactive, watch } from 'vue';
 
-// 1. Props 정의 (부모로부터 상태를 받습니다)
+// Props 정의
 const props = defineProps({
   isOpen: {
     type: Boolean,
     required: true
   },
-  // 수정 기능을 위해 reviewId를 받을 수도 있습니다.
+  // 수정 기능을 위해 reviewId를 받기.
   reviewId: {
     type: [String, Number],
     default: null
   },
-  // 수정 시 기존 데이터를 받기 위한 prop (필요 시)
+  // 수정 시 기존 데이터를 받기 위한 prop
   initialData: {
     type: Object,
     default: () => ({ rating: 5, content: '' })
@@ -66,6 +66,11 @@ const reviewData = reactive({
   content: props.initialData.content,
   title: props.initialData.title || '',
   tag: props.initialData.tag || '',
+  creationTime: props.initialData.tag || '',
+  suggestion: props.initialData.suggestion || 0,
+  views: props.initialData.views || 0,
+  nickname: props.initialData.nickname || '',
+
 });
 
 // 4. 모달이 열릴 때 초기 데이터를 설정합니다.
@@ -75,13 +80,16 @@ watch(() => props.isOpen, (newVal) => {
         reviewData.content = props.initialData.content;
         reviewData.title = props.initialData.title || '';
         reviewData.tag = props.initialData.tag || '';
+        reviewData.creationTime = props.initialData.creationTime || '';
+        reviewData.suggestion = props.initialData.suggestion || 0;
+        reviewData.views = props.initialData.views || 0;
+        reviewData.nickname = props.initialData.nickname || '';
     }
 });
 
 
 // 모달 닫기 함수
 const closeModal = () => {
-    // 부모 컴포넌트에 모달을 닫으라고 알립니다.
     emit('close');
 };
 
