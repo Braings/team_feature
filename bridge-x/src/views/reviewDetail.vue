@@ -46,7 +46,14 @@
                 <span v-if="isRecommended"> 추천 취소 ({{ post.recommend }})</span>
                 <span v-else> 추천 ({{ post.recommend }})</span>
               </button>
-              <button class="btn" @click="goToEdit">수정</button>
+              <button  class="btn" @click="openEditModal">수정</button>
+              <ReviewWriteModal
+                :isOpen="isModalOpen"
+                @close="closeModal"
+                @submit-success="handleReviewEdit"
+                :reviewId="detailData.id"
+                :initialData="detailData"
+              />
               <button class="btn danger" @click="deletePost">삭제</button>
             </footer>
           </article>
@@ -112,9 +119,10 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, reactive, onMounted, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { getReviews, getReviewDetail, deleteReview } from '@/api.js';
+import ReviewWriteModal from './mergeToModal.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -270,10 +278,6 @@ function goBack() {
   router.push({ name: 'reviews' }).catch(()=>{});
 }
 
-function goToEdit() {
-  if (post.value) router.push({ name: 'reviewsWrite', params: { username: post.value.username } }).catch(()=>{});
-}
-
 async function deletePost() {
   if (!post.value || !confirm('정말 삭제하시겠습니까?')) return;
   try {
@@ -316,6 +320,34 @@ watch(() => route.query, (newQuery, oldQuery) => {
         loadReviews();
     }
 }, { deep: true }); // route.query 내부의 변경 사항을 감지하기 위해 deep: true 사용
+
+// 모달
+// 3. 모달 상태 관리 변수 추가
+const isModalOpen = ref(false);
+const detailData = reactive({
+  id: 1,
+  rating: 4,
+  content: '기존 리뷰 내용입니다.'
+}); // 기존 상세 데이터 (예시)
+
+// 4. 모달 열기/닫기 함수
+const openEditModal = () => {
+  isModalOpen.value = true;
+};
+
+const closeModal = () => {
+  isModalOpen.value = false;
+};
+
+const handleReviewEdit = (updatedReview) => {
+  console.log('리뷰가 수정되었습니다:', updatedReview);
+  // 5. TODO: API 호출을 통해 서버에 수정된 데이터를 저장하고, 상세 페이지의 데이터를 업데이트합니다.
+  Object.assign(detailData, updatedReview);
+};
+
+onMounted(() => {
+  // TODO: 실제 리뷰 상세 데이터를 로드하는 로직
+});
 
 </script>
 

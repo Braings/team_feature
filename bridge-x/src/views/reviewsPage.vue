@@ -66,7 +66,13 @@
           <button @click="prevPage" :disabled="page === 1">이전</button>
           <span :style="{cursor: 'default'}"> {{ page }} / {{ totalPages }} </span>
           <button @click="nextPage" :disabled="page === totalPages">다음</button>
-          <button class="write-btn" @click="goToWrite">글쓰기</button>
+          <button class="write-btn" @click="openWriteModal">글쓰기</button>
+          <ReviewWriteModal
+            :isOpen="isModalOpen"
+            @close="closeWriteModal"
+            @submit-success="handleReviewSubmit"
+            :initialData="defaultReviewData"
+          />
         </div>
 
       </section>
@@ -102,13 +108,12 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, reactive, computed, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { getReviews } from '@/api.js';
+import ReviewWriteModal from './mergeToModal.vue';
 
 const router = useRouter();
-
-const goToWrite = () => router.push({ name: 'reviewsWrite' });
 
 const search = ref({ type: 'all', query: '' });
 const selectedCategory = ref('all');
@@ -251,6 +256,32 @@ watch(search, () => {
 onMounted(() => {
   loadReviews();
 });
+
+
+// 글쓰기 모달 관련 상태 및 함수
+// 3. 모달 상태 관리 변수 추가
+const isModalOpen = ref(false);
+// const reviews = ref([]); // 기존 리뷰 목록 상태 (필요 시)
+
+// 4. 리뷰 작성 모달 상태 및 함수
+const defaultReviewData = reactive({ rating: 5, content: '' }); // 새 리뷰를 위한 기본 데이터
+
+const openWriteModal = () => {
+  isModalOpen.value = true;
+};
+
+const closeWriteModal = () => {
+  isModalOpen.value = false;
+};
+
+const handleReviewSubmit = (newReview) => {
+  console.log('새 리뷰가 작성되었습니다:', newReview);
+  // 5. TODO: 새 리뷰를 목록에 추가하거나(unshift), 목록 API를 다시 호출하여 업데이트합니다.
+  // 예: reviews.value.unshift(newReview);
+
+  // 모달은 이미 ReviewWriteModal 내부에서 닫힙니다.
+  // closeWriteModal(); // 필요하다면 여기서 다시 닫아줍니다.
+};
 
 </script>
 

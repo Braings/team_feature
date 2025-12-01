@@ -67,18 +67,25 @@
         </div>
         <!-- 버튼 영역 -->
         <div class="button-area">
-          <button class="edit-button">정보 수정</button>
+          <button class="edit-button" @click="openEditModal">정보 수정</button>
           <button class="logout-button" @click="handleLogout">로그아웃</button>
         </div>
       </div>
     </div>
+    <ProfileEditModal
+      :isOpen="isModalOpen"
+      :profileData="userProfile"
+      @close="closeEditModal"
+      @update-profile="handleProfileUpdate"
+    />
   </div>
 </template>
 
 <script setup>
-import { reactive, computed, onMounted } from 'vue';
+import { reactive, ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { signupFormData } from '@/stores/signupStore';
+import ProfileEditModal from './ProfileEditModal.vue';
 
 const router = useRouter();
 
@@ -134,6 +141,33 @@ const handleLogout = () => {
   localStorage.removeItem('authToken');
   localStorage.removeItem('username');
   router.push({ name: 'homePage' });
+};
+
+// 추가적인 기능(예: 정보 수정 모달 열기 등)은 여기에 구현할 수 있습니다.
+// 1. 모달 상태 변수 추가
+const isModalOpen = ref(false);
+
+// 2. 모달 열기/닫기 함수
+const openEditModal = () => {
+  isModalOpen.value = true;
+};
+
+const closeEditModal = () => {
+  isModalOpen.value = false;
+};
+
+// 3. 수정된 데이터 처리 함수
+const handleProfileUpdate = (updatedProfile) => {
+  // 실제로는 여기서 API 호출을 통해 서버에 저장해야 합니다.
+  // 현재는 로컬 상태만 업데이트합니다.
+  Object.assign(userProfile, updatedProfile);
+  if (updatedProfile.username) {
+    localStorage.setItem('username', updatedProfile.username);
+  }
+
+  // 업데이트 후 모달 닫기
+  closeEditModal();
+  console.log('프로필 업데이트 완료:', userProfile);
 };
 </script>
 

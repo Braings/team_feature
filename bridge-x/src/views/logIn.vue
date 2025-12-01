@@ -75,7 +75,7 @@ const VALIDATION_RULES = {
     }
   },
   password: {
-    minLength: 1,//8로 추후 수정해야함 
+    minLength: 1,//8로 추후 수정해야함
     messages: {
       empty: '비밀번호를 입력하세요.',
       minLength: '비밀번호는 8자 이상이어야 합니다.'
@@ -109,8 +109,8 @@ const passwordDisplay = computed({
 // Event Handlers
 // ========================
 const onUsernameInput = () => {
-  // 영문, 숫자, 언더스코어만 필터링
-  formData.username = formData.username.replace(/[^\x20-\x7E]/g, '');
+  formData.username = formData.username.replace(/[^a-zA-Z0-9_]/g, '');
+
 };
 
 const onPasswordInput = () => {
