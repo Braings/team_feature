@@ -11,6 +11,7 @@
           type="number"
           placeholder="HEIGHT (cm)"
           :error="errors.height"
+          @input="validateField('height')"
           @blur="validateField('height')"
         />
 
@@ -19,6 +20,7 @@
           type="number"
           placeholder="WEIGHT (kg)"
           :error="errors.weight"
+          @input="validateField('weight')"
           @blur="validateField('weight')"
         />
 
@@ -86,7 +88,7 @@ const VALIDATION_RULES = {
 // ========================
 // Form Validation
 // ========================
-const { errors, validateField, validateForm } = useFormValidation(VALIDATION_RULES);
+const { errors, validateField, validateForm } = useFormValidation(VALIDATION_RULES, formData);
 
 // ========================
 // Event Handlers

@@ -12,15 +12,17 @@
           placeholder="EMAIL"
           :error="errors.email"
           @blur="validateField('email')"
+          @input="validateField('email')"
         />
           <select
+            :style="{ color: '#888888' }"
             v-model="formData.sex"
             class="select-field"
             @blur="validateField('sex')"
           >
-            <option value="" disabled selected hidden>select sex</option>
-            <option value="MALE">Male</option>
-            <option value="FEMALE">Female</option>
+            <option value="" disabled selected hidden >select sex</option>
+            <option :style="{ color: 'black' }" value="MALE">Male</option>
+            <option :style="{ color: 'black' }" value="FEMALE">Female</option>
             <!-- <option value="other">Other</option> -->
           </select>
         <div class="birthday-wrapper">
@@ -103,7 +105,7 @@ const VALIDATION_RULES = {
 // ========================
 // Form Validation
 // ========================
-const { errors, validateField, validateForm } = useFormValidation(VALIDATION_RULES);
+const { errors, validateField, validateForm } = useFormValidation(VALIDATION_RULES, formData);
 
 // ========================
 // Birthday Validation Functions
@@ -113,6 +115,8 @@ const validateBirthdayDate = (value) => {
 
   const [yStr, mStr, dStr] = value.split('-');
   const y = Number(yStr), m = Number(mStr), d = Number(dStr);
+
+
 
   // 월 유효성
   if (m < 1 || m > 12) return false;

@@ -6,11 +6,22 @@
       <form class="input-area" @submit.prevent="handleNext">
         <FormField
           v-model="formData.username"
-          label="ID"
+          label="username"
           type="text"
           placeholder="ID"
           :error="errors.username"
+          @input="validateField('username')"
           @blur="validateField('username')"
+        />
+
+        <FormField
+          v-model="formData.nickname"
+          label="nickname"
+          type="text"
+          placeholder="nickname"
+          :error="errors.nickname"
+          @input="validateField('nickname')"
+          @blur="validateField('nickname')"
         />
 
         <FormField
@@ -64,7 +75,18 @@ const VALIDATION_RULES = {
     maxLength: 20,
     pattern: /^[a-zA-Z0-9_]+$/,
     messages: {
-      empty: 'ID를 입력하세요.',
+      empty: 'username을 입력하세요.',
+      minLength: '최소 4자 이상이어야 합니다.',
+      maxLength: '최대 20자 이하여야 합니다.',
+      pattern: '영문, 숫자, 언더스코어(_)만 사용 가능합니다.'
+    }
+  },
+  nickname: {
+    minLength: 4,
+    maxLength: 20,
+    pattern: /^[a-zA-Z0-9_]+$/,
+    messages: {
+      empty: 'nickname을 입력하세요.',
       minLength: '최소 4자 이상이어야 합니다.',
       maxLength: '최대 20자 이하여야 합니다.',
       pattern: '영문, 숫자, 언더스코어(_)만 사용 가능합니다.'
@@ -93,12 +115,13 @@ const VALIDATION_RULES = {
 // ========================
 // Form Validation
 // ========================
-const { errors, validateField, validateForm } = useFormValidation(VALIDATION_RULES);
+const { errors, validateField, validateForm } = useFormValidation(VALIDATION_RULES, formData);
 
 // ========================
 // Event Handlers
 // ========================
 const onPasswordInput = () => {
+  validateField('password');
   if (formData.passwordCheck) {
     validateField('passwordCheck', formData.passwordCheck);
   }

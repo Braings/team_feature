@@ -1,11 +1,14 @@
+// useFormValidation.js
+
 import { reactive } from 'vue';
 
 /**
  * 폼 검증 로직을 관리하는 composable
  * @param {Object} validationRules - 검증 규칙 설정
+ * @param {Object} formData - 폼 데이터
  * @returns {Object} 검증 함수 및 에러 상태
  */
-export function useFormValidation(validationRules) {
+export function useFormValidation(validationRules, formData) {
   const errors = reactive({});
 
   // 초기화: 모든 필드의 에러 메시지 초기화
@@ -24,33 +27,40 @@ export function useFormValidation(validationRules) {
 
     if (!rules) return true;
 
+    const fieldValue = (value !== undefined) ? value : formData[field];
+
+    // 안전하게 trim()을 호출하기 위해 문자열로 변환합니다.
+    const trimmedValue = String(fieldValue || '').trim();
+
     // 필수 입력 확인
-    if (!value || !value.toString().trim()) {
+    if (!fieldValue || !trimmedValue) {
       errors[field] = rules.messages.empty;
       return false;
     }
 
     // 최소 길이 확인
-    if (rules.minLength && value.trim().length < rules.minLength) {
+    if (rules.minLength && trimmedValue.length < rules.minLength) {
       errors[field] = rules.messages.minLength;
       return false;
     }
 
     // 최대 길이 확인
-    if (rules.maxLength && value.trim().length > rules.maxLength) {
+    if (rules.maxLength && trimmedValue.length > rules.maxLength) {
       errors[field] = rules.messages.maxLength;
       return false;
     }
 
     // 패턴 확인
-    if (rules.pattern && !rules.pattern.test(value.trim())) {
+    if (rules.pattern && !rules.pattern.test(trimmedValue)) {
       errors[field] = rules.messages.pattern;
       return false;
     }
 
-    // 커스텀 검증 함수
-    if (rules.validate && !rules.validate(value)) {
-      errors[field] = rules.messages.custom;
+    // 커스텀 검증 함수 (원본 fieldValue 사용)
+    if (rules.validate && !rules.validate(fieldValue)) {
+      if (!errors[field]) {
+        errors[field] = rules.messages.custom;
+      }
       return false;
     }
 
