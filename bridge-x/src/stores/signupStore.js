@@ -5,6 +5,7 @@ import { post } from '@/api'
 export const signupFormData = reactive({
   // Step 1: ID & Password
   username: '',
+  nickname: '',
   password: '',
   passwordcheck: '',
 
