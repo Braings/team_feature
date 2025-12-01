@@ -75,7 +75,7 @@ const VALIDATION_RULES = {
     }
   },
   password: {
-    minLength: 8,
+    minLength: 1,//8로 추후 수정해야함 
     messages: {
       empty: '비밀번호를 입력하세요.',
       minLength: '비밀번호는 8자 이상이어야 합니다.'
@@ -133,6 +133,7 @@ const handleLogin = async () => {
     if (res && res.token) {
       localStorage.setItem('authToken', res.token);
       localStorage.setItem('username', formData.username);
+      localStorage.setItem('nickname', formData.nickname);
       router.push({ name: 'homePage' });
       return;
     }

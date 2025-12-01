@@ -83,9 +83,17 @@ export default {
     const router = useRouter();
 
     const goToPage = (routeName) => {
+      if (routeName === 'myPage') {
+        if (localStorage.getItem('authToken')) {
             router.push({ name: routeName });
-        };
-
+        } else {
+            alert('로그인이 필요합니다.');
+            router.push({ name: 'logIn' });
+        }
+      } else {
+            router.push({ name: routeName });
+      }
+    }
     return {
       exercise: "스쿼트, 윗몸일으키기",// 운동 처방
       userName: "(USER)", // 사용자 이름
@@ -93,6 +101,8 @@ export default {
     }
   }
 }
+
+
 </script>
 
 <style lang="scss" scoped>
