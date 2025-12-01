@@ -16,8 +16,9 @@
           <h2 class="section-title">기본 정보</h2>
           <div class="info-grname">
             <div class="info-item">
-              <span class="label">이름</span>
+              <span class="label">username / nickname </span>
               <span class="value">{{ userProfile.username || 'N/A' }}</span>
+              <span class="value">{{ userProfile.nickname || 'N/A' }}</span>
             </div>
             <div class="info-item">
               <span class="label">생년월일</span>
@@ -110,11 +111,12 @@ const userInitial = computed(() => {
 onMounted(() => {
   // 저장된 회원가입 정보를 global store에서 로드
   userProfile.username = signupFormData.username || localStorage.getItem('username') || 'User';
-  userProfile.email = signupFormData.email || 'N/A';
-  userProfile.birthday = signupFormData.birthday || '';
-  userProfile.sex = signupFormData.sex || '';
-  userProfile.height = signupFormData.height || '';
-  userProfile.weight = signupFormData.weight || '';
+  userProfile.nickname = signupFormData.nickname || localStorage.getItem('nickname') || 'User';
+  userProfile.email = signupFormData.email || localStorage.getItem('email') || 'N/A';
+  userProfile.birthday = signupFormData.birthday || localStorage.getItem('birthday') || '';
+  userProfile.sex = signupFormData.sex || localStorage.getItem('sex') ||'';
+  userProfile.height = signupFormData.height || localStorage.getItem('height') ||'';
+  userProfile.weight = signupFormData.weight || localStorage.getItem('weight') ||'';
 });
 
 const formatBirthday = (birthday) => {

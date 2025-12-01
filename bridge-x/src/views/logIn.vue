@@ -139,7 +139,16 @@ const handleLogin = async () => {
     }
 
     if (res && (res.success || res.ok)) {
+      localStorage.setItem('authToken', res.token);
       localStorage.setItem('username', formData.username);
+      localStorage.setItem('nickname', formData.nickname);
+      localStorage.setItem('email', formData.email);
+      localStorage.setItem('birthday', formData.birthday);
+      localStorage.setItem('sex', formData.sex);
+      // 일단 로컬로 넣었는데 정상적이면 글로벌로 불러야함 ㅇㅇ <- 보안상 문제 생김
+
+      // exercise정보 호출해서 넣어야함
+      // 추가 사용자 정보 저장 가능
       router.push({ name: 'homePage' });
       return;
     }

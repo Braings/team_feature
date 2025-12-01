@@ -73,16 +73,12 @@ watch(() => props.isOpen, (newVal) => {
 
 // 변경 사항 저장 함수
 const saveChanges = () => {
-  // 수정된 데이터를 부모 컴포넌트로 이벤트 전송
   emit('update-profile', { ...editableProfile });
-  // 모달 닫기 이벤트는 부모 컴포넌트의 처리 함수(`handleProfileUpdate`)에서 호출하는 것을 권장합니다.
-  // emit('close');
 };
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/_variables.scss'; // 경로는 프로젝트 구조에 맞게 수정해주세요.
-// 모달 스타일은 이전 답변에서 제공된 스타일과 동일하게 적용합니다.
+@import '@/styles/_variables.scss';
 
 .modal-overlay {
   position: fixed;
@@ -149,12 +145,35 @@ const saveChanges = () => {
   gap: map-get($spacing, 'lg');
 }
 
+
+.save-button,
+.cancel-button {
+  flex: 1;
+  padding: map-get($spacing, 'lg') map-get($spacing, 'md');
+  border: none;
+  border-radius: map-get($radius, 'md');
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
 .save-button {
   background-color: map-get($colors, 'black');
   color: map-get($colors, 'white');
+
+  &:hover {
+    background-color: map-get($colors, 'gray-hover');
+  }
 }
+
 .cancel-button {
-  background-color: #e0e0e0;
+  background-color: #f5f5f5;
   color: map-get($colors, 'black');
+  border: 1px solid map-get($colors, 'border');
+
+  &:hover {
+    background-color: #e0e0e0;
+  }
 }
 </style>

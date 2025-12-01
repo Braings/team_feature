@@ -111,7 +111,7 @@
 import { ref, reactive, computed, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { getReviews } from '@/api.js';
-import ReviewWriteModal from './mergeToModal.vue';
+import ReviewWriteModal from './reviewModal.vue';
 
 const router = useRouter();
 

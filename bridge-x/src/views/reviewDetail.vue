@@ -122,7 +122,7 @@
 import { ref, reactive, onMounted, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { getReviews, getReviewDetail, deleteReview } from '@/api.js';
-import ReviewWriteModal from './mergeToModal.vue';
+import ReviewWriteModal from './reviewModal.vue';
 
 const route = useRoute();
 const router = useRouter();

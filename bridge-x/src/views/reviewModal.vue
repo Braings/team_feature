@@ -8,15 +8,19 @@
 
       <div class="modal-body">
         <form @submit.prevent="submitReview">
-
           <div class="form-group">
-            <label>평점</label>
-            <input type="number" v-model="reviewData.rating" min="1" max="5" required>
-          </div>
-
-          <div class="form-group">
-            <label for="content">내용</label>
-            <textarea id="content" v-model="reviewData.content" required></textarea>
+            <div class="form-header">
+              <select class="form-tag" v-model="reviewData.tag" required>
+                <option value="" disabled selected hidden>말머리 선택</option>
+                <option value="질문">질문</option>
+                <option value="정보">정보</option>
+                <option value="잡담">잡담</option>
+              </select>
+              <input class="form-title" id="title" v-model="reviewData.title" placeholder="제목을 입력하세요" required/>
+            </div>
+            <div class="form-content">
+              <textarea id="content" v-model="reviewData.content" required></textarea>
+            </div>
           </div>
 
           <div class="modal-footer">
@@ -53,35 +57,37 @@ const props = defineProps({
   }
 });
 
-// 2. Events 정의 (부모에게 상태 변경을 알립니다)
+// Events 정의
 const emit = defineEmits(['close', 'submit-success']);
 
-// 3. 리뷰 데이터 상태 (기존 reviewsWritePage의 상태를 사용)
+// 리뷰 데이터 상태
 const reviewData = reactive({
   rating: props.initialData.rating,
   content: props.initialData.content,
-  // ... 기타 필드
+  title: props.initialData.title || '',
+  tag: props.initialData.tag || '',
 });
 
 // 4. 모달이 열릴 때 초기 데이터를 설정합니다.
 watch(() => props.isOpen, (newVal) => {
     if (newVal) {
-        // 모달이 열릴 때마다 초기 데이터로 리셋하거나, 수정 모드일 때 데이터를 로드합니다.
         reviewData.rating = props.initialData.rating;
         reviewData.content = props.initialData.content;
+        reviewData.title = props.initialData.title || '';
+        reviewData.tag = props.initialData.tag || '';
     }
 });
 
 
-// 5. 모달 닫기 함수
+// 모달 닫기 함수
 const closeModal = () => {
     // 부모 컴포넌트에 모달을 닫으라고 알립니다.
     emit('close');
 };
 
-// 6. 리뷰 제출 로직
+// 리뷰 제출 로직
 const submitReview = () => {
-  // 🚧 이 부분에 실제 API 통신 로직을 구현해야 합니다.
+  emit('update-profile', { ...reviewData });
   console.log('리뷰 제출 데이터:', reviewData);
 
   // TODO: API 호출 로직 (POST 또는 PUT)
@@ -95,7 +101,7 @@ const submitReview = () => {
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/_variables.scss'; // 경로는 프로젝트 구조에 맞게 수정해주세요.
+@import '@/styles/_variables.scss';
 
 /* --- 모달 기본 스타일 --- */
 .modal-overlay {
@@ -148,11 +154,55 @@ const submitReview = () => {
 }
 
 .modal-body {
-  padding: map-get($spacing, 'xl');
+  padding: map-get($spacing, '3xl');
+  width: 100%;
 }
 
 .form-group {
     margin-bottom: map-get($spacing, 'xl');
+    width: 100%;
+  .form-header{
+    display: flex;
+    gap: map-get($spacing, 'lg');
+    margin-bottom: map-get($spacing, 'lg');
+    .form-tag {
+      flex: 1;
+      padding: map-get($spacing, 'md');
+      border: 1px solid map-get($colors, 'border');
+      border-radius: map-get($radius, 'md');
+      font-size: map-get($typography, 'base');
+    }
+    select {
+      flex: 1;
+      width: 30%;
+      padding: map-get($spacing, 'md');
+      border: 1px solid map-get($colors, 'border');
+      border-radius: map-get($radius, 'md');
+      font-size: map-get($typography, 'base');
+    }
+  }
+  .form-title{
+    flex: 3;
+    padding: map-get($spacing, 'md');
+    border: 1px solid map-get($colors, 'border');
+    border-radius: map-get($radius, 'md');
+    font-size: map-get($typography, 'base');
+  }
+  .form-content {
+    position: relative;
+    width: 100%;
+
+    textarea {
+    width: 100%;
+    height: 150px;
+    padding: map-get($spacing, 'md');
+    border: 1px solid map-get($colors, 'border');
+    border-radius: map-get($radius, 'md');
+    font-size: map-get($typography, 'base');
+    resize: vertical;
+    box-sizing: border-box;
+    }
+  }
 }
 
 .form-group label {
