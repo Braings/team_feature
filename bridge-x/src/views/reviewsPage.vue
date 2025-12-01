@@ -271,7 +271,7 @@ onMounted(() => {
 
   .write-btn {
       position: absolute;
-      right: 5px;
+      right: 0;
       background-color: map.get($colors, 'black');
       color: map.get($colors, 'white');
       border: 1px solid map.get($colors,'black');
@@ -291,23 +291,31 @@ onMounted(() => {
 
     .gallery-header {
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
+      margin-left: 3rem;
       padding: map.get($spacing, 'md') map.get($spacing, 'lg');
       background: transparent;
       border-radius: map.get($radius, 'md');
       box-shadow: map.get($shadows, 'sm');
 
-      .gallery-title { font-size: 2rem; margin: 0; }
+      .gallery-meta {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .gallery-title { font-size: 2.5rem; margin: 0; text-align: center;}
       .gallery-sub { color: map.get($colors, 'muted'); margin: 0; }
 
     }
 
     .controls {
+      position: relative;
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-top: map.get($spacing, 'md');
+      bottom: 10px;
 
       .tabs { display: flex; gap: 0.5rem;
         .tab { @include button-base;
@@ -390,6 +398,8 @@ onMounted(() => {
         border-radius: map.get($radius,'sm');
         overflow: hidden;
         box-shadow: map.get($shadows,'xs');
+        position: relative;
+        bottom: 12px;
 
         th, td { font-size: 0.9rem; padding: 0.9rem 1rem; text-align: center;
           border-bottom: 1px solid map.get($colors,'border');
@@ -407,7 +417,7 @@ onMounted(() => {
         .col-views, .col-rec { width:8%; text-align:center; }
       }
 
-      .pagination { align-items: center; justify-content: center; position: relative; top: 5px; cursor: outo; display:flex; gap:1rem; margin-top:1rem; }
+      .pagination { align-items: center; justify-content: center; position: relative; bottom: 5px; cursor: outo; display:flex; gap:1rem; margin-top:1rem; }
     }
   }
 

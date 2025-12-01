@@ -357,15 +357,21 @@ watch(() => route.query, (newQuery, oldQuery) => {
       flex: 1 1 auto;
 
       .gallery-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: map.get($spacing, 'md') map.get($spacing, 'lg');
-        background: transparent;
-        border-radius: map.get($radius, 'md');
-        box-shadow: map.get($shadows, 'sm');
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-left: 2rem;
+      padding: map.get($spacing, 'md') map.get($spacing, 'lg');
+      background: transparent;
+      border-radius: map.get($radius, 'md');
+      box-shadow: map.get($shadows, 'sm');
 
-        .gallery-title { font-size: 2rem; margin: 0; }
+      .gallery-meta {
+        display: flex;
+        flex-direction: column;
+      }
+
+        .gallery-title { text-align: center; font-size: 2.5rem; margin: 0; }
         .gallery-sub { color: map.get($colors, 'muted'); margin: 0; }
       }
 

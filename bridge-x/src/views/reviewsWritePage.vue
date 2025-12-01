@@ -12,19 +12,10 @@
         <button class="back" @click="goBack">◀ 목록으로</button>
       </section>
 
-      <!-- <div class="review-write-wrapper" v-if="post">
 
-      </div>
-
-      <template v-else>
-        <div v-if="loading" class="list-status">게시물을 로드하는 중...</div>
-        <div v-else-if="error" class="list-status">게시물을 로드하는 데 실패했습니다: {{ error }}</div>
-        <div v-else class="post-list">
-
-        </div>
-      </template> -->
-
-      <form class="write-form" @submit.prevent="submit">
+      <div class="review-write-wrapper">
+        <div class="write-page">
+          <form class="write-form" @submit.prevent="submit">
         <div class="row">
           <select v-model="form.tag" :disabled="loading">
             <option value="">말머리 선택</option>
@@ -45,6 +36,20 @@
           <button type="button" class="btn" @click="goBack" :disabled="loading">취소</button>
         </div>
       </form>
+      </div>
+
+        </div>
+
+
+      <!-- <template v-else>
+        <div v-if="loading" class="list-status">게시물을 로드하는 중...</div>
+        <div v-else-if="error" class="list-status">게시물을 로드하는 데 실패했습니다: {{ error }}</div>
+        <div v-else class="post-list">
+
+        </div>
+      </template> -->
+
+
     </div>
   </div>
 </template>
@@ -245,327 +250,328 @@ watch(() => route.query, (newQuery, oldQuery) => {
 
 
 .list-status {
-    box-shadow: 1px 1px 2px black;
-    min-height: 200px; /* 메시지가 보일 영역의 최소 높이 */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 1.2rem;
-    color: map.get($colors, 'muted');
-    border: 1px solid map.get($colors, 'border');
-    border-radius: map.get($radius, 'sm');
-    background: map.get($colors, 'white');
-    padding: 2rem;
-    text-align: center;
+  box-shadow: 1px 1px 2px black;
+  min-height: 200px; /* 메시지가 보일 영역의 최소 높이 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.2rem;
+  color: map.get($colors, 'muted');
+  border: 1px solid map.get($colors, 'border');
+  border-radius: map.get($radius, 'sm');
+  background: map.get($colors, 'white');
+  padding: 2rem;
+  text-align: center;
 
-    &.error {
-      color: map.get($colors, 'error');
-      font-weight: bold;
-    }
+  &.error {
+    color: map.get($colors, 'error');
+    font-weight: bold;
+  }
 }
 
 .gallery-page {
+display: flex;
+min-height: 100vh;
+min-width: 100vw;
+gap: 2vw;
+padding: 2vh 3vw;
+font-family: 'TheJamsilOTF6ExtraBold', sans-serif;
+background-color: map.get($colors, 'table');
+
+.gallery-main {
+  flex: 1 1 auto;
+
+  .gallery-header {
     display: flex;
-    min-height: 100vh;
-    min-width: 100vw;
-    gap: 2vw;
-    padding: 2vh 3vw;
-    font-family: 'TheJamsilOTF6ExtraBold', sans-serif;
-    background-color: map.get($colors, 'table');
+    justify-content: space-between;
+    align-items: center;
+    padding: map.get($spacing, 'md') map.get($spacing, 'lg');
+    background: transparent;
+    border-radius: map.get($radius, 'md');
+    box-shadow: map.get($shadows, 'sm');
 
-    .gallery-main {
-      flex: 1 1 auto;
+    .gallery-title { font-size: 2rem; margin: 0; }
+    .gallery-sub { color: map.get($colors, 'muted'); margin: 0; }
+  }
 
-      .gallery-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: map.get($spacing, 'md') map.get($spacing, 'lg');
-        background: transparent;
-        border-radius: map.get($radius, 'md');
-        box-shadow: map.get($shadows, 'sm');
+  .controls {
+    position: relative;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: map.get($spacing, 'md');
 
-        .gallery-title { font-size: 2rem; margin: 0; }
-        .gallery-sub { color: map.get($colors, 'muted'); margin: 0; }
-      }
-
-      .controls {
-        position: relative;
-        margin-bottom: 10px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: map.get($spacing, 'md');
-
-        .back {
-          position: relative;
-          background: transparent; border: none;
-          color: map.get($colors,'muted');
-          cursor: pointer;
-        }
-      }
-
-      .post-list {
-        margin-top: map.get($spacing, 'md');
-        .posts-table {
-          width: 100%;
-          border-collapse: collapse;
-          background: map.get($colors,'white');
-          border-radius: map.get($radius,'sm');
-          overflow: hidden;
-          box-shadow: map.get($shadows,'xs');
-
-          th, td {
-            font-size: 0.9rem;
-            padding: 0.9rem 1rem;
-            text-align: center;
-            border-bottom: 1px solid map.get($colors,'border');
-          }
-          thead {
-            background: map.get($colors,'light');
-            color: map.get($colors,'dark');
-          }
-          tbody tr { cursor: pointer; }
-          .col-no { width:7%; }
-          .col-tag { width:8%; }
-          .col-title { width:50%; text-align: left;}
-          .col-author { width:10%; }
-          .col-date { width:10%; }
-          .col-views, .col-rec { width:8%; text-align:center; }
-        }
-      }
+    .back {
+      position: relative;
+      background: transparent; border: none;
+      color: map.get($colors,'muted');
+      cursor: pointer;
     }
+  }
 
-      // 상세 보기 전용 스타일
-      .reviews-write-wrapper {
-        position: relative;
+  .post-list {
+    margin-top: map.get($spacing, 'md');
+    .posts-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: map.get($colors,'white');
+      border-radius: map.get($radius,'sm');
+      overflow: hidden;
+      box-shadow: map.get($shadows,'xs');
 
-      .container {
-        max-width: 100%;
-        margin: 0 auto;
-
-        .back {
-          position: relative;
-          top: 20px;
-          left: 20px;
-          background: transparent; border: none;
-          color: map.get($colors,'muted');
-          cursor: pointer;
-          margin-bottom: 1rem;
-        }
-
-        .post-card {
-          min-height: 60vh;
-          background: map.get($colors,'white');
-          padding: map.get($spacing,'lg');
-          border-radius: map.get($radius,'md');
-          box-shadow: map.get($shadows,'sm');
-
-          .post-header {
-            position: relative;
-            display:flex; justify-content:space-between; align-items:flex-start;
-            border-bottom: 2px solid map.get($colors,'border');
-            .post-title { margin:0; font-size:2rem; }
-            .post-meta { position: relative; top:20px; color: map.get($colors,'muted'); font-size:0.9rem; display:flex; gap:0.8rem; }
-          }
-
-          .post-body {
-            margin-top:1rem;
-            min-height: 40vh;
-            .tag {
-              display:inline-block;
-              background: map.get($colors,'light');
-              padding:0.2rem 0.5rem;
-              border-radius:4px;
-              margin-bottom:0.8rem;
-            }
-          }
-
-          .post-actions {
-            margin-top:1.2rem;
-            display:flex;
-            gap:0.8rem;
-            justify-content: flex-end; // 버튼 오른쪽 정렬
-
-            .btn {
-              background-color: map.get($colors, 'black');
-              color: map.get($colors, 'white');
-              border: 1px solid map.get($colors,'black');
-              font-size: 1rem;
-              padding: 0.3rem 0.8rem;
-              cursor: pointer;
-              transition: background-color 0.1s ease;
-              border-radius:4px;
-              box-shadow: 1px 1px 3px black;
-
-              &:hover {
-                background-color: map.get($colors, 'dark');
-                color: map.get($colors, 'white');
-              }
-            }
-            .recommend-btn {
-              margin-right: auto; // 오른쪽 버튼들과 분리하여 왼쪽으로 이동
-
-              background-color: map.get($colors, 'white');
-              color: map.get($colors, 'black');
-              border: 1px solid map.get($colors,'border');
-
-              &.active {
-                background-color: map.get($colors, 'dark');
-                color: map.get($colors, 'white');
-                border-color: transparent;
-
-                &:hover {
-                  background-color: darken(map.get($colors,'error'), 10%);
-                }
-              }
-
-              &:hover:not(.active) {
-                background-color: map.get($colors, 'gray-hover');
-                color: map.get($colors, 'black');
-              }
-            }
-
-            .danger {
-              background: map.get($colors,'error');
-              border-color: map.get($colors,'error');
-              &:hover {
-                background-color: darken(map.get($colors,'error'), 10%);
-              }
-            }
-          }
-        }
+      th, td {
+        font-size: 0.9rem;
+        padding: 0.9rem 1rem;
+        text-align: center;
+        border-bottom: 1px solid map.get($colors,'border');
       }
+      thead {
+        background: map.get($colors,'light');
+        color: map.get($colors,'dark');
+      }
+      tbody tr { cursor: pointer; }
+      .col-no { width:7%; }
+      .col-tag { width:8%; }
+      .col-title { width:50%; text-align: left;}
+      .col-author { width:10%; }
+      .col-date { width:10%; }
+      .col-views, .col-rec { width:8%; text-align:center; }
     }
-
-    .gallery-side { width: 18vw; display:flex; flex-direction:column;
-
-      .category-padding { height: 2rem; }
-      .trending-box, .recent-box {
-        background: map.get($colors,'white');
-        padding: map.get($spacing,'md');
-        border-radius: map.get($radius,'md');
-        box-shadow: map.get($shadows,'sm');
-
-        h3, h4 { margin: 10px 0 0.8rem 0; font-size: 1rem; }
-      }
-
-
-      .trending-list, .recent-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-
-        li {
-          padding: 0.5rem 0;
-          border-bottom: 1px solid map.get($colors,'border');
-
-          &:last-child { border-bottom: none; }
-        }
-      }
-
-      .trending-list li {
-        display:flex;
-        justify-content:space-between;
-        align-items:center;
-        gap:0.5rem;
-        cursor: pointer;
-
-        &:hover { background:map.get($colors,'light'); padding-left:0.3rem; }
-
-        .trending-title { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-        .trending-count {
-          background: map.get($colors,'black');
-          color: white;
-          padding:0.2rem 0.5rem;
-          border-radius:12px;
-          font-size:0.8rem;
-          font-weight:bold;
-        }
-      }
-
-      .recent-list li {
-        display:flex;
-        justify-content:space-between;
-        align-items:center;
-        gap:0.5rem;
-        cursor: pointer;
-
-        &:hover { background:map.get($colors,'light'); padding-left:0.3rem; }
-
-        .recent-title { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-        .recent-date {
-          color: map.get($colors,'muted');
-          font-size:0.8rem;
-          white-space:nowrap;
-        }
-      }
-    }
+  }
 }
 
-.write-page {
-  padding: 3vh 4vw;
-  .container {
-    max-width: 900px;
-    margin: 0 auto;
-  }
-  .back {
-    background: transparent; border: none;
-    color: map.get($colors,'muted');
-    cursor: pointer;
-    margin-bottom: 1rem;
-  }
+// 상세 보기 전용 스타일
+.review-write-wrapper {
+  position: relative;
 
-  .write-form {
-    display:flex;
-    flex-direction:column;
-    gap:1rem;
-    background: map.get($colors,'white');
-    padding: map.get($spacing,'lg');
-    border-radius: map.get($radius,'md');
-    box-shadow: map.get($shadows,'sm');
-
-    // 폼 비활성화 시 스타일
-    &:disabled {
-      opacity: 0.6;
-      pointer-events: none;
+  .write-page {
+    padding: 3vh 4vw;
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .back {
+      background: transparent; border: none;
+      color: map.get($colors,'muted');
+      cursor: pointer;
+      margin-bottom: 1rem;
     }
 
-    .row {
+    .write-form {
       display:flex;
+      flex-direction:column;
       gap:1rem;
-      select, input {
-        flex:1;
-        padding:0.6rem;
+      background: map.get($colors,'white');
+      padding: map.get($spacing,'lg');
+      border-radius: map.get($radius,'md');
+      box-shadow: map.get($shadows,'sm');
+
+      // 폼 비활성화 시 스타일
+      &:disabled {
+        opacity: 0.6;
+        pointer-events: none;
+      }
+
+      .row {
+        display:flex;
+        gap:1rem;
+        select, input {
+          flex:1;
+          padding:0.6rem;
+          border:1px solid map.get($colors,'border');
+          border-radius:4px;
+          &:disabled {
+            background: map.get($colors, 'light');
+          }
+        }
+      }
+      textarea {
+        max-width:100%;
+        padding:0.8rem;
         border:1px solid map.get($colors,'border');
-        border-radius:4px;
+        border-radius:6px;
         &:disabled {
           background: map.get($colors, 'light');
         }
       }
-    }
-    textarea {
-      max-width:100%;
-      padding:0.8rem;
-      border:1px solid map.get($colors,'border');
-      border-radius:6px;
-      &:disabled {
-        background: map.get($colors, 'light');
-      }
-    }
-    .actions {
-      display:flex;
-      gap:0.8rem;
-      .btn {
-        @include button-base; // SCSS 믹스인 사용
-        &:disabled {
-          cursor: not-allowed;
-          opacity: 0.5;
+      .actions {
+        display:flex;
+        gap:0.8rem;
+        .btn {
+          @include button-base; // SCSS 믹스인 사용
+          &:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+          }
+        }
+        .primary {
+          background: map.get($colors,'black');
+          color:white;
         }
       }
-      .primary {
+    }
+  }
+  .container {
+    max-width: 100%;
+    margin: 0 auto;
+
+    .back {
+      position: relative;
+      top: 20px;
+      left: 20px;
+      background: transparent; border: none;
+      color: map.get($colors,'muted');
+      cursor: pointer;
+      margin-bottom: 1rem;
+    }
+
+    .post-card {
+      min-height: 60vh;
+      background: map.get($colors,'white');
+      padding: map.get($spacing,'lg');
+      border-radius: map.get($radius,'md');
+      box-shadow: map.get($shadows,'sm');
+
+      .post-header {
+        position: relative;
+        display:flex; justify-content:space-between; align-items:flex-start;
+        border-bottom: 2px solid map.get($colors,'border');
+        .post-title { margin:0; font-size:2rem; }
+        .post-meta { position: relative; top:20px; color: map.get($colors,'muted'); font-size:0.9rem; display:flex; gap:0.8rem; }
+      }
+
+      .post-body {
+        margin-top:1rem;
+        min-height: 40vh;
+        .tag {
+          display:inline-block;
+          background: map.get($colors,'light');
+          padding:0.2rem 0.5rem;
+          border-radius:4px;
+          margin-bottom:0.8rem;
+        }
+      }
+
+      .post-actions {
+        margin-top:1.2rem;
+        display:flex;
+        gap:0.8rem;
+        justify-content: flex-end; // 버튼 오른쪽 정렬
+
+        .btn {
+          background-color: map.get($colors, 'black');
+          color: map.get($colors, 'white');
+          border: 1px solid map.get($colors,'black');
+          font-size: 1rem;
+          padding: 0.3rem 0.8rem;
+          cursor: pointer;
+          transition: background-color 0.1s ease;
+          border-radius:4px;
+          box-shadow: 1px 1px 3px black;
+
+          &:hover {
+            background-color: map.get($colors, 'dark');
+            color: map.get($colors, 'white');
+          }
+        }
+
+        .recommend-btn {
+          margin-right: auto; // 오른쪽 버튼들과 분리하여 왼쪽으로 이동
+
+          background-color: map.get($colors, 'white');
+          color: map.get($colors, 'black');
+          border: 1px solid map.get($colors,'border');
+
+          &.active {
+            background-color: map.get($colors, 'dark');
+            color: map.get($colors, 'white');
+            border-color: transparent;
+
+            &:hover {
+              background-color: darken(map.get($colors,'error'), 10%);
+            }
+          }
+
+          &:hover:not(.active) {
+            background-color: map.get($colors, 'gray-hover');
+            color: map.get($colors, 'black');
+          }
+        }
+
+        .danger {
+          background: map.get($colors,'error');
+          border-color: map.get($colors,'error');
+          &:hover {
+            background-color: darken(map.get($colors,'error'), 10%);
+          }
+        }
+      }
+    }
+  }
+}
+
+
+  .gallery-side { width: 18vw; display:flex; flex-direction:column;
+
+    .category-padding { height: 2rem; }
+    .trending-box, .recent-box {
+      background: map.get($colors,'white');
+      padding: map.get($spacing,'md');
+      border-radius: map.get($radius,'md');
+      box-shadow: map.get($shadows,'sm');
+
+      h3, h4 { margin: 10px 0 0.8rem 0; font-size: 1rem; }
+    }
+
+
+    .trending-list, .recent-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      li {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid map.get($colors,'border');
+
+        &:last-child { border-bottom: none; }
+      }
+    }
+
+    .trending-list li {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:0.5rem;
+      cursor: pointer;
+
+      &:hover { background:map.get($colors,'light'); padding-left:0.3rem; }
+
+      .trending-title { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+      .trending-count {
         background: map.get($colors,'black');
-        color:white;
+        color: white;
+        padding:0.2rem 0.5rem;
+        border-radius:12px;
+        font-size:0.8rem;
+        font-weight:bold;
+      }
+    }
+
+    .recent-list li {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:0.5rem;
+      cursor: pointer;
+
+      &:hover { background:map.get($colors,'light'); padding-left:0.3rem; }
+
+      .recent-title { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+      .recent-date {
+        color: map.get($colors,'muted');
+        font-size:0.8rem;
+        white-space:nowrap;
       }
     }
   }
