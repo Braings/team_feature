@@ -75,11 +75,29 @@
 </template>
 
 <script>
-import { useRouter } from 'vue-router';
+import { useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue';;
+
+
 
 export default {
   name: 'homePage',
   data() {
+    const userName = ref('');
+    const exerciseRecommendation = ref('');
+
+    onMounted(() => {
+      // A. userName 로드
+      // 'username'이 localStorage에 없으면 'GUEST'를 기본값으로 사용합니다.
+      const storedUserName = localStorage.getItem('username');
+      userName.value = storedUserName || 'GUEST';
+
+      // B. 추천 운동(exercise) 로드
+      // 'exercise' 키로 저장된 값이 없으면 기본 안내 문구를 사용합니다.
+      const storedExercise = localStorage.getItem('exercise');
+      exerciseRecommendation.value = storedExercise || '회원님의 건강 정보에 기반한 맞춤 운동을 곧 준비해 드릴게요!';
+    });
+
     const router = useRouter();
 
     const goToPage = (routeName) => {
@@ -95,8 +113,8 @@ export default {
       }
     }
     return {
-      exercise: "스쿼트, 윗몸일으키기",// 운동 처방
-      userName: "(USER)", // 사용자 이름
+      exercise : exerciseRecommendation,
+      userName : userName,
       goToPage,
     }
   }
@@ -185,7 +203,7 @@ export default {
   margin-bottom: 2vh;
 }
 
-.graph-area .user-name {
+.user-name {
     font-weight: bold;
 }
 
@@ -293,7 +311,7 @@ export default {
 }
 
 .recommendation-text {
-  font-size: 2vw;
+  font-size: 1.5vw;
   font-weight: bold;
   margin: 0;
 }
