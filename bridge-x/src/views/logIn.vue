@@ -52,13 +52,14 @@ import { post } from '@/api.js';
 import FormField from '@/components/FormField.vue';
 import { useFormValidation } from '@/composables/useFormValidation';
 import { loginFormData } from '@/stores/loginStore.js';
+import { userExerciseData } from '@/stores/userExerciseStore.js';
 
 // ========================
 // Data & State
 // ========================
 const router = useRouter();
 const formData = loginFormData;
-
+const exerciseData = userExerciseData;
 const loading = ref(false);
 
 // ========================
@@ -140,6 +141,8 @@ const handleLogin = async () => {
     if (res && (res.success || res.ok)) {
       localStorage.setItem('authToken', res.token);
       localStorage.setItem('nickname', formData.nickname);
+
+      localStorage.setItem('exercise', exerciseData.recommend);
       // 일단 로컬로 넣었는데 정상적이면 글로벌로 불러야함 ㅇㅇ <- 보안상 문제 생김
 
       // exercise정보 호출해서 넣어야함

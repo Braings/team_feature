@@ -42,7 +42,7 @@
               <div class="bar pink-bar" style="height: 10%;">21</div>
               <div class="bar green-bar" style="height: 40%;">108</div>
             </div>
-                         <div class="bar-group">
+            <div class="bar-group">
               <div class="bar pink-bar" style="height: 10%;">21</div>
               <div class="bar green-bar" style="height: 40%;">108</div>
             </div>
@@ -88,12 +88,10 @@ export default {
 
     onMounted(() => {
       // A. userName 로드
-      // 'username'이 localStorage에 없으면 'GUEST'를 기본값으로 사용합니다.
       const storedUserName = localStorage.getItem('username');
       userName.value = storedUserName || 'GUEST';
 
       // B. 추천 운동(exercise) 로드
-      // 'exercise' 키로 저장된 값이 없으면 기본 안내 문구를 사용합니다.
       const storedExercise = localStorage.getItem('exercise');
       exerciseRecommendation.value = storedExercise || '회원님의 건강 정보에 기반한 맞춤 운동을 곧 준비해 드릴게요!';
     });

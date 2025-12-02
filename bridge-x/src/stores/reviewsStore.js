@@ -40,10 +40,10 @@ export async function submitReviews() {
 
   try {
     const response = await createReview('/api/reviews', reviewsData)
-    console.log('추천운동 불러오기 성공:', response)
+    console.log('리뷰 불러오기 성공:', response)
     return response
   } catch (error) {
-    console.error('추천운동 불러오기 실패:', error)
+    console.error('리뷰 불러오기 실패:', error)
     throw error
   }
 }
