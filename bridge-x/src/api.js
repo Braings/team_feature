@@ -107,20 +107,21 @@ export async function getUserExercise() {
   return get('/api/userExercise');
 }
 
-// --------------------------------------------------------------- //
-
-// User Exercise Board API Endpoints (사용자 운동 게시판)
-
-
 // ===============================================================
 //  운동 시설 조회 API 함수
 // ===============================================================
 
 // 운동 시설 목록을 조회합니다.
+  // @param {Object} query - 지역 정보를 포함하는 쿼리 파라미터 객체 ({ region: '도', city: '시군구' })
   // @returns {Promise<Object>} 운동 시설 데이터 목록
 
-export async function loadExerciseFacilities() {
-  return get('/api/exerciseFacilities');
+export async function loadExerciseFacilities(query = {}) {
+  // 쿼리 객체를 'region=도&city=시군구' 형태의 URLSearchParams로 변환
+  // 예: { region: '서울', city: '강남구' } -> ?region=서울&city=강남구
+  const params = new URLSearchParams(query);
+
+  // GET 요청 경로를 '/api/exerciseFacilities?region=...&city=...' 형태로 구성
+  return get(`/api/exerciseFacilities?${params.toString()}`);
 }
 
 // --------------------------------------------------------------- //
@@ -237,5 +238,5 @@ export async function deleteReview(reviewId) {
 export default {
     API_BASE, request, post, get,
     getReviews, getReviewDetail, createReview, updateReview, deleteReview,
-    getUserProfile, updateProfile
+    getUserProfile, updateProfile, loadExerciseFacilities
 };
