@@ -103,8 +103,8 @@ async function loadPost() {
       content: post.content || '',
       author: post.author || '익명'
     };
-  } catch (err) {
-    console.error('게시물 로드 실패:', err);
+  } catch (error) {
+    console.error('게시물 로드 실패:', error);
     error.value = '게시물 로드 중 오류 발생';
     // 로드 실패 시 대체 데이터 할당
     form.value = {
@@ -156,9 +156,9 @@ async function submit() {
       }
 
     }
-  } catch (err) {
-    console.error('제출 실패:', err);
-    error.value = err.message || '알 수 없는 오류가 발생했습니다.';
+  } catch (error) {
+    console.error('제출 실패:', error);
+    error.value = error.message || '알 수 없는 오류가 발생했습니다.';
     alert('제출 실패: ' + error.value);
   } finally {
     loading.value = false; // 로딩 상태 해제
@@ -167,10 +167,10 @@ async function submit() {
 
 // 이전 페이지 (목록)로 이동
 function goBack() {
-  router.push({ name: 'reviews' }).catch(err => {
+  router.push({ name: 'reviews' }).catch(error => {
     // 중복 내비게이션 오류는 무시
-    if (err.name !== 'NavigationDuplicated') {
-      console.error(err);
+    if (error.name !== 'NavigationDuplicated') {
+      console.error(error);
     }
   });
 }
@@ -197,9 +197,9 @@ async function loadReviews() {
       query: search.value.query
     });
     posts.value = data.data || data || [];
-  } catch (err) {
-    console.error('리뷰 목록 로드 실패:', err);
-    error.value = err.message;
+  } catch (error) {
+    console.error('리뷰 목록 로드 실패:', error);
+    error.value = error.message;
     // 폴백: 샘플 데이터
     posts.value = Array.from({ length: 100 }).map((_, i) => ({
       username: `author${i + 1}`,

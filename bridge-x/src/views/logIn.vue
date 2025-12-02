@@ -132,7 +132,6 @@ const handleLogin = async () => {
 
     if (res && res.token) {
       localStorage.setItem('authToken', res.token);
-      localStorage.setItem('username', formData.username);
       localStorage.setItem('nickname', formData.nickname);
       router.push({ name: 'homePage' });
       return;
@@ -140,11 +139,7 @@ const handleLogin = async () => {
 
     if (res && (res.success || res.ok)) {
       localStorage.setItem('authToken', res.token);
-      localStorage.setItem('username', formData.username);
       localStorage.setItem('nickname', formData.nickname);
-      localStorage.setItem('email', formData.email);
-      localStorage.setItem('birthday', formData.birthday);
-      localStorage.setItem('sex', formData.sex);
       // 일단 로컬로 넣었는데 정상적이면 글로벌로 불러야함 ㅇㅇ <- 보안상 문제 생김
 
       // exercise정보 호출해서 넣어야함
@@ -154,9 +149,9 @@ const handleLogin = async () => {
     }
 
     errors.password = res?.message || '로그인에 실패했습니다.';
-  } catch (err) {
-    console.error('로그인 에러:', err);
-    errors.password = err?.message || '서버 오류가 발생했습니다.';
+  } catch (error) {
+    console.error('로그인 에러:', error);
+    errors.password = error?.message || '서버 오류가 발생했습니다.';
   } finally {
     loading.value = false;
   }

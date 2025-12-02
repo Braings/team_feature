@@ -28,8 +28,8 @@
             <header class="post-header">
               <h1 class="post-title">{{ post.title }}</h1>
               <div class="post-meta">
-                <span class="author">{{ post.author }}</span>
-                <span class="date">{{ post.date }}</span>
+                <span class="author">{{ post.nickname }}</span>
+                <span class="date">{{ post.creationTime }}</span>
                 <span class="views">조회 {{ post.views }}</span>
               </div>
             </header>
@@ -168,9 +168,9 @@ async function loadReviews() {
       query: search.value.query
     });
     posts.value = data.data || data || [];
-  } catch (err) {
-    console.error('리뷰 목록 로드 실패:', err);
-    error.value = err.message;
+  } catch (error) {
+    console.error('리뷰 목록 로드 실패:', error);
+    error.value = error.message;
     // 폴백: 샘플 데이터
     posts.value = Array.from({ length: 100 }).map((_, i) => ({
       username: `author${i + 1}`,
@@ -228,9 +228,9 @@ async function loadPost(id) {
       tag: id.length % 3 === 0 ? '정보' : '질문',
       content: '이것은 샘플 게시물의 본문입니다.'
     };
-  } catch (err) {
-    console.error('게시물 로드 실패:', err);
-    error.value = err.message;
+  } catch (error) {
+    console.error('게시물 로드 실패:', error);
+    error.value = error.message;
     // 폴백
     post.value = {
       username: id,
@@ -264,12 +264,12 @@ async function toggleRecommend() {
     // 성공 시: 그대로 유지
     alert(`${action}되었습니다! (현재 추천 수: ${post.value.recommend})`);
 
-  } catch (err) {
+  } catch (error) {
     // 3. 실패 시 상태 롤백 (롤백 로직)
     isRecommended.value = isCurrentlyRecommended;
     post.value.recommend += isCurrentlyRecommended ? 1 : -1;
-    alert('추천/추천 취소에 실패했습니다: ' + err.message);
-    console.error('추천 토글 실패:', err);
+    alert('추천/추천 취소에 실패했습니다: ' + error.message);
+    console.error('추천 토글 실패:', error);
   }
 }
 
@@ -284,9 +284,9 @@ async function deletePost() {
     await deleteReview(post.value.username);
     alert('삭제되었습니다.');
     router.push({ name: 'reviews' }).catch(()=>{});
-  } catch (err) {
-    alert('삭제 실패: ' + err.message);
-    console.error('삭제 실패:', err);
+  } catch (error) {
+    alert('삭제 실패: ' + error.message);
+    console.error('삭제 실패:', error);
   }
 }
 

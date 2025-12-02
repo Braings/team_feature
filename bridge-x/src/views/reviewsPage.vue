@@ -124,12 +124,14 @@ const error = ref(null);
 const page = ref(1);
 const pageSize = 10;
 
-// 💡 중요: 실제 API 연동 시에는 이 함수가 서버에서 페이지네이션/필터링된 데이터를 가져와야 합니다.
+// ========================
+// Data Loading
+// ========================
+
 async function loadReviews() {
   loading.value = true;
   error.value = null;
   try {
-    // API 호출 시 필터링 및 페이지네이션 조건 전달 (서버가 이를 처리한다고 가정)
     const data = await getReviews({
       page: page.value,
       limit: pageSize,
@@ -137,23 +139,19 @@ async function loadReviews() {
       searchType: search.value.type,
       query: search.value.query
     });
-    // posts.value에 서버 응답 데이터를 넣습니다. (서버에서 전체 데이터 개수를 함께 받아오면 더 좋음)
+
     posts.value = data.data || data || [];
 
-    // 만약 서버가 현재 페이지 데이터만 반환한다면,
-    // totalPages를 계산하기 위한 totalCount를 서버에서 받아와야 합니다.
-    // 현재는 클라이언트 측에서 계산하기 때문에 posts.value에 전체 데이터가 들어있다고 가정합니다.
-
-  } catch (err) {
-    console.error('리뷰 목록 로드 실패:', err);
-    error.value = err.message;
+  } catch (error) {
+    console.error('리뷰 목록 로드 실패:', error);
+    error.value = error.message;
 
     // 폴백: 샘플 데이터 (37개 전체를 생성하여 클라이언트 측 필터링을 허용)
     // 💡 이 샘플 데이터는 어떤 필터링 조건에서도 항상 동일하게 전체를 생성해야 합니다.
     posts.value = Array.from({ length: 100  }).map((_, i) => ({
       username: `author${i + 1}`,
       no: 100 - i,
-      tag: i % 5 === 0 ? '질문' : i % 3 === 0 ? '정보' : '리뷰', // 샘플 데이터에 리뷰/잡담 추가
+      tag: i % 5 === 0 ? '질문' : i % 3 === 0 ? '정보' : '리뷰',
       title: `샘플 게시물 제목 ${i + 1}`,
       author: `운영자${(i % 6) + 1}`,
       date: '25/11/' + ((i % 30) + 1).toString().padStart(2, '0'),
@@ -164,18 +162,18 @@ async function loadReviews() {
     loading.value = false;
   }
 }
+// ========================
+// Event Handlers
+// ========================
 
 function doSearch() {
   page.value = 1;
-  // 💡 검색 조건이 바뀌었으므로, 서버에서 새로운 필터링 결과를 가져옵니다.
   loadReviews();
 }
 
 function handleSearchAndBlur(event) {
-  // 1. 실제 검색 작업 수행
   doSearch();
 
-  // 2. 포커스 해제 (blur)
   if (event && event.currentTarget) {
     event.currentTarget.blur();
     console.log('버튼 포커스 해제됨');
@@ -184,7 +182,6 @@ function handleSearchAndBlur(event) {
 function selectCategory(cat) {
   selectedCategory.value = cat;
   page.value = 1;
-  // 💡 카테고리가 바뀌었으므로, 서버에서 새로운 필터링 결과를 가져옵니다.
   loadReviews();
 }
 
@@ -192,8 +189,6 @@ function openPost(post) {
   if (router) router.push({ name: 'reviewDetail', params: { username: post.username } }).catch(()=>{});
 }
 
-// 💡 수정: prevPage와 nextPage는 page 값만 변경하고 loadReviews()를 호출하지 않습니다.
-// page 값이 바뀌면 computed 속성인 pagedPosts가 자동으로 업데이트됩니다.
 function prevPage() {
   if (page.value > 1) {
     page.value -= 1;
@@ -205,6 +200,10 @@ function nextPage() {
   }
 }
 
+// ========================
+// Computed Properties
+// ========================
+
 const filteredPosts = computed(() => {
   let result = posts.value;
 
@@ -212,7 +211,6 @@ const filteredPosts = computed(() => {
   if (selectedCategory.value !== 'all') {
     const categoryMap = { question: '질문', info: '정보', review: '리뷰', chat: '잡담' };
     const cat = categoryMap[selectedCategory.value];
-    // posts.value에 tag가 없는 경우가 있으므로 안전하게 확인
     if (cat) result = result.filter(p => p.tag === cat);
   }
 
@@ -220,7 +218,6 @@ const filteredPosts = computed(() => {
   if (search.value.query) {
     const q = search.value.query.toLowerCase();
     result = result.filter(p => {
-      // p.title이나 p.author가 null이 아닌지 확인하여 오류 방지
       const titleMatch = (p.title || '').toLowerCase().includes(q);
       const authorMatch = (p.author || '').toLowerCase().includes(q);
 
@@ -249,22 +246,21 @@ const pagedPosts = computed(() => {
 });
 
 watch(search, () => {
-  // 검색 타입 또는 쿼리가 변경되면 페이지를 1로 초기화하고 데이터를 다시 로드합니다.
   doSearch();
-}, { deep: true }); // search 객체의 내부 속성 변화도 감지하기 위해 deep: true 설정
+}, { deep: true });
 
 onMounted(() => {
   loadReviews();
 });
 
 
-// 글쓰기 모달 관련 상태 및 함수
-// 3. 모달 상태 관리 변수 추가
-const isModalOpen = ref(false);
-// const reviews = ref([]); // 기존 리뷰 목록 상태 (필요 시)
+// ========================
+// Modal State and Handlers
+// ========================
 
-// 4. 리뷰 작성 모달 상태 및 함수
-const defaultReviewData = reactive({ rating: 5, content: '' }); // 새 리뷰를 위한 기본 데이터
+const isModalOpen = ref(false);
+
+const defaultReviewData = reactive({ rating: 5, content: '' });
 
 const openWriteModal = () => {
   isModalOpen.value = true;
@@ -276,11 +272,8 @@ const closeWriteModal = () => {
 
 const handleReviewSubmit = (newReview) => {
   console.log('새 리뷰가 작성되었습니다:', newReview);
-  // 5. TODO: 새 리뷰를 목록에 추가하거나(unshift), 목록 API를 다시 호출하여 업데이트합니다.
-  // 예: reviews.value.unshift(newReview);
-
-  // 모달은 이미 ReviewWriteModal 내부에서 닫힙니다.
-  // closeWriteModal(); // 필요하다면 여기서 다시 닫아줍니다.
+  closeWriteModal();
+  loadReviews();
 };
 
 </script>

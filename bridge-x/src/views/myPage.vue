@@ -85,9 +85,9 @@
 <script setup>
 import { reactive, ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { signupFormData } from '@/stores/signupStore';
 import ProfileEditModal from './ProfileEditModal.vue';
-
+import { userExerciseData } from '@/stores/userExerciseStore';
+import { updateProfile, getProfile } from '@/api.js';
 const router = useRouter();
 
 const userProfile = reactive({
@@ -103,20 +103,47 @@ const userExercise = reactive({
   recommend: ''
 });
 
+// ========================
+// Data Loading Functions
+// ========================
+
+const loadProfile = async () => {
+  try {
+    const profile = await getProfile();
+    userProfile.username = profile.username || '';
+    userProfile.email = profile.email || '';
+    userProfile.birthday = profile.birthday || '';
+    userProfile.sex = profile.sex || '';
+    userProfile.height = profile.height || '';
+    userProfile.weight = profile.weight || '';
+  } catch (error) {
+    console.error('프로필 로드 실패:', error);
+  }
+};
+
+const loadUserExercise = async () => {
+  try {
+    const exercise = await userExerciseData();
+    userExercise.recommend = exercise.recommend || 'N/A';
+  } catch (error) {
+    console.error('추천 운동 로드 실패:', error);
+  }
+};
+
+
+
+onMounted(() => {
+  loadProfile();
+  loadUserExercise();
+});
+
+// ========================
+// Computed Properties
+// ========================
+
 const userInitial = computed(() => {
   const username = localStorage.getItem('username') || 'U';
   return username.charAt(0).toUpperCase();
-});
-
-onMounted(() => {
-  // 저장된 회원가입 정보를 global store에서 로드
-  userProfile.username = signupFormData.username || localStorage.getItem('username') || 'User';
-  userProfile.nickname = signupFormData.nickname || localStorage.getItem('nickname') || 'User';
-  userProfile.email = signupFormData.email || localStorage.getItem('email') || 'N/A';
-  userProfile.birthday = signupFormData.birthday || localStorage.getItem('birthday') || '';
-  userProfile.sex = signupFormData.sex || localStorage.getItem('sex') ||'';
-  userProfile.height = signupFormData.height || localStorage.getItem('height') ||'';
-  userProfile.weight = signupFormData.weight || localStorage.getItem('weight') ||'';
 });
 
 const formatBirthday = (birthday) => {
@@ -145,7 +172,10 @@ const handleLogout = () => {
   router.push({ name: 'homePage' });
 };
 
-// 추가적인 기능(예: 정보 수정 모달 열기 등)은 여기에 구현할 수 있습니다.
+// ========================
+// Modal State and Handlers
+// ========================
+
 // 1. 모달 상태 변수 추가
 const isModalOpen = ref(false);
 
@@ -159,17 +189,18 @@ const closeEditModal = () => {
 };
 
 // 3. 수정된 데이터 처리 함수
-const handleProfileUpdate = (updatedProfile) => {
-  // 실제로는 여기서 API 호출을 통해 서버에 저장해야 합니다.
-  // 현재는 로컬 상태만 업데이트합니다.
-  Object.assign(userProfile, updatedProfile);
-  if (updatedProfile.username) {
-    localStorage.setItem('username', updatedProfile.username);
-  }
+const handleProfileUpdate = async (newProfileData) => {
+  try {
+    const newProfile = await updateProfile(newProfileData);
 
-  // 업데이트 후 모달 닫기
-  closeEditModal();
-  console.log('프로필 업데이트 완료:', userProfile);
+    console.log('프로필 업데이트 성공');
+    await loadProfile(newProfile);
+    closeEditModal();
+
+  } catch (error) {
+    console.error('프로필 업데이트 실패:', error);
+    alert('프로필 업데이트에 실패했습니다: ' + (error.raw?.message || '서버 오류'));
+  }
 };
 </script>
 

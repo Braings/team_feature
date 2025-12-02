@@ -198,9 +198,6 @@ const handleNext = async () => {
   }
 
   console.log('✓ 폼 검증 성공');
-  console.log('Email:', formData.email);
-  console.log('Birthday:', formData.birthday);
-  console.log('sex:', formData.sex);
 
   // 전역 store에 데이터 저장
   signupFormData.email = formData.email;

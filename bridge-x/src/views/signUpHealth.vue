@@ -100,7 +100,6 @@ const handleNext = async () => {
   }
 
   console.log('✓ 폼 검증 성공');
-  console.log('Health Info:', formData);
 
   // 전역 store에 건강정보 데이터 저장
   signupFormData.height = formData.height;

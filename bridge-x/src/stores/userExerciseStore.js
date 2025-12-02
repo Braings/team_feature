@@ -18,7 +18,7 @@ export const userExerciseData = reactive({
  */
 export async function submitExercise() {
   const userExerciseData = {
-    username: userExerciseData.recommend,
+    recommend: userExerciseData.recommend,
   }
 
   try {

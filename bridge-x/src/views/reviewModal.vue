@@ -38,6 +38,7 @@
 
 <script setup>
 import { reactive, watch } from 'vue';
+import { createReview, updateReview } from '@/api.js';
 
 // Props 정의
 const props = defineProps({
@@ -62,7 +63,6 @@ const emit = defineEmits(['close', 'submit-success']);
 
 // 리뷰 데이터 상태
 const reviewData = reactive({
-  rating: props.initialData.rating,
   content: props.initialData.content,
   title: props.initialData.title || '',
   tag: props.initialData.tag || '',
@@ -76,7 +76,6 @@ const reviewData = reactive({
 // 4. 모달이 열릴 때 초기 데이터를 설정합니다.
 watch(() => props.isOpen, (newVal) => {
     if (newVal) {
-        reviewData.rating = props.initialData.rating;
         reviewData.content = props.initialData.content;
         reviewData.title = props.initialData.title || '';
         reviewData.tag = props.initialData.tag || '';
@@ -94,17 +93,34 @@ const closeModal = () => {
 };
 
 // 리뷰 제출 로직
-const submitReview = () => {
-  emit('update-profile', { ...reviewData });
-  console.log('리뷰 제출 데이터:', reviewData);
+const submitReview = async () => {
 
-  // TODO: API 호출 로직 (POST 또는 PUT)
+    // 서버로 보낼 데이터 (rating은 폼에 없으므로 제외하고, 있다면 추가 가능)
+    const payload = {
+      tag: reviewData.tag,
+      title: reviewData.title,
+      content: reviewData.content,
+    };
 
-  // 성공적으로 제출되었다고 가정하고 부모에게 알립니다.
-  emit('submit-success', reviewData);
+    let result = null;
 
-  // 제출 후 모달을 닫습니다.
-  closeModal();
+    try {
+        if (props.reviewId) {
+            result = await updateReview(props.reviewId, payload);
+            console.log('리뷰 수정 성공:', result);
+        } else {
+            result = await createReview(payload);
+            console.log('리뷰 작성 성공:', result);
+        }
+
+        // 부모 컴포넌트에 서버 응답 결과를 전달
+        emit('submit-success', result);
+        closeModal();
+
+    } catch (error) {
+        console.error('리뷰 제출 실패:', error);
+        alert(`리뷰 제출에 실패했습니다. (${error.raw?.message || '서버 오류'})`);
+    }
 };
 </script>
 

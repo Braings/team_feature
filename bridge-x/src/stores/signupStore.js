@@ -1,7 +1,7 @@
 import { reactive } from 'vue'
 import { post } from '@/api'
 
-// Signup 폼 데이터 전역 상태
+// 폼 데이터 전역 상태
 export const signupFormData = reactive({
   // Step 1: ID & Password
   username: '',
@@ -17,18 +17,21 @@ export const signupFormData = reactive({
   // Step 3: Health Info
   height: '',
   weight: '',
-  experienceLevel: '',
 
   // Reset 함수
   reset() {
+
     this.username = ''
     this.password = ''
+    this.nickname = ''
+    this.passwordcheck = ''
+
     this.email = ''
     this.birthday = ''
     this.sex = ''
+
     this.height = ''
     this.weight = ''
-    this.experienceLevel = ''
   }
 })
 
@@ -39,20 +42,24 @@ export const signupFormData = reactive({
  */
 export async function submitSignup() {
   // 회원가입 데이터 구성
-  const signupData = {
+  const signupFormData = {
+
     username: signupFormData.username,
+    nickname: signupFormData.nickname,
     password: signupFormData.password,
+    passwordcheck: signupFormData.passwordcheck,
+
     email: signupFormData.email,
     birthday: signupFormData.birthday,
     sex: signupFormData.sex,
+
     height: parseInt(signupFormData.height),
     weight: parseInt(signupFormData.weight),
-    experienceLevel: signupFormData.experienceLevel
   }
 
   try {
     // API 호출
-    const response = await post('/api/sign', signupData)
+    const response = await post('/api/sign', signupFormData)
     console.log('회원가입 성공:', response)
     return response
   } catch (error) {

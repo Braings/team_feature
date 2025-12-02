@@ -135,7 +135,6 @@ const handleNext = async () => {
   }
 
   console.log('✓ 폼 검증 성공');
-  console.log('Username:', formData.username);
 
   // 전역 store에 데이터 저장
   signupFormData.username = formData.username;
