@@ -9,12 +9,18 @@ import Reviews from '../views/reviewsPage.vue'
 import ReviewDetail from '../views/reviewDetail.vue'
 import ReviewsWrite from '../views/reviewsWritePage.vue'
 import LogIn from '../views/logIn.vue'
+import Recommend from '@/views/recommend.vue'
 
 const routes = [
   {
     path: '/',
     name: 'homePage',
     component: HomePage
+  },
+  {
+    path: '/recommend',
+    name: 'recommend',
+    component: Recommend
   },
   {
     path: '/signup/ID',
