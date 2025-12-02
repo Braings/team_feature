@@ -3,7 +3,7 @@ import HomePage from '../views/homePage.vue'
 import SignUpID from '../views/signUpID.vue'
 import SignUpPrivate from '../views/signUpPrivate.vue'
 import SignUpHealth from '../views/signUpHealth.vue'
-import Maps from '../views/mapsPage.vue'
+import ExerciseFacilities from '../views/exerciseFacilities.vue'
 import MyPage from '../views/myPage.vue'
 import Reviews from '../views/reviewsPage.vue'
 import ReviewDetail from '../views/reviewDetail.vue'
@@ -32,9 +32,9 @@ const routes = [
     component: SignUpHealth
   },
   {
-    path: '/maps',
-    name: 'maps',
-    component: Maps
+    path: '/exerciseFacilities',
+    name: 'exerciseFacilities',
+    component: ExerciseFacilities
   },
   {
     path: '/myPage',

@@ -66,7 +66,7 @@
 
       <div class="side-icons">
         <div class="icon-placeholder cursorPointer myPage-icon"  @click="goToPage('myPage')"></div>
-        <div class="icon-placeholder cursorPointer maps-icon" @click="goToPage('maps')"></div>
+        <div class="icon-placeholder cursorPointer compass-icon" @click="goToPage('exerciseFacilities')"></div>
         <div class="icon-placeholder cursorPointer reviews-icon" @click="goToPage('reviews')"></div>
       </div>
 
@@ -344,7 +344,7 @@ export default {
   background-position: center;
   background-repeat: no-repeat;
 }
-.maps-icon {
+.compass-icon {
   background-image: url('../img/mapsIcon.png');
   background-size: 80%;
   background-position: center;
