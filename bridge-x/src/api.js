@@ -19,7 +19,8 @@ const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8080';
 async function request(path, options = {}) {
   // 모든 요청에 기본으로 적용될 옵션 설정
   const defaultOptions = {
-    credentials: 'include', // 세션/인증 쿠키를 요청에 포함 (인증 유지)
+    // 브라우저에게 해당 API 호출 시 현재 도메인에 저장된 모든 쿠키를 요청에 자동으로 포함하여 서버로 보내도록 지시
+    credentials: 'include',
     headers: { 'Content-Type': 'application/json' } // 기본 콘텐츠 타입 (JSON)
   };
   const finalOptions = Object.assign(defaultOptions, options);
@@ -104,6 +105,22 @@ export async function get(path, opts = {}) {
 
 export async function getUserExercise() {
   return get('/api/userExercise');
+}
+
+// --------------------------------------------------------------- //
+
+// User Exercise Board API Endpoints (사용자 운동 게시판)
+
+
+// ===============================================================
+//  운동 시설 조회 API 함수
+// ===============================================================
+
+// 운동 시설 목록을 조회합니다.
+  // @returns {Promise<Object>} 운동 시설 데이터 목록
+
+export async function loadExerciseFacilities() {
+  return get('/api/exerciseFacilities');
 }
 
 // --------------------------------------------------------------- //

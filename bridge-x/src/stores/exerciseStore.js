@@ -3,7 +3,14 @@ import { post } from '@/api'
 
 // Signup 폼 데이터 전역 상태
 export const userExerciseData = reactive({
+  // 추천 운동
   recommend: '',
+
+  // 평균 운동 능력
+  avg_grip: '',
+  avg_flex: '',
+  avg_situp: '',
+  avg_jump: '',
 
   // Reset 함수
   reset() {

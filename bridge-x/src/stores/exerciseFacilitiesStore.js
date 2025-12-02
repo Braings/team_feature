@@ -1,27 +1,18 @@
 import { reactive } from 'vue'
-import { createReview } from '@/api'
+import { loadExerciseFacilities } from '@/api'
 
 // 폼 데이터 전역 상태
-export const reviewsData = reactive({
-  rating: 0,
-  content: '',
-  title: '',
-  tag: '',
-  creationTime: '',
-  suggestion: 0,
-  views: 0,
-  nickname: '',
+export const exerciseFacilitiesData = reactive({
+  selectedRegion :'',
+  selectedCity :'',
+  selectedRegionElement :'',
+
 
   // Reset 함수
   reset() {
-    this.rating = 0
-    this.content = ''
-    this.title = ''
-    this.tag = ''
-    this.creationTime = ''
-    this.suggestion = 0
-    this.views = 0
-    this.nickname = ''
+    this.selectedRegion = ''
+    this.selectedCity = ''
+    this.selectedRegionElement = ''
   }
 })
 
@@ -30,20 +21,19 @@ export const reviewsData = reactive({
  * @returns {Promise} API 응답
  * @throws {Error} API 오류 시 에러 throw
  */
-export async function submitReviews() {
-  const reviewsData = {
-    rating: reviewsData.rating,
-    content: reviewsData.content,
-    title: reviewsData.title,
-    tag: reviewsData.tag,
+export async function ExerciseFacilities() {
+  const exerciseFacilitiesData = {
+    selectedRegion: exerciseFacilitiesData.selectedRegion,
+    selectedCity: exerciseFacilitiesData.selectedCity,
+    selectedRegionElement: exerciseFacilitiesData.selectedRegionElement,
   }
 
   try {
-    const response = await createReview('/api/reviews', reviewsData)
-    console.log('추천운동 불러오기 성공:', response)
+    const response = await loadExerciseFacilities('/api/reviews', exerciseFacilitiesData)
+    console.log('운동시설 불러오기 성공:', response)
     return response
   } catch (error) {
-    console.error('추천운동 불러오기 실패:', error)
+    console.error('운동시설 불러오기 실패:', error)
     throw error
   }
 }

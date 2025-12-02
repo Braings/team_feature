@@ -52,7 +52,7 @@ import { post } from '@/api.js';
 import FormField from '@/components/FormField.vue';
 import { useFormValidation } from '@/composables/useFormValidation';
 import { loginFormData } from '@/stores/loginStore.js';
-import { userExerciseData } from '@/stores/userExerciseStore.js';
+import { userExerciseData } from '@/stores/exerciseStore.js';
 
 // ========================
 // Data & State
@@ -131,25 +131,13 @@ const handleLogin = async () => {
     const body = { username: formData.username, password: formData.password };
     const res = await post('/api/login', body);
 
-    if (res && res.token) {
+  if (res && res.token) {
       localStorage.setItem('authToken', res.token);
       localStorage.setItem('nickname', formData.nickname);
-      router.push({ name: 'homePage' });
-      return;
-    }
-
-    if (res && (res.success || res.ok)) {
-      localStorage.setItem('authToken', res.token);
-      localStorage.setItem('nickname', formData.nickname);
-
       localStorage.setItem('exercise', exerciseData.recommend);
-      // 일단 로컬로 넣었는데 정상적이면 글로벌로 불러야함 ㅇㅇ <- 보안상 문제 생김
-
-      // exercise정보 호출해서 넣어야함
-      // 추가 사용자 정보 저장 가능
       router.push({ name: 'homePage' });
       return;
-    }
+  }
 
     errors.password = res?.message || '로그인에 실패했습니다.';
   } catch (error) {
@@ -163,7 +151,9 @@ const handleLogin = async () => {
 const goToSignUp = () => {
   router.push({ name: 'sign.id' });
 };
+
 </script>
+
 
 <style lang="scss" scoped>
 @import '@/styles/_variables.scss';

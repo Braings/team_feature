@@ -86,7 +86,7 @@
 import { reactive, ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import ProfileEditModal from './ProfileEditModal.vue';
-import { userExerciseData } from '@/stores/userExerciseStore';
+import { userExerciseData } from '@/stores/exerciseStore';
 import { updateProfile, getProfile } from '@/api.js';
 const router = useRouter();
 

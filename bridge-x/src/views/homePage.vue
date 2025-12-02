@@ -77,7 +77,7 @@
 <script>
 import { useRouter } from 'vue-router'
 import { ref, onMounted } from 'vue';;
-
+import { getUserProfile } from '@/api.js';
 
 
 export default {
@@ -86,14 +86,35 @@ export default {
     const userName = ref('');
     const exerciseRecommendation = ref('');
 
-    onMounted(() => {
-      // A. userName 로드
-      const storedUserName = localStorage.getItem('username');
-      userName.value = storedUserName || 'GUEST';
+    const fetchUserProfile = async () => {
+      const authtoken = localStorage.getItem('authToken');
+      if (!authtoken) {
+        userName.value = 'GUEST';
+        exerciseRecommendation.value = '로그인이 필요합니다.';
+        return;
+      }
 
-      // B. 추천 운동(exercise) 로드
-      const storedExercise = localStorage.getItem('exercise');
-      exerciseRecommendation.value = storedExercise || '회원님의 건강 정보에 기반한 맞춤 운동을 곧 준비해 드릴게요!';
+      try {
+        const profileData = await getUserProfile();
+
+        userName.value = profileData.nickname || '사용자';
+        exerciseRecommendation.value = profileData.recommend || '추천 운동';
+
+        localStorage.setItem('nickname',userName.value);
+        localStorage.setItem('recommend',exerciseRecommendation.value);
+
+      } catch(error) {
+        console.error("인증이 프로필 데이터 로드 실패:", error);
+
+        localStorage.removeItem('authToken');
+        userName.value = 'GUEST';
+        alert('인증 정보가 만료되었습니다. 다시 로그인해 주세요.');
+        router.push({ name: 'logIn' });
+      }
+    }
+
+    onMounted(() => {
+      fetchUserProfile();
     });
 
     const router = useRouter();

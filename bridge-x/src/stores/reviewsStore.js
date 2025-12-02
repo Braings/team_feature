@@ -3,7 +3,6 @@ import { createReview } from '@/api'
 
 // 폼 데이터 전역 상태
 export const reviewsData = reactive({
-  rating: 0,
   content: '',
   title: '',
   tag: '',
@@ -14,7 +13,6 @@ export const reviewsData = reactive({
 
   // Reset 함수
   reset() {
-    this.rating = 0
     this.content = ''
     this.title = ''
     this.tag = ''
@@ -32,7 +30,6 @@ export const reviewsData = reactive({
  */
 export async function submitReviews() {
   const reviewsData = {
-    rating: reviewsData.rating,
     content: reviewsData.content,
     title: reviewsData.title,
     tag: reviewsData.tag,

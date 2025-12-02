@@ -3,20 +3,26 @@ import { post } from '@/api'
 
 // 폼 데이터 전역 상태
 export const loginFormData = reactive({
-  // Step 1: ID & Password
+  // 아이디(사용자 이름), 닉네임, 비밀번호
   username: '',
   nickname: '',
   password: '',
   passwordcheck: '',
 
-  // Step 2: Email & Birthday & Sex
+  // 이메일, 생일, 성별
   email: '',
   birthday: '',
   sex: '',
 
-  // Step 3: Health Info
+  // 신체 정보
   height: '',
   weight: '',
+
+  // 운동 능력 정보
+  user_grip: '',
+  user_flex: '',
+  user_situp: '',
+  user_jump: '',
 
   // Reset 함수
   reset() {
@@ -32,6 +38,11 @@ export const loginFormData = reactive({
 
     this.height = ''
     this.weight = ''
+
+    this.user_grip = ''
+    this.user_flex = ''
+    this.user_situp = ''
+    this.user_jump = ''
   }
 })
 
@@ -55,6 +66,11 @@ export async function submitLogin() {
 
     height: parseInt(loginFormData.height),
     weight: parseInt(loginFormData.weight),
+
+    user_grip: parseInt(loginFormData.user_grip),
+    user_flex: parseInt(loginFormData.user_flex),
+    user_situp: parseInt(loginFormData.user_situp),
+    user_jump: parseInt(loginFormData.user_jump),
   }
 
   try {
