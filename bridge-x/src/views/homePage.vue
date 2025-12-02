@@ -59,7 +59,7 @@
           추천 운동
         </p>
         <div class="recommendation-box">
-          <p class="recommendation-text">{{ exercise }}</p>
+          <p class="recommendation-text cursorPointer"  @click="goToPage('recommend')" >{{ exercise }}</p>
         </div>
 
       </div>

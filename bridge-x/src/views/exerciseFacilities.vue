@@ -40,9 +40,27 @@
               <span class="value">{{ selectedCity }}</span>
             </div>
             <div class="info-display">
-              <p>{{ selectedRegion }} {{ selectedCity }} 정보가 여기에 표시됩니다.</p>
+              <p v-if="facilityListState.isLoading" class="loading-state">
+                  <i class="fa fa-spinner fa-spin"></i>
+                  {{ selectedRegion }} {{ selectedCity }} 정보를 불러오는 중...
+              </p>
+              <p v-else-if="facilityListState.hasError" class="error-state">
+                  🚨 데이터를 불러오는 데 실패했습니다. 다시 시도해 주세요.
+              </p>
+              <div v-else-if="facilityListState.data.length > 0">
+                  <h3>운동 시설 목록 (총 {{ facilityListState.data.length }}개)</h3>
+                  <ul class="facility-list">
+                      <li v-for="facility in facilityListState.data" :key="facility.id" class="facility-item">
+                          <span class="facility-name">📌 {{ facility.name }} ({{ facility.type }})</span>
+                          <span class="facility-address">{{ facility.address }}</span>
+                      </li>
+                  </ul>
+              </div>
+              <p v-else>
+                  {{ selectedRegion }} {{ selectedCity }}에 등록된 시설 정보가 없습니다.
+              </p>
             </div>
-          </div>
+             </div>
           <div v-else class="empty-state">
             <p>지도에서 지역을 선택하세요</p>
           </div>
@@ -55,6 +73,7 @@
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue'
 import svgContent from '@/img/maps/korea_map.svg?raw'
+import { facilityListState, fetchExerciseFacilities, setSelectedRegionAndCity } from '@/stores/exerciseFacilitiesStore'
 
 // 상태 관리
 const showDropdown = ref(false)
@@ -68,6 +87,105 @@ const dropdownStyle = computed(() => ({
   top: dropdownPosition.top,
   left: dropdownPosition.left
 }))
+
+// 드롭다운 닫기
+const closeDropdown = () => {
+  showDropdown.value = false
+}
+
+// 도시 선택
+const selectCity = async (city) => {
+  selectedCity.value = city
+  setSelectedRegionAndCity(selectedRegion.value, city)
+
+  // 드롭다운 닫기
+  closeDropdown()
+
+  try {
+    await fetchExerciseFacilities(selectedRegion.value, city)
+  } catch (error) {
+    // Store에서 에러를 처리하지만, 컴포넌트에서도 추가적인 UI 처리가 필요하다면 catch 블록에 추가합니다.
+    console.error("시설 조회 실패 (컴포넌트 레벨):", error);
+  }
+}
+
+// SVG 지도 클릭 이벤트 처리
+const handleMapClick = (event) => {
+  const target = event.target
+  const regionGroup = target.closest('[data-name]')
+
+  if (regionGroup) {
+    // 이전 선택 영역 스타일 제거
+    if (selectedRegionElement.value) {
+      const prevPaths = selectedRegionElement.value.querySelectorAll('path, polygon')
+      prevPaths.forEach(el => {
+        el.style.stroke = ''
+        el.style.strokeWidth = ''
+        el.style.fill = ''
+      })
+    }
+
+    // 새로운 영역 선택
+    const region = regionGroup.getAttribute('data-name')
+    selectedRegionElement.value = regionGroup
+
+    // 선택된 영역 내 모든 path/polygon에 스타일 적용
+    const paths = regionGroup.querySelectorAll('path, polygon')
+    paths.forEach(el => {
+      el.style.fill = '#4caf50'
+      el.style.stroke = 'none'
+    })
+
+    // SVG 컨테이너의 위치 기준으로 드롭다운 위치 계산
+    const mapContainer = document.querySelector('.map-container')
+    const containerRect = mapContainer.getBoundingClientRect()
+
+    // 마우스 위치 (클릭 위치 기준)
+    let mouseX = event.clientX - containerRect.left
+    let mouseY = event.clientY - containerRect.top
+
+    // 드롭다운 크기 (대략적인 크기로 초기 계산)
+    const dropdownWidth = 200
+    const dropdownHeight = 300
+
+    // 오른쪽 여백 체크: 드롭다운이 컨테이너를 벗어나면 왼쪽에 배치
+    if (mouseX + dropdownWidth + 10 > containerRect.width) {
+      mouseX = Math.max(10, mouseX - dropdownWidth - 10)
+    } else {
+      mouseX = mouseX + 10
+    }
+
+    // 아래쪽 여백 체크: 드롭다운이 컨테이너를 벗어나면 위쪽에 배치
+    if (mouseY + dropdownHeight > containerRect.height) {
+      mouseY = Math.max(10, mouseY - dropdownHeight - 10)
+    }
+
+    // 드롭다운 위치 설정
+    dropdownPosition.top = Math.max(0, mouseY) + 'px'
+    dropdownPosition.left = Math.max(0, mouseX) + 'px'
+
+    selectedRegion.value = region
+    selectedCity.value = ''
+    showDropdown.value = true
+    setSelectedRegionAndCity(region, '')
+  }
+}
+
+// SVG 지도 초기화 (마운트 시 실행)
+const initializeMap = () => {
+  // 주석: SVG가 렌더링된 후 스타일 적용
+  const svgElement = document.querySelector('.svg-wrapper svg')
+  if (svgElement) {
+    svgElement.style.width = '100%'
+    svgElement.style.maxWidth = '800px'
+    svgElement.style.cursor = 'pointer'
+  }
+}
+
+// 컴포넌트 마운트 시 지도 초기화
+onMounted(() => {
+  initializeMap()
+})
 
 // 지역별 도시/구 데이터
 const regionCities = reactive({
@@ -150,95 +268,6 @@ const regionCities = reactive({
   '제주': [
     '제주시', '서귀포시'
   ]
-})
-
-// 드롭다운 닫기
-const closeDropdown = () => {
-  showDropdown.value = false
-}
-
-// 도시 선택
-const selectCity = (city) => {
-  selectedCity.value = city
-  // 드롭다운 닫기
-  closeDropdown()
-}
-
-// SVG 지도 클릭 이벤트 처리
-const handleMapClick = (event) => {
-  const target = event.target
-  const regionGroup = target.closest('[data-name]')
-
-  if (regionGroup) {
-    // 이전 선택 영역 스타일 제거
-    if (selectedRegionElement.value) {
-      const prevPaths = selectedRegionElement.value.querySelectorAll('path, polygon')
-      prevPaths.forEach(el => {
-        el.style.stroke = ''
-        el.style.strokeWidth = ''
-        el.style.fill = ''
-      })
-    }
-
-    // 새로운 영역 선택
-    const region = regionGroup.getAttribute('data-name')
-    selectedRegionElement.value = regionGroup
-
-    // 선택된 영역 내 모든 path/polygon에 스타일 적용
-    const paths = regionGroup.querySelectorAll('path, polygon')
-    paths.forEach(el => {
-      el.style.fill = '#4caf50'
-      el.style.stroke = 'none'
-    })
-
-    // SVG 컨테이너의 위치 기준으로 드롭다운 위치 계산
-    const mapContainer = document.querySelector('.map-container')
-    const containerRect = mapContainer.getBoundingClientRect()
-
-    // 마우스 위치 (클릭 위치 기준)
-    let mouseX = event.clientX - containerRect.left
-    let mouseY = event.clientY - containerRect.top
-
-    // 드롭다운 크기 (대략적인 크기로 초기 계산)
-    const dropdownWidth = 200
-    const dropdownHeight = 300
-
-    // 오른쪽 여백 체크: 드롭다운이 컨테이너를 벗어나면 왼쪽에 배치
-    if (mouseX + dropdownWidth + 10 > containerRect.width) {
-      mouseX = Math.max(10, mouseX - dropdownWidth - 10)
-    } else {
-      mouseX = mouseX + 10
-    }
-
-    // 아래쪽 여백 체크: 드롭다운이 컨테이너를 벗어나면 위쪽에 배치
-    if (mouseY + dropdownHeight > containerRect.height) {
-      mouseY = Math.max(10, mouseY - dropdownHeight - 10)
-    }
-
-    // 드롭다운 위치 설정
-    dropdownPosition.top = Math.max(0, mouseY) + 'px'
-    dropdownPosition.left = Math.max(0, mouseX) + 'px'
-
-    selectedRegion.value = region
-    selectedCity.value = ''
-    showDropdown.value = true
-  }
-}
-
-// SVG 지도 초기화 (마운트 시 실행)
-const initializeMap = () => {
-  // 주석: SVG가 렌더링된 후 스타일 적용
-  const svgElement = document.querySelector('.svg-wrapper svg')
-  if (svgElement) {
-    svgElement.style.width = '100%'
-    svgElement.style.maxWidth = '800px'
-    svgElement.style.cursor = 'pointer'
-  }
-}
-
-// 컴포넌트 마운트 시 지도 초기화
-onMounted(() => {
-  initializeMap()
 })
 </script>
 
@@ -436,4 +465,75 @@ onMounted(() => {
     font-size: 16px;
   }
 }
+
+.info-display {
+  margin-top: 20px;
+  padding: 16px;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+  // text-align: center; // 목록이 중앙 정렬되는 것을 방지하기 위해 주석 처리
+
+  h3 {
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-size: 16px;
+    color: #4CAF50;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 8px;
+  }
+
+  p {
+    margin: 0;
+    color: #666;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+}
+
+// 💡 로딩 및 에러 상태 스타일
+.loading-state {
+  color: #2196F3;
+  font-weight: bold;
+  text-align: center;
+}
+
+.error-state {
+  color: #F44336;
+  font-weight: bold;
+  text-align: center;
+}
+
+// 💡 시설 목록 스타일
+.facility-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.facility-item {
+  padding: 10px;
+  border: 1px solid #f0f0f0;
+  border-left: 4px solid #4CAF50;
+  border-radius: 4px;
+  background: #fafafa;
+  display: flex;
+  flex-direction: column;
+
+  .facility-name {
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 4px;
+    font-size: 15px;
+  }
+
+  .facility-address {
+    font-size: 13px;
+    color: #777;
+  }
+}
+
 </style>
