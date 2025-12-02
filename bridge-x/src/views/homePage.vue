@@ -82,7 +82,7 @@ import { getUserProfile } from '@/api.js';
 
 export default {
   name: 'homePage',
-  data() {
+  setup() {
     const userName = ref('');
     const exerciseRecommendation = ref('');
 
