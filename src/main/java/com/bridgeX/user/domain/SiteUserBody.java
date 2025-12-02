@@ -25,7 +25,7 @@ public class SiteUserBody {
 	
 	@OneToOne
     @MapsId
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "id")
     private SiteUser user;
 	
 	private Integer height;
