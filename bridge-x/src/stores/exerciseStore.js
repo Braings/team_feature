@@ -15,6 +15,10 @@ export const userExerciseData = reactive({
   // Reset 함수
   reset() {
     this.recommend = ''
+    this.avg_flex = ''
+    this.avg_grip = ''
+    this.avg_jump = ''
+    this.avg_situp = ''
   }
 })
 
@@ -24,16 +28,25 @@ export const userExerciseData = reactive({
  * @throws {Error} API 오류 시 에러 throw
  */
 export async function submitExercise() {
-  const userExerciseData = {
+  const payload = {
     recommend: userExerciseData.recommend,
+    avg_grip: userExerciseData.avg_grip,
+    avg_flex: userExerciseData.avg_flex,
+    avg_jump: userExerciseData.avg_jump,
+    avg_situp: userExerciseData.avg_situp,
   }
 
-  try {
-    const response = await post('/api/userExercise', userExerciseData)
-    console.log('추천운동 불러오기 성공:', response)
+try {
+    const response = await post('/api/userExercise', payload)
+
+    if (response && response.recommend) {
+      userExerciseData.recommend = response.recommend
+    }
+
+    console.log('운동 정보 요청 성공:', response)
     return response
   } catch (error) {
-    console.error('추천운동 불러오기 실패:', error)
+    console.error('운동 정보 요청 실패:', error)
     throw error
   }
 }

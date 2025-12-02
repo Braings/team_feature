@@ -134,7 +134,7 @@ export async function loadExerciseFacilities() {
 // 현재 로그인된 사용자의 프로필 정보를 조회합니다.
   // @returns {Promise<Object>} 사용자 프로필 데이터
 
-  export async function getProfile() {
+  export async function getUserProfile() {
   // 인증 정보를 통해 서버가 현재 사용자를 식별하여 데이터를 반환합니다.
   return get('/api/users/profile');
 }
@@ -237,5 +237,5 @@ export async function deleteReview(reviewId) {
 export default {
     API_BASE, request, post, get,
     getReviews, getReviewDetail, createReview, updateReview, deleteReview,
-    getProfile, updateProfile
+    getUserProfile, updateProfile
 };

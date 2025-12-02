@@ -16,8 +16,11 @@
           <h2 class="section-title">기본 정보</h2>
           <div class="info-grname">
             <div class="info-item">
-              <span class="label">username / nickname </span>
+              <span class="label">이름</span>
               <span class="value">{{ userProfile.username || 'N/A' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">닉네임</span>
               <span class="value">{{ userProfile.nickname || 'N/A' }}</span>
             </div>
             <div class="info-item">
@@ -33,7 +36,37 @@
 
         <!-- 건강 정보 -->
         <div class="info-section">
-          <h2 class="section-title">건강 정보</h2>
+          <h2 class="section-title">운동 능력</h2>
+          <div class="exercise-grname">
+            <div class="exercise-item">
+              <span class="label">근력</span>
+              <span class="label">악력</span>
+              <span class="value">{{ userProfile.user_grip || '-' }} kg</span>
+            </div>
+            <div class="exercise-item">
+              <span class="label">유연성</span>
+              <span class="label">앉아윗몸앞으로굽히기</span>
+              <span class="value">{{ userProfile.user_flex || '-' }} cm</span>
+            </div>
+          <!-- </div>
+
+          <div class="exercise-grname"> -->
+            <div class="exercise-item">
+              <span class="label">근지구력</span>
+              <span class="label">교차윗몸일으키기</span>
+              <span class="value">{{ userProfile.user_situp || '-' }} 회</span>
+            </div>
+            <div class="exercise-item">
+              <span class="label">순발력</span>
+              <span class="label">제자리멀리뛰기</span>
+              <span class="value">{{ userProfile.user_jump || '-' }} cm</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 운동 능력 정보 -->
+        <div class="info-section">
+          <h2 class="section-title">신체 정보</h2>
           <div class="health-grname">
             <div class="health-item">
               <span class="label">키</span>
@@ -87,16 +120,23 @@ import { reactive, ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import ProfileEditModal from './ProfileEditModal.vue';
 import { userExerciseData } from '@/stores/exerciseStore';
-import { updateProfile, getProfile } from '@/api.js';
+import { updateProfile, getUserProfile } from '@/api.js';
 const router = useRouter();
 
 const userProfile = reactive({
   username: '',
+
   email: '',
   birthday: '',
   sex: '',
+
   height: '',
-  weight: ''
+  weight: '',
+
+  user_grip: '',
+  user_flex: '',
+  user_situp: '',
+  user_jump: '',
 });
 
 const userExercise = reactive({
@@ -109,13 +149,21 @@ const userExercise = reactive({
 
 const loadProfile = async () => {
   try {
-    const profile = await getProfile();
-    userProfile.username = profile.username || '';
-    userProfile.email = profile.email || '';
-    userProfile.birthday = profile.birthday || '';
-    userProfile.sex = profile.sex || '';
-    userProfile.height = profile.height || '';
-    userProfile.weight = profile.weight || '';
+    const profile = await getUserProfile();
+    userProfile.username = profile.username || 'N/A';
+
+    userProfile.email = profile.email || 'N/A';
+    userProfile.birthday = profile.birthday || 'N/A';
+    userProfile.sex = profile.sex || 'N/A';
+
+    userProfile.height = profile.height || 'N/A';
+    userProfile.weight = profile.weight || 'N/A';
+
+    userProfile.user_flex = profile.user_flex || 'N/A';
+    userProfile.user_situp = profile.user_situp || 'N/A';
+    userProfile.user_jump = profile.user_jump || 'N/A';
+    userProfile.user_grip = profile.user_grip || 'N/A';
+
   } catch (error) {
     console.error('프로필 로드 실패:', error);
   }
@@ -316,6 +364,22 @@ const handleProfileUpdate = async (newProfileData) => {
 }
 
 .health-item {
+  background: #f5f5f5;
+  padding: map-get($spacing, 'lg');
+  border-radius: map-get($radius, 'md');
+  display: flex;
+  flex-direction: column;
+  gap: map-get($spacing, 'sm');
+  text-align: center;
+}
+
+.exercise-grname {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: map-get($spacing, 'lg');
+}
+
+.exercise-item {
   background: #f5f5f5;
   padding: map-get($spacing, 'lg');
   border-radius: map-get($radius, 'md');
