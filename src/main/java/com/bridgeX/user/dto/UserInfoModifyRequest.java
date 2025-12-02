@@ -2,8 +2,6 @@ package com.bridgeX.user.dto;
 
 import java.time.LocalDate;
 
-import com.bridgeX.user.domain.SiteUser;
-import com.bridgeX.user.domain.SiteUserBody;
 import com.bridgeX.user.domain.UserGender;
 
 import jakarta.validation.constraints.Email;

@@ -1,16 +1,21 @@
 package com.bridgeX.user.controller;
 
+import java.io.IOException;
 import java.security.Principal;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.bridgeX.image.ImageService;
 import com.bridgeX.user.dto.LoginRequest;
 import com.bridgeX.user.dto.LoginResponse;
 import com.bridgeX.user.dto.SignupRequest;
@@ -31,6 +36,7 @@ import lombok.RequiredArgsConstructor;
 public class UserApiController {
 
     private final UserService userService;
+    private final ImageService imageService;
     
     // Sign-up
     @PostMapping("/sign")
@@ -101,5 +107,17 @@ public class UserApiController {
 
         return ResponseEntity.ok(UserBodyInfo);        
     }
+    
+    // User Profile Photo
+    @PostMapping("/users/{id}/profile-image")
+    public ResponseEntity<?> uploadProfile(@PathVariable Long id,
+                                           @RequestPart("image") MultipartFile image) throws IOException {
+
+        String imageUrl = imageService.uploadProfileImage(image, id);
+        userService.updateProfileImage(id, imageUrl);
+
+        return ResponseEntity.ok(imageUrl);
+    }
+
 }
 

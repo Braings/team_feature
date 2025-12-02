@@ -189,6 +189,14 @@ public class UserService {
         );
     }
     
+    // Profile Photo Update: only URL
+    @Transactional
+    public void updateProfileImage(Long userId, String imageUrl) {
+        SiteUser user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("유저 없음"));
+
+        user.setProfileImageUrl(imageUrl);
+    }
     
     
 	// Back-end Test only.

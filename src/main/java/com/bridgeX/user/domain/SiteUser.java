@@ -51,6 +51,9 @@ public class SiteUser {
 	@Enumerated(EnumType.STRING) // Use e-num
     private UserRole role;
 	
+	// Profile Photo
+	private String profileImageUrl;
+	
 	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private SiteUserBody bodyInfo;
 }
