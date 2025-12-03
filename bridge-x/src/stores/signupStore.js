@@ -42,7 +42,7 @@ export const signupFormData = reactive({
  */
 export async function submitSignup() {
   // 회원가입 데이터 구성
-  const signupFormData = {
+  const dataToSend = {
 
     username: signupFormData.username,
     nickname: signupFormData.nickname,
@@ -59,7 +59,7 @@ export async function submitSignup() {
 
   try {
     // API 호출
-    const response = await post('/api/sign', signupFormData)
+    const response = await post('/api/sign', dataToSend)
     console.log('회원가입 성공:', response)
     return response
   } catch (error) {

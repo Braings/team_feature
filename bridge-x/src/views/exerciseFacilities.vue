@@ -33,11 +33,7 @@
           <div v-if="selectedCity" class="selected-info">
             <div class="info-item">
               <span class="label">지역:</span>
-              <span class="value">{{ selectedRegion }}</span>
-            </div>
-            <div class="info-item">
-              <span class="label">시군구:</span>
-              <span class="value">{{ selectedCity }}</span>
+              <span class="value">{{ selectedRegion }} {{ selectedCity }}</span>
             </div>
             <div class="info-display">
               <p v-if="facilityListState.isLoading" class="loading-state">
@@ -50,9 +46,9 @@
               <div v-else-if="facilityListState.data.length > 0">
                   <h3>운동 시설 목록 (총 {{ facilityListState.data.length }}개)</h3>
                   <ul class="facility-list">
-                      <li v-for="facility in facilityListState.data" :key="facility.id" class="facility-item">
-                          <span class="facility-name">📌 {{ facility.name }} ({{ facility.type }})</span>
-                          <span class="facility-address">{{ facility.address }}</span>
+                      <li v-for="facility in facilityListState.data" :key="facility.id" class="info-item">
+                          <span class="value">📌 {{ facility.name }} ({{ facility.type }})</span>
+                          <span class="value">{{ facility.address }}</span>
                       </li>
                   </ul>
               </div>
@@ -175,6 +171,7 @@ const handleMapClick = (event) => {
 const initializeMap = () => {
   // 주석: SVG가 렌더링된 후 스타일 적용
   const svgElement = document.querySelector('.svg-wrapper svg')
+
   if (svgElement) {
     svgElement.style.width = '100%'
     svgElement.style.maxWidth = '800px'
@@ -310,8 +307,8 @@ const regionCities = reactive({
   position: relative;
 
   :deep(svg) {
-    width: 100%;
-    height: 100%;
+    width: 90%;
+    height: 90%;
     cursor: pointer;
     display: block;
 
@@ -409,7 +406,7 @@ const regionCities = reactive({
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 20px;
-  min-height: 400px;
+  min-height: 590px;
   display: flex;
   align-items: center;
   justify-content: center;
