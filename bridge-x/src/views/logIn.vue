@@ -48,18 +48,16 @@
 <script setup>
 import { useRouter } from 'vue-router';
 import { ref, computed } from 'vue';
-import { post } from '@/api.js';
+// import { post } from '@/api.js';
 import FormField from '@/components/FormField.vue';
 import { useFormValidation } from '@/composables/useFormValidation';
-import { loginFormData } from '@/stores/loginStore.js';
-import { userExerciseData } from '@/stores/exerciseStore.js';
+import { loginFormData, submitLogin } from '@/stores/loginStore';
 
 // ========================
 // Data & State
 // ========================
 const router = useRouter();
 const formData = loginFormData;
-const exerciseData = userExerciseData;
 const loading = ref(false);
 
 // ========================
@@ -127,23 +125,26 @@ const handleLogin = async () => {
 
   loading.value = true;
 
-  try {
-    const body = { username: formData.username, password: formData.password };
-    const res = await post('/api/login', body);
+  loginFormData.username = formData.username;
+  loginFormData.password = formData.password;
 
-  if (res && res.token) {
-      localStorage.setItem('authToken', res.token);
-      localStorage.setItem('nickname', formData.nickname);
-      localStorage.setItem('exercise', exerciseData.recommend);
-      router.push({ name: 'homePage' });
-      return;
-  }
 
-    errors.password = res?.message || '로그인에 실패했습니다.';
+
+try {
+    // 3. Store의 API 호출 및 데이터 저장 로직 실행
+    await submitLogin();
+
+    // 4. 💡 최적화: API 호출 및 데이터 저장이 성공하면 페이지 이동
+    // (두 번째 로직의 목표였던 'homePage'로 통일)
+    router.push({ name: 'homePage' });
+
   } catch (error) {
-    console.error('로그인 에러:', error);
-    errors.password = error?.message || '서버 오류가 발생했습니다.';
+    const warningMessage = `로그인 실패! 서버 응답 오류. (상세: ${error.body?.message || error.message || '알 수 없는 오류'})`;
+    console.warn('[로그인 경고]', warningMessage);
+    console.error('로그인 실패:', error);
+
   } finally {
+    // 6. 로딩 상태 해제
     loading.value = false;
   }
 };
