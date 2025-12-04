@@ -20,6 +20,15 @@ public class FacilitiesService {
                 .toList();
     }
 	
+    // 시군구 입력 값 기반 검색
+    public List<FacilitiesInfo> searchFacilities(FacilitiesRequeest req) {
+        return facilitiesRepository
+                .findByFcltyManageCtprvnNmAndFcltyManageSignguNm(
+                        req.getFCLTY_MANAGE_CTPRVN_NM(),
+                        req.getFCLTY_MANAGE_SIGNGU_NM()
+                );
+    }
+    
 	// 하나만 검색
 	public FacilitiesResponse getFacility(Long id) {
         FacilitiesInfo entity = facilitiesRepository.findById(id)
@@ -41,8 +50,8 @@ public class FacilitiesService {
 	        .FCLTY_TEL_NO(entity.getFCLTY_TEL_NO())
 	        .RSPNSBLTY_TEL_NO(entity.getRSPNSBLTY_TEL_NO())
 	        .FCLTY_HMPG_URL(entity.getFCLTY_HMPG_URL())
-	        .FCLTY_MANAGE_CTPRVN_NM(entity.getFCLTY_MANAGE_CTPRVN_NM())
-	        .FCLTY_MANAGE_SIGNGU_NM(entity.getFCLTY_MANAGE_SIGNGU_NM())
+	        .FCLTY_MANAGE_CTPRVN_NM(entity.getFcltyManageCtprvnNm())
+	        .FCLTY_MANAGE_SIGNGU_NM(entity.getFcltyManageSignguNm())
 	        //.FCLTY_MANAGE_CTPRVN_NMElement(entity.getFCLTY_MANAGE_CTPRVN_NMElement())
 	        .build();
 	}

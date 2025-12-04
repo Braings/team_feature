@@ -53,11 +53,11 @@ public class FacilitiesInfo {
     @Column(length = 200)
     private String FCLTY_HMPG_URL; // http://www.cheongju.go.kr
     
-    @Column(length = 20)
-    private String FCLTY_MANAGE_CTPRVN_NM; // 충청북도
+    @Column(length = 20, name = "FCLTY_MANAGE_CTPRVN_NM")
+    private String fcltyManageCtprvnNm; // 충청북도
     
-    @Column(length = 20)
-    private String FCLTY_MANAGE_SIGNGU_NM; // 청주시 서원구
+    @Column(length = 20, name = "FCLTY_MANAGE_SIGNGU_NM")
+    private String fcltyManageSignguNm; // 청주시 서원구
     /*
     @Column(length = 20)
     private String FCLTY_MANAGE_CTPRVN_NMElement; // 충북
