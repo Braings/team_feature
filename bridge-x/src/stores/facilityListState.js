@@ -1,0 +1,172 @@
+ export default [
+  // 1. 청주 종합 경기장
+  {
+    FCLTY_NM: '청주종합경기장',
+    INDUTY_NM: '종합경기장 (축구장, 트랙)',
+    ROAD_NM_ZIP_NO: '28639',
+    RDNMADR_ONE_NM: '충북 청주시 서원구 사직대로 229',
+    RDNMADR_TWO_NM: '일부 시설별 상이',
+    ZIP_NO_VALUE: '28639',
+    FCLTY_ADDR_ONE_NM: '충북 청주시 서원구 사직동 229-1',
+    FCLTY_ADDR_TWO_NM: '일부 시설별 상이',
+    FCLTY_TEL_NO: '043-281-2222',
+    RSPNSBLTY_TEL_NO: '043-281-2223',
+    FCLTY_HMPG_URL: 'http://www.cheongju.go.kr',
+    FCLTY_MANAGE_CTPRVN_NM: '충청북도',
+    FCLTY_MANAGE_SIGNGU_NM: '청주시 서원구',
+    FCLTY_MANAGE_CTPRVN_NMElement: '충북'
+  },
+  // 2. 청주 야구장
+  {
+    FCLTY_NM: '청주야구장',
+    INDUTY_NM: '야구장',
+    ROAD_NM_ZIP_NO: '28639',
+    RDNMADR_ONE_NM: '충북 청주시 서원구 사직대로 229',
+    RDNMADR_TWO_NM: '종합경기장 내',
+    ZIP_NO_VALUE: '28639',
+    FCLTY_ADDR_ONE_NM: '충북 청주시 서원구 사직동 229-1',
+    FCLTY_ADDR_TWO_NM: '종합경기장 내',
+    FCLTY_TEL_NO: '043-281-2222',
+    RSPNSBLTY_TEL_NO: '043-281-2224',
+    FCLTY_HMPG_URL: 'http://www.cheongju.go.kr',
+    FCLTY_MANAGE_CTPRVN_NM: '충청북도',
+    FCLTY_MANAGE_SIGNGU_NM: '청주시 서원구',
+    FCLTY_MANAGE_CTPRVN_NMElement: '충북'
+  },
+  // 3. 청주 체육관
+  {
+    FCLTY_NM: '청주체육관',
+    INDUTY_NM: '실내 체육관 (농구, 배구)',
+    ROAD_NM_ZIP_NO: '28639',
+    RDNMADR_ONE_NM: '충북 청주시 서원구 사직대로 229',
+    RDNMADR_TWO_NM: '종합경기장 인근',
+    ZIP_NO_VALUE: '28639',
+    FCLTY_ADDR_ONE_NM: '충북 청주시 서원구 사직동 229-1',
+    FCLTY_ADDR_TWO_NM: '종합경기장 인근',
+    FCLTY_TEL_NO: '043-281-2225',
+    RSPNSBLTY_TEL_NO: '043-281-2226',
+    FCLTY_HMPG_URL: 'http://www.cheongju.go.kr',
+    FCLTY_MANAGE_CTPRVN_NM: '충청북도',
+    FCLTY_MANAGE_SIGNGU_NM: '청주시 서원구',
+    FCLTY_MANAGE_CTPRVN_NMElement: '충북'
+  },
+  // 4. 청주 수영장
+  {
+    FCLTY_NM: '청주수영장',
+    INDUTY_NM: '수영장',
+    ROAD_NM_ZIP_NO: '28631',
+    RDNMADR_ONE_NM: '충북 청주시 서원구 흥덕로 61',
+    RDNMADR_TWO_NM: '사직동',
+    ZIP_NO_VALUE: '28631',
+    FCLTY_ADDR_ONE_NM: '충북 청주시 서원구 사직동 216-1',
+    FCLTY_ADDR_TWO_NM: '국민생활관 내',
+    FCLTY_TEL_NO: '043-281-2227',
+    RSPNSBLTY_TEL_NO: '043-281-2228',
+    FCLTY_HMPG_URL: 'http://www.cjfmc.or.kr',
+    FCLTY_MANAGE_CTPRVN_NM: '충청북도',
+    FCLTY_MANAGE_SIGNGU_NM: '청주시 서원구',
+    FCLTY_MANAGE_CTPRVN_NMElement: '충북'
+  },
+  // 5. 김수녕 양궁장
+  {
+    FCLTY_NM: '김수녕양궁장',
+    INDUTY_NM: '양궁장',
+    ROAD_NM_ZIP_NO: '28723',
+    RDNMADR_ONE_NM: '충북 청주시 상당구 1순환로1514번길 89',
+    RDNMADR_TWO_NM: '용정동',
+    ZIP_NO_VALUE: '28723',
+    FCLTY_ADDR_ONE_NM: '충북 청주시 상당구 용정동 228-3',
+    FCLTY_ADDR_TWO_NM: '훈련장',
+    FCLTY_TEL_NO: '043-200-2229',
+    RSPNSBLTY_TEL_NO: '043-200-2230',
+    FCLTY_HMPG_URL: 'http://www.cheongju.go.kr',
+    FCLTY_MANAGE_CTPRVN_NM: '충청북도',
+    FCLTY_MANAGE_SIGNGU_NM: '청주시 상당구',
+    FCLTY_MANAGE_CTPRVN_NMElement: '충북'
+  },
+  // 6. 용정 축구 공원
+  {
+    FCLTY_NM: '용정축구공원',
+    INDUTY_NM: '축구장/풋살장',
+    ROAD_NM_ZIP_NO: '28723',
+    RDNMADR_ONE_NM: '충북 청주시 상당구 1순환로1594번길 42',
+    RDNMADR_TWO_NM: '용정동',
+    ZIP_NO_VALUE: '28723',
+    FCLTY_ADDR_ONE_NM: '충북 청주시 상당구 용정동 427-1',
+    FCLTY_ADDR_TWO_NM: '시민 체육 시설',
+    FCLTY_TEL_NO: '043-200-2231',
+    RSPNSBLTY_TEL_NO: '043-200-2232',
+    FCLTY_HMPG_URL: 'http://www.cjfmc.or.kr',
+    FCLTY_MANAGE_CTPRVN_NM: '충청북도',
+    FCLTY_MANAGE_SIGNGU_NM: '청주시 상당구',
+    FCLTY_MANAGE_CTPRVN_NMElement: '충북'
+  },
+  // 7. 청주 국제 테니스장
+  {
+    FCLTY_NM: '청주국제테니스장',
+    INDUTY_NM: '테니스장',
+    ROAD_NM_ZIP_NO: '28711',
+    RDNMADR_ONE_NM: '충북 청주시 상당구 수영로 380',
+    RDNMADR_TWO_NM: '금천동',
+    ZIP_NO_VALUE: '28711',
+    FCLTY_ADDR_ONE_NM: '충북 청주시 상당구 금천동 150-1',
+    FCLTY_ADDR_TWO_NM: '국제 규격',
+    FCLTY_TEL_NO: '043-200-2233',
+    RSPNSBLTY_TEL_NO: '043-200-2234',
+    FCLTY_HMPG_URL: 'http://www.cheongju.go.kr',
+    FCLTY_MANAGE_CTPRVN_NM: '충청북도',
+    FCLTY_MANAGE_SIGNGU_NM: '청주시 상당구',
+    FCLTY_MANAGE_CTPRVN_NMElement: '충북'
+  },
+  // 8. 푸르미 스포츠 센터
+  {
+    FCLTY_NM: '푸르미스포츠센터',
+    INDUTY_NM: '다목적 스포츠센터 (수영, 헬스)',
+    ROAD_NM_ZIP_NO: '28170',
+    RDNMADR_ONE_NM: '충북 청주시 흥덕구 2순환로1455번길 30',
+    RDNMADR_TWO_NM: '강내면',
+    ZIP_NO_VALUE: '28170',
+    FCLTY_ADDR_ONE_NM: '충북 청주시 흥덕구 강내면 탑연리 110-1',
+    FCLTY_ADDR_TWO_NM: '환경사업소 인근',
+    FCLTY_TEL_NO: '043-290-7900',
+    RSPNSBLTY_TEL_NO: '043-290-7901',
+    FCLTY_HMPG_URL: 'http://www.cjfmc.or.kr',
+    FCLTY_MANAGE_CTPRVN_NM: '충청북도',
+    FCLTY_MANAGE_SIGNGU_NM: '청주시 흥덕구',
+    FCLTY_MANAGE_CTPRVN_NMElement: '충북'
+  },
+  // 9. 청주 종합 사격장
+  {
+    FCLTY_NM: '청주종합사격장',
+    INDUTY_NM: '사격장',
+    ROAD_NM_ZIP_NO: '28121',
+    RDNMADR_ONE_NM: '충북 청주시 청원구 도원세교로 369',
+    RDNMADR_TWO_NM: '내수읍',
+    ZIP_NO_VALUE: '28121',
+    FCLTY_ADDR_ONE_NM: '충북 청주시 청원구 내수읍 세교리 120-1',
+    FCLTY_ADDR_TWO_NM: '국제 규격',
+    FCLTY_TEL_NO: '043-211-1335',
+    RSPNSBLTY_TEL_NO: '043-211-1336',
+    FCLTY_HMPG_URL: 'http://www.cjfmc.or.kr',
+    FCLTY_MANAGE_CTPRVN_NM: '충청북도',
+    FCLTY_MANAGE_SIGNGU_NM: '청주시 청원구',
+    FCLTY_MANAGE_CTPRVN_NMElement: '충북'
+  },
+  // 10. 가경 국민 체육 센터
+  {
+    FCLTY_NM: '가경국민체육센터',
+    INDUTY_NM: '국민체육센터 (헬스, 강습)',
+    ROAD_NM_ZIP_NO: '28406',
+    RDNMADR_ONE_NM: '충북 청주시 흥덕구 서부로 1234',
+    RDNMADR_TWO_NM: '가경동',
+    ZIP_NO_VALUE: '28406',
+    FCLTY_ADDR_ONE_NM: '충북 청주시 흥덕구 가경동 1547-1',
+    FCLTY_ADDR_TWO_NM: '주민센터 인근',
+    FCLTY_TEL_NO: '043-234-7788',
+    RSPNSBLTY_TEL_NO: '043-234-7789',
+    FCLTY_HMPG_URL: 'http://www.cheongju.go.kr',
+    FCLTY_MANAGE_CTPRVN_NM: '충청북도',
+    FCLTY_MANAGE_SIGNGU_NM: '청주시 흥덕구',
+    FCLTY_MANAGE_CTPRVN_NMElement: '충북'
+  }
+]

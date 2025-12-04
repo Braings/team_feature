@@ -9,7 +9,7 @@ export const reviewsData = reactive({
   creationTime: '',
   suggestion: 0,
   views: 0,
-  nickname: '',
+  writer: '',
 
   // Reset 함수
   reset() {
@@ -19,7 +19,7 @@ export const reviewsData = reactive({
     this.creationTime = ''
     this.suggestion = 0
     this.views = 0
-    this.nickname = ''
+    this.writer = ''
   }
 })
 
@@ -29,18 +29,19 @@ export const reviewsData = reactive({
  * @throws {Error} API 오류 시 에러 throw
  */
 export async function submitReviews() {
-  const reviewsData = {
+  const dataToSend = {
     content: reviewsData.content,
     title: reviewsData.title,
     tag: reviewsData.tag,
+    writer: reviewsData.writer,
   }
 
   try {
-    const response = await createReview('/api/reviews', reviewsData)
-    console.log('리뷰 불러오기 성공:', response)
+    const response = await createReview('/api/reviews', dataToSend)
+    console.log('리뷰 제출 성공:', response)
     return response
   } catch (error) {
-    console.error('리뷰 불러오기 실패:', error)
+    console.error('리뷰 제출 실패:', error)
     throw error
   }
 }

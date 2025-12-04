@@ -23,6 +23,7 @@ export const signupFormData = reactive({
 
     this.username = ''
     this.password = ''
+    this.passwordcheck = ''
     this.nickname = ''
     this.passwordcheck = ''
 

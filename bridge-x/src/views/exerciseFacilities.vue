@@ -1,9 +1,10 @@
 <template>
   <div class="map-wrapper">
+    <div class="header-gap"/>
     <div class="container">
       <!-- 왼쪽 섹션: 지도 -->
+
       <div class="map-section">
-        <h2>지도</h2>
         <div class="map-container" style="position: relative;">
           <!-- SVG 지도 -->
           <div class="svg-wrapper" v-html="svgContent" @click="handleMapClick"></div>
@@ -28,11 +29,9 @@
 
       <!-- 오른쪽 섹션: 선택된 정보 -->
       <div class="info-section">
-        <h2>선택된 지역</h2>
         <div class="info-content">
           <div v-if="selectedCity" class="selected-info">
             <div class="info-item">
-              <span class="label">지역:</span>
               <span class="value">{{ selectedRegion }} {{ selectedCity }}</span>
             </div>
             <div class="info-display">
@@ -45,13 +44,16 @@
               </p>
               <div v-else-if="facilityListState.data.length > 0">
                   <h3>운동 시설 목록 (총 {{ facilityListState.data.length }}개)</h3>
-                  <ul class="facility-list">
+                  <div class="facility-list-wrapper">
+                    <ul class="facility-list">
                       <li v-for="facility in facilityListState.data" :key="facility.id" class="info-item">
-                          <span class="value">📌 {{ facility.name }} ({{ facility.type }})</span>
-                          <span class="value">{{ facility.address }}</span>
+                        <span class="value"> {{ truncateText(facility.FCLTY_NM) }} </span>
+                        <span class="value"> {{ truncateText(facility.INDUTY_NM) }} </span>
+                        <span class="value"> {{ facility.RSPNSBLTY_TEL_NO }} </span>
                       </li>
-                  </ul>
-              </div>
+                    </ul>
+                  </div>
+                </div>
               <p v-else>
                   {{ selectedRegion }} {{ selectedCity }}에 등록된 시설 정보가 없습니다.
               </p>
@@ -179,6 +181,14 @@ const initializeMap = () => {
   }
 }
 
+const truncateText = (text, maxLength = 8) => {
+  if (!text) return '';
+  if (text.length > maxLength) {
+    return text.substring(0, maxLength) + '...';
+  }
+  return text;
+};
+
 // 컴포넌트 마운트 시 지도 초기화
 onMounted(() => {
   initializeMap()
@@ -269,9 +279,35 @@ const regionCities = reactive({
 </script>
 
 <style lang="scss" scoped>
+
+.header-gap {
+  height: 10vh;
+}
 .map-wrapper {
   width: 100%;
   padding: 20px;
+}
+
+/* 시설 목록 스크롤 래퍼 스타일 */
+.facility-list-wrapper {
+  max-height: 400px; /* 원하는 최대 높이를 설정하세요. 이 높이를 넘어가면 스크롤이 생깁니다. */
+  overflow-y: auto;  /* 세로 스크롤을 활성화합니다. */
+  padding-right: 15px; /* 스크롤바 때문에 내용이 잘리는 것을 방지하기 위한 패딩 */
+}
+
+/* 목록 스타일 (선택사항: 가독성 향상) */
+.facility-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.facility-list li {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
 }
 
 .container {
@@ -279,8 +315,10 @@ const regionCities = reactive({
   gap: 30px;
   max-width: 1400px;
   margin: 0 auto;
-}
 
+  // 자식 항목의 높이를 동일하게 맞춥니다.
+  align-items: stretch;
+}
 .map-section {
   flex: 1;
   min-width: 0;
@@ -402,11 +440,13 @@ const regionCities = reactive({
 }
 
 .info-content {
+  height: 100%;
+
   background: #f9f9f9;
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 20px;
-  min-height: 590px;
+
   display: flex;
   align-items: center;
   justify-content: center;
