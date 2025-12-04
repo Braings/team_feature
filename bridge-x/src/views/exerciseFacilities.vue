@@ -46,7 +46,7 @@
                   <h3>운동 시설 목록 (총 {{ facilityListState.data.length }}개)</h3>
                   <div class="facility-list-wrapper">
                     <ul class="facility-list">
-                      <li v-for="facility in facilityListState.data" :key="facility.id" class="info-item">
+                      <li @click="openFacilityModal(facility.id)" v-for="(facility) in facilityListState.data" :key="facility.id" class="info-item">
                         <span class="value"> {{ truncateText(facility.FCLTY_NM) }} </span>
                         <span class="value"> {{ truncateText(facility.INDUTY_NM) }} </span>
                         <span class="value"> {{ facility.RSPNSBLTY_TEL_NO }} </span>
@@ -65,13 +65,21 @@
         </div>
       </div>
     </div>
+    <FacilityDetailModal
+      :isOpen="isModalOpen"
+      :facilityId="selectedFacilityId"
+      @close="closeFacilityModal"
+    />
   </div>
+
+
 </template>
 
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue'
 import svgContent from '@/img/maps/korea_map.svg?raw'
 import { facilityListState, fetchExerciseFacilities, setSelectedRegionAndCity } from '@/stores/exerciseFacilitiesStore'
+import FacilityDetailModal from './facilityDetailModal.vue'
 
 // 상태 관리
 const showDropdown = ref(false)
@@ -188,6 +196,26 @@ const truncateText = (text, maxLength = 8) => {
   }
   return text;
 };
+
+// ========================
+// Modal State and Handlers
+// ========================
+
+// 1. 모달 상태 변수 추가
+const isModalOpen = ref(false);
+const selectedFacilityId = ref(null);
+
+
+// 2. 모달 열기/닫기 함수
+const openFacilityModal = (id) => {
+  selectedFacilityId.value = id; // ID 저장
+  isModalOpen.value = true;
+};
+const closeFacilityModal = () => {
+  isModalOpen.value = false;
+  selectedFacilityId.value = null; // 닫힐 때 ID 초기화
+};
+
 
 // 컴포넌트 마운트 시 지도 초기화
 onMounted(() => {

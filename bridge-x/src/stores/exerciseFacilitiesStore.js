@@ -8,6 +8,7 @@ import localFacilityData from './facilityListState.js'
 
 // 폼 데이터 전역 상태 (등록/수정 폼에 사용될 필드)
 export const exerciseFacilitiesFormData = reactive({
+  id:'',
   FCLTY_NM :'', //(건물명)
   INDUTY_NM:'', //(사업 분류)
 
@@ -47,6 +48,7 @@ export const facilityListState = reactive({
  * 폼 데이터 필드를 초기화하는 함수
  */
 export function resetFormData() {
+  exerciseFacilitiesFormData.id = ''
   exerciseFacilitiesFormData.FCLTY_MANAGE_CTPRVN_NM = ''
   exerciseFacilitiesFormData.FCLTY_MANAGE_SIGNGU_NM = ''
   exerciseFacilitiesFormData.FCLTY_MANAGE_CTPRVN_NMElement = ''
