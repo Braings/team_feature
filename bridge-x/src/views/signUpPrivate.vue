@@ -299,7 +299,7 @@ const handleNext = async () => {
         .birthday-input-wrapper {
           width: 100%;
           display: flex;
-          get: map.get($spacing, 'sm');
+          gap: map.get($spacing, 'sm');
           align-items: center;
           position: relative;
 
