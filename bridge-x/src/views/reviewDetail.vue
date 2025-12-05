@@ -633,7 +633,7 @@ onMounted(() => {
             margin-bottom: 20px;
             border-bottom: 0.1vw solid gray;
             padding: 20px;
-            .writer {
+            .nickname {
               display:inline-block;
               background: map.get($colors,'light');
               padding:0.2rem 0.5rem;

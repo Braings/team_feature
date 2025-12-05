@@ -9,7 +9,8 @@ export const reviewsData = reactive({
   creationTime: '',
   suggestion: 0,
   views: 0,
-  writer: '',
+  nickname: '',
+  username: '',
 
   // Reset 함수
   reset() {
@@ -19,7 +20,8 @@ export const reviewsData = reactive({
     this.creationTime = ''
     this.suggestion = 0
     this.views = 0
-    this.writer = ''
+    this.nickname = ''
+    this.username = ''
   }
 })
 
@@ -33,7 +35,8 @@ export async function submitReviews() {
     content: reviewsData.content,
     title: reviewsData.title,
     tag: reviewsData.tag,
-    writer: reviewsData.writer,
+    nickname: reviewsData.nickname,
+    username: reviewsData.username,
   }
 
   try {

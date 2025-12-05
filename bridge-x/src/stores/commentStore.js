@@ -13,17 +13,20 @@ export const commentData = reactive({
   parentCommentID: null,
 
   // 작성자 정보 (필수)
-  writer: '',
+  nickname: '',
 
   // 작성 시간 (서버에서 설정될 수 있으나, 폼에는 포함하지 않을 수 있음)
   creationTime: '',
+
+  username: '',
 
   // Reset 함수
   reset() {
     this.reviewID = ''
     this.content = ''
     this.parentCommentID = null // 대댓글 작성 후 초기화 시 null로 설정
-    this.writer = ''
+    this.nickname = ''
+    this.username = ''
     this.creationTime = ''
   }
 })
@@ -37,7 +40,8 @@ export async function submitComment() {
   reviewID: commentData.reviewID,
   content: commentData.content,
   parentCommentID: commentData.parentCommentID,
-  writer: commentData.writer,
+  nickname: commentData.nickname,
+  username: commentData.username,
   }
 
   try {
