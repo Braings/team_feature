@@ -82,8 +82,8 @@ export async function fetchExerciseFacilities(region, city) {
 
   // 2. API 호출을 위한 쿼리 데이터 구성
   const queryData = {
-    region: region,
-    city: city
+    region: encodeURIComponent(region),
+    city: encodeURIComponent(city),
   }
 
   try {
