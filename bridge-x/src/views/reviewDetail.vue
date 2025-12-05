@@ -60,9 +60,12 @@
 
           <!-- 댓글 -->
           <article  class="comment-card" :style="{ flex: 1, boxShadow: '1px 1px 3px black'}">
-            <header class="post-header">
-              <h1 class="post-title">댓글</h1>
-            </header>
+            <section :style="border = '1px solid'" class="comment-body">
+              ss
+            </section>
+            <section class="comment-list">
+              <p>{{ post.content }}</p>
+            </section>
           </article>
         </div>
       </div>
@@ -130,6 +133,8 @@ import { ref, reactive, onMounted, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { getReviews, getReviewDetail, deleteReview } from '@/api.js';
 import ReviewWriteModal from './reviewModal.vue';
+import { sortItems } from 'vuetify/lib/components/VDataTable/composables/sort';
+import { submitUserProfileData } from '@/stores/profileStore';
 
 const route = useRoute();
 const router = useRouter();
@@ -526,6 +531,7 @@ onMounted(() => {
           .post-body {
             margin-top:1rem;
             min-height: 40vh;
+
             .tag {
               display:inline-block;
               background: map.get($colors,'light');
@@ -609,8 +615,11 @@ onMounted(() => {
           }
 
           .comment-body {
-            margin-top:1rem;
+            margin-bottom: 20px;
             min-height: 40vh;
+            border: 0.1vw solid gray;
+            border-radius: 15px;
+            padding: 20px;
             .tag {
               display:inline-block;
               background: map.get($colors,'light');
@@ -620,6 +629,18 @@ onMounted(() => {
             }
           }
 
+         .comment-list {
+            margin-bottom: 20px;
+            border-bottom: 0.1vw solid gray;
+            padding: 20px;
+            .writer {
+              display:inline-block;
+              background: map.get($colors,'light');
+              padding:0.2rem 0.5rem;
+              border-radius:4px;
+              margin-bottom:0.8rem;
+            }
+          }
 
           .comment-actions {
             margin-top:1.2rem;

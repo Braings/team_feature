@@ -53,7 +53,7 @@ async function request(path, options = {}) {
 
   // 응답 상태가 성공(res.ok = 2xx)이 아닐 경우 에러 처리
   if (!res.ok) {
-    const err = new Error(data?.message || res.statusText || 'API error');
+    const err = new Error(data?.message || res.statusText || 'API 문제');
     err.status = res.status; // HTTP 상태 코드 저장
     err.raw = data; // 응답 데이터 원본 저장
     throw err; // 호출 함수에서 catch 할 수 있도록 에러 발생
