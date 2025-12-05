@@ -44,38 +44,37 @@ export const facilityListState = reactive({
 // 2. 함수 (ACTIONS) 정의
 // -------------------------------------------------------------
 
-/**
- * 폼 데이터 필드를 초기화하는 함수
- */
+// 폼 데이터 필드를 초기화하는 함수
+
 export function resetFormData() {
   exerciseFacilitiesFormData.id = ''
   exerciseFacilitiesFormData.FCLTY_MANAGE_CTPRVN_NM = ''
   exerciseFacilitiesFormData.FCLTY_MANAGE_SIGNGU_NM = ''
   exerciseFacilitiesFormData.FCLTY_MANAGE_CTPRVN_NMElement = ''
-
-  // 필요하다면 다른 필드들도 초기화 로직을 추가할 수 있습니다.
 }
 
-/**
- * 지도에서 선택된 지역(도/시) 및 시군구 정보를 Store에 저장합니다.
- * @param {string} region - '도' 또는 '시' (예: '서울')
- * @param {string} city - '시군구' (예: '강남구')
- */
-export function setSelectedRegionAndCity(region, city) { //
-  exerciseFacilitiesFormData.FCLTY_MANAGE_CTPRVN_NM = region //
-  exerciseFacilitiesFormData.FCLTY_MANAGE_SIGNGU_NM = city //
+
+// 지도에서 선택된 지역(도/시) 및 시군구 정보를 Store에 저장합니다.
+  // @param {string} region - '도' 또는 '시' (예: '서울')
+  // @param {string} city - '시군구' (예: '강남구')
+
+
+export function setSelectedRegionAndCity(region, city) {
+  exerciseFacilitiesFormData.FCLTY_MANAGE_CTPRVN_NM = region
+  exerciseFacilitiesFormData.FCLTY_MANAGE_SIGNGU_NM = city
   console.log(`Store 상태 업데이트: 지역=${region}, 시군구=${city}`)
 }
 
-/**
- * API 호출: 특정 지역의 운동 시설 목록을 조회하고 Store 상태를 업데이트 합니다.
- * @param {string} region - '도' 또는 '시' (예: '서울')
- * @param {string} city - '시군구' (예: '강남구')
- * @returns {void} Store 상태 업데이트
- * @throws {Error} API 오류 시 에러 throw
- */
+
+// API 호출: 특정 지역의 운동 시설 목록을 조회하고 Store 상태를 업데이트 합니다.
+  // @param {string} region - '도' 또는 '시' (예: '서울')
+  // @param {string} city - '시군구' (예: '강남구')
+  // @returns {void} Store 상태 업데이트
+  // @throws {Error} API 오류 시 에러 throw
+
 
 export async function fetchExerciseFacilities(region, city) {
+
   // 1. 로딩 상태 설정
   facilityListState.isLoading = true
   facilityListState.hasError = false
