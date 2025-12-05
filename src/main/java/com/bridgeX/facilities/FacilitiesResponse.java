@@ -36,5 +36,24 @@ public class FacilitiesResponse {
     private String FCLTY_MANAGE_SIGNGU_NM; // 청주시 서원구
     
     // private String FCLTY_MANAGE_CTPRVN_NMElement; // 충북
-
+    
+    
+    public static FacilitiesResponse from(FacilitiesInfo info) {
+        return FacilitiesResponse.builder()
+                .id(info.getId())
+                .FCLTY_NM(info.getFCLTY_NM())
+                .INDUTY_NM(info.getINDUTY_NM())
+                .ROAD_NM_ZIP_NO(info.getROAD_NM_ZIP_NO())
+                .RDNMADR_ONE_NM(info.getRDNMADR_ONE_NM())
+                .RDNMADR_TWO_NM(info.getRDNMADR_TWO_NM())
+                .ZIP_NO_VALUE(info.getZIP_NO_VALUE())
+                .FCLTY_ADDR_ONE_NM(info.getFCLTY_ADDR_ONE_NM())
+                .FCLTY_ADDR_TWO_NM(info.getFCLTY_ADDR_TWO_NM())
+                .FCLTY_TEL_NO(info.getFCLTY_TEL_NO())
+                .RSPNSBLTY_TEL_NO(info.getRSPNSBLTY_TEL_NO())
+                .FCLTY_HMPG_URL(info.getFCLTY_HMPG_URL())
+                .FCLTY_MANAGE_CTPRVN_NM(info.getFcltyManageCtprvnNm())
+                .FCLTY_MANAGE_SIGNGU_NM(info.getFcltyManageSignguNm())
+                .build();
+    }
 }

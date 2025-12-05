@@ -45,6 +45,9 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.PUT, "/api/forum/**").authenticated()
 				.requestMatchers(HttpMethod.DELETE, "/api/forum/**").authenticated()
 				
+				// Exercise Facilities는 모두 조회 가능
+				.requestMatchers("/api/exerciseFacilities/**").permitAll()
+
 				// else => private
 				.anyRequest().authenticated()
 				)

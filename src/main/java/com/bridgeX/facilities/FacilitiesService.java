@@ -21,13 +21,13 @@ public class FacilitiesService {
     }
 	
     // 시군구 입력 값 기반 검색
-    public List<FacilitiesInfo> searchFacilities(FacilitiesRequeest req) {
-        return facilitiesRepository
-                .findByFcltyManageCtprvnNmAndFcltyManageSignguNm(
-                        req.getFCLTY_MANAGE_CTPRVN_NM(),
-                        req.getFCLTY_MANAGE_SIGNGU_NM()
-                );
+    public List<FacilitiesResponse> searchFacilities(String region, String city) {
+        return facilitiesRepository.findByFcltyManageCtprvnNmAndFcltyManageSignguNm(region, city)
+            .stream().map(FacilitiesResponse::from)
+            .toList();
     }
+
+
     
 	// 하나만 검색
 	public FacilitiesResponse getFacility(Long id) {
