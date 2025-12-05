@@ -17,7 +17,7 @@
           type="text"
           placeholder="USERNAME"
           :error="errors.username"
-          @blur="validateField('username')"
+          @blur="validateField('username', formData)"
           @input="onUsernameInput"
         />
 
@@ -26,7 +26,7 @@
           type="password"
           placeholder="PASSWORD"
           :error="errors.password"
-          @blur="validateField('password')"
+          @blur="validateField('password', formData)"
           @input="onPasswordInput"
         />
 
