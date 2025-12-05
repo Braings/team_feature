@@ -37,15 +37,15 @@ public class SecurityConfig {
 				.requestMatchers("/api/sign", "/api/sign/**", "/api/login").permitAll()
 				.requestMatchers("/test/**", "/h2_BX-console/**").permitAll()
 
-				// forum read (GET) is public
-				.requestMatchers(HttpMethod.GET, "/api/forum/**").permitAll()
+				// forum(reviews) read (GET) is public
+				.requestMatchers(HttpMethod.GET, "/api/reviews/**").permitAll()
 
-				// forum write (POST, PUT, DELETE)는 인증 필요
-				.requestMatchers(HttpMethod.POST, "/api/forum/**").authenticated()
-				.requestMatchers(HttpMethod.PUT, "/api/forum/**").authenticated()
-				.requestMatchers(HttpMethod.DELETE, "/api/forum/**").authenticated()
+				// forum(reviews) write (POST, PUT, DELETE)는 인증 필요
+				.requestMatchers(HttpMethod.POST, "/api/reviews/**").authenticated()
+				.requestMatchers(HttpMethod.PUT, "/api/reviews/**").authenticated()
+				.requestMatchers(HttpMethod.DELETE, "/api/reviews/**").authenticated()
 				
-				// Exercise Facilities는 모두 조회 가능
+				// Exercise Facilities 는 모두 조회 가능
 				.requestMatchers("/api/exerciseFacilities/**").permitAll()
 
 				// else => private

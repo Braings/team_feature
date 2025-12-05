@@ -1,4 +1,4 @@
-package com.bridgeX.forum.domain;
+package com.bridgeX.review.domain;
 
 import java.time.LocalDateTime;
 
@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Entity
 @NoArgsConstructor
-public class ForumPost {
+public class ReviewInfo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,9 +29,10 @@ public class ForumPost {
 
     @NotNull
     private ContentTag tag;
-    
-    private String author;
+ 
+    private String username;
 
+    // DTO: creationTime
     private LocalDateTime date;
     
     private Integer suggestion;

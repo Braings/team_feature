@@ -1,4 +1,4 @@
-package com.bridgeX.forum.domain;
+package com.bridgeX.review.domain;
 import lombok.Getter;
 
 @Getter
