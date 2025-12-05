@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.bridgeX.DataNotFoundException;
+// import com.bridgeX.DataNotFoundException;
 import com.bridgeX.user.domain.SiteUser;
 import com.bridgeX.user.domain.SiteUserBody;
 import com.bridgeX.user.domain.UserRole;
@@ -37,10 +37,13 @@ public class UserService {
     public void signup(SignupRequest dto) {
         // Check ID duplication.
         if (userRepository.findByUsername(dto.getUsername()).isPresent()) {
-            throw new IllegalArgumentException("[SERVER]: 이미 등록된 사용자입니다.");
+            throw new IllegalArgumentException("[SERVER] 이미 등록된 사용자입니다.");
         }
         if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
-        	throw new IllegalArgumentException("[SERVER]: 이미 등록된 이메일입니다.");
+        	throw new IllegalArgumentException("[SERVER] 이미 등록된 이메일입니다.");
+        }
+        if (userRepository.findByNickname(dto.getNickname()).isPresent()) {
+        	throw new IllegalArgumentException("[SERVER] 중복되는 닉네임입니다.");
         }
         // create User
         SiteUser user = SiteUser.builder()
@@ -180,7 +183,7 @@ public class UserService {
     public UserBodyInfoResponse getBodyInfo(String username) {
     	
     	SiteUserBody user = userBodyRepository.findByUser_Username(username)
-                .orElseThrow(() -> new RuntimeException("[SERVER]: 유저가 존재하지 않습니다."));
+                .orElseThrow(() -> new RuntimeException("[SERVER] 유저가 존재하지 않습니다."));
         
         return new UserBodyInfoResponse(
                 user.getHeight(),
@@ -193,7 +196,7 @@ public class UserService {
     @Transactional
     public void updateProfileImage(Long userId, String imageUrl) {
         SiteUser user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("[SERVER]: 유저 없음"));
+            .orElseThrow(() -> new RuntimeException("[SERVER] 유저 없음"));
 
         user.setProfileImageUrl(imageUrl);
     }
@@ -201,6 +204,7 @@ public class UserService {
     
 	// Back-end Test only.
     // Dummy Function
+    /*
 	public SiteUser create(String username, String email, String password) {
 		SiteUser user = SiteUser.builder()
 				.username(username)
@@ -220,4 +224,5 @@ public class UserService {
 			throw new DataNotFoundException("[SERVER]: 유저가 존재하지 않습니다.");
 		}
 	}
+	*/
 }

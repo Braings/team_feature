@@ -8,9 +8,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class LoginRequest {
-	@NotEmpty(message = "[SERVER]:ID는 공백으로 둘 수 없습니다.")
+	@NotEmpty(message = "[SERVER] ID는 공백으로 둘 수 없습니다.")
 	private String username;
 	
-	@NotEmpty(message = "[SERVER]:비밀번호는 공백으로 둘 수 없습니다.")
+	@NotEmpty(message = "[SERVER] 비밀번호는 공백으로 둘 수 없습니다.")
 	private String password;
 }
