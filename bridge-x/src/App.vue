@@ -41,7 +41,7 @@ export default {
         router.push({ name: 'logIn' });
       } else {
         // 로그아웃 처리
-        localStorage.removeItem('authToken');
+        localStorage.removeItem('LogIn');
         localStorage.removeItem('nickname');
         nickname.value = 'Log In';
         router.push({ name: 'homePage' });

@@ -87,8 +87,8 @@ export default {
     const exerciseRecommendation = ref('');
 
     const fetchUserProfile = async () => {
-      const authtoken = localStorage.getItem('authToken');
-      if (!authtoken) {
+      const LogIn = localStorage.getItem('LogIn');
+      if (!LogIn) {
         userName.value = 'GUEST';
         exerciseRecommendation.value = '로그인이 필요합니다.';
         return;
@@ -98,15 +98,15 @@ export default {
         const profileData = await getUserProfile();
 
         userName.value = profileData.nickname || '사용자';
-        exerciseRecommendation.value = profileData.recommend || '추천 운동';
+        exerciseRecommendation.value = '추천 운동'; // 추천운동 넣어야함
 
         localStorage.setItem('nickname',userName.value);
-        localStorage.setItem('recommend',exerciseRecommendation.value);
+        // localStorage.setItem('recommend',exerciseRecommendation.value);
 
       } catch(error) {
         console.error("인증이 프로필 데이터 로드 실패:", error);
 
-        localStorage.removeItem('authToken');
+        localStorage.removeItem('LogIn');
         userName.value = 'GUEST';
         alert('인증 정보가 만료되었습니다. 다시 로그인해 주세요.');
         router.push({ name: 'logIn' });
@@ -121,7 +121,7 @@ export default {
 
     const goToPage = (routeName) => {
       if (routeName === 'myPage') {
-        if (localStorage.getItem('authToken')) {
+        if (localStorage.getItem('LogIn')) {
             router.push({ name: routeName });
         } else {
             alert('로그인이 필요합니다.');

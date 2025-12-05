@@ -131,9 +131,9 @@ const handleLogin = async () => {
 try {
     // 3. Store의 API 호출 및 데이터 저장 로직 실행
     await submitLogin();
+
     loginFormData.reset();
-    // 4. 💡 최적화: API 호출 및 데이터 저장이 성공하면 페이지 이동
-    // (두 번째 로직의 목표였던 'homePage'로 통일)
+    localStorage.setItem('LogIn',true)
     router.push({ name: 'homePage' });
 
   } catch (error) {
