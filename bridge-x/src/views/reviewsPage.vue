@@ -146,10 +146,10 @@ async function loadReviews() {
     console.error('리뷰 목록 로드 실패:', error);
     error.value = error.message;
 
-    // 폴백: 샘플 데이터 (37개 전체를 생성하여 클라이언트 측 필터링을 허용)
-    // 💡 이 샘플 데이터는 어떤 필터링 조건에서도 항상 동일하게 전체를 생성해야 합니다.
+
+    // 이 샘플 데이터는 어떤 필터링 조건에서도 항상 동일하게 전체를 생성해야 합니다.
     posts.value = Array.from({ length: 100  }).map((_, i) => ({
-      reviewID: `${i + 1}` ,
+      reviewId: 100 - i,
       username: `nickname${i + 1}`,
       no: 100 - i,
       tag: i % 5 === 0 ? '질문' : i % 3 === 0 ? '정보' : '리뷰',
@@ -187,7 +187,9 @@ function selectCategory(cat) {
 }
 
 function openPost(post) {
-  if (router) router.push({ name: 'reviewDetail', params: { reviewID: post.reviewID } }).catch(()=>{});
+  if (router) router.push({
+    name: 'reviewDetail',
+    params: { reviewID: post.reviewID } }).catch(()=>{});
 }
 
 function prevPage() {

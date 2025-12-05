@@ -2,7 +2,7 @@
   <div v-if="isOpen" class="modal-overlay" @click.self="closeModal">
     <div class="modal-content">
       <div class="modal-header">
-        <h3 class="modal-title">{{ reviewId ? '리뷰 수정' : '리뷰 작성' }}</h3>
+        <h3 class="modal-title">{{ reviewID ? '리뷰 수정' : '리뷰 작성' }}</h3>
         <button class="close-button" @click="closeModal">&times;</button>
       </div>
 
@@ -46,7 +46,7 @@ const props = defineProps({
     type: Boolean,
     required: true
   },
-  reviewId: {
+  reviewID: {
     type: [String, Number],
     default: null
   },
@@ -100,7 +100,6 @@ const submitReview = async () => {
       tag: reviewData.tag,
       title: reviewData.title,
       content: reviewData.content,
-      // 💡 'recommend' 필드 사용
       recommend: reviewData.recommend,
       views: reviewData.views,
       nickname: reviewData.nickname,
@@ -111,9 +110,9 @@ const submitReview = async () => {
     let result = null;
 
     try {
-        if (props.reviewId) {
+        if (props.reviewID) {
             // 수정
-            result = await updateReview(props.reviewId, payload);
+            result = await updateReview(props.reviewID, payload);
             console.log('리뷰 수정 성공:', result);
         } else {
             // 작성

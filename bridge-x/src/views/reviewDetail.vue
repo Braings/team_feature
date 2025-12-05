@@ -119,7 +119,7 @@
 
     <ReviewWriteModal
       :isOpen="isModalOpen"
-      :reviewId="detailData.id"
+      :reviewId="detailData.reviewId"
       :initialData="detailData"
       @close="closeModal"
       @submit-success="handleReviewEdit"
@@ -148,19 +148,26 @@ const error = ref(null);
 const isRecommended = ref(false);
 
 // 상세 보기 로직
-async function loadPost(id) {
+async function loadPost(reviewID) {
   loading.value = true;
   error.value = null;
+
+  if (!reviewID) {
+      error.value = "유효하지 않은 리뷰 ID입니다.";
+      loading.value = false;
+      return;
+  }
   try {
-    const data = await getReviewDetail(id);
+    const data = await getReviewDetail(reviewID);
+
     post.value = data.data || data || {
-      reviewID: id,
+      reviewID: reviewID,
       username: 'sss12',
-      title: `샘플 게시물 제목 ${id}`,
+      title: `샘플 게시물 제목 ${reviewID}`,
       nickname: '운영자1',
       date: '25/11/24',
       views: 123,
-      tag: id.length % 3 === 0 ? '정보' : '질문',
+      tag: reviewID.length % 3 === 0 ? '정보' : '질문',
       content: '이것은 샘플 게시물의 본문입니다.',
       recommend: 5
     };
@@ -211,9 +218,9 @@ async function deletePost() {
 }
 
 // Watch (상세 보기 로직 처리)
-watch(reviewID, (newreviewID) => {
-  if (newreviewID) {
-    loadPost(newreviewID);
+watch(reviewID, (newId) => {
+  if (newId) {
+    loadPost(newId);
   } else {
     post.value = null;
   }
@@ -221,100 +228,89 @@ watch(reviewID, (newreviewID) => {
 
 
 // ======================================
-// 댓글 및 대댓글 기능 로직
+// 🌟 댓글 및 대댓글 기능 로직 (ID 기반) 🌟
 // ======================================
 const isCommentLoading = ref(false);
 const isCommentSubmitting = ref(false);
 
 const newComment = reactive({ content: '' });
-const replyingToId = ref(null);
+const replyingToCommentID = ref(null);
 const newReplyContent = ref('');
 
 const comments = ref([
   {
-    id: 3,
+    commentID: 101,
+    reviewID: 1,
     nickname: '테스터1',
     content: '좋은 정보 감사합니다!',
     date: '25/12/05 10:00',
     replies: [
-      { id: 301, nickname: '운영자', content: '도움이 되셨다니 기쁩니다!', date: '25/12/05 10:30' },
-      { id: 302, nickname: '개발자2', content: '맞아요, 저도 잘 쓰고 있습니다!', date: '25/12/05 10:45' },
+      { commentID: 10101, parentCommentID: 101, nickname: '운영자', content: '감사합니다.', date: '25/12/05 10:30' }
     ]
   },
-  { id: 2, nickname: '개발자2', content: 'Bridge-X 응원합니다.', date: '25/12/05 11:30', replies: [] },
-  { id: 1, nickname: '작성자', content: '샘플 댓글입니다.', date: '25/12/05 12:45', replies: [] }
+  { commentID: 102, reviewID: 1, nickname: '개발자', content: '댓글 테스트', date: '25/12/05 11:00', replies: [] }
 ]);
 
 async function submitComment() {
-  if (!newComment.content.trim()) {
-    alert('댓글 내용을 입력해주세요.');
-    return;
-  }
+  if (!newComment.content.trim()) return;
+
   isCommentSubmitting.value = true;
   try {
-    const now = new Date();
-    const dateStr = `${now.getFullYear().toString().slice(2)}/${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getDate().toString().padStart(2, '0')} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-    const tempId = comments.value.length > 0 ? comments.value[0].id + 1 : 1;
+    // 💡 API 호출 시 reviewId 전달
+    // await apiCreateComment(post.value.reviewId, { content: newComment.content });
+
+    // Mock Update
+    const newID = Date.now();
     comments.value.unshift({
-      id: tempId,
+      commentID: newID,
+      reviewID: post.value.reviewId,
       nickname: '현재사용자',
       content: newComment.content.trim(),
-      date: dateStr,
+      date: new Date().toLocaleDateString(),
       replies: []
     });
     newComment.content = '';
-    alert('댓글이 등록되었습니다.');
   } catch(e) {
-      console.error("댓글 등록 실패:", e);
-      alert('댓글 등록에 실패했습니다.');
+      console.error(e);
+      alert('실패');
   } finally {
       isCommentSubmitting.value = false;
   }
 }
 
-function toggleReplyForm(commentId) {
-    if (replyingToId.value === commentId) {
-        replyingToId.value = null;
+function toggleReplyForm(commentID) {
+    if (replyingToCommentID.value === commentID) {
+        replyingToCommentID.value = null;
     } else {
-        replyingToId.value = commentId;
+        replyingToCommentID.value = commentID;
         newReplyContent.value = '';
     }
 }
 
-async function submitReply(parentId) {
-    if (!newReplyContent.value.trim()) {
-        alert('답글 내용을 입력해주세요.');
-        return;
-    }
+async function submitReply(parentCommentID) {
+    if (!newReplyContent.value.trim()) return;
 
-    const parentComment = comments.value.find(c => c.id === parentId);
-    if (!parentComment) return;
+    // 부모 댓글 찾기 (commentID로 검색)
+    const parent = comments.value.find(c => c.commentID === parentCommentID);
+    if (!parent) return;
 
     try {
-        const now = new Date();
-        const dateStr = `${now.getFullYear().toString().slice(2)}/${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getDate().toString().padStart(2, '0')} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+        // Mock Update
+        const newID = Date.now();
+        if(!parent.replies) parent.replies = [];
 
-        if (!parentComment.replies) {
-             parentComment.replies = [];
-        }
-
-        const lastReplyId = parentComment.replies.length > 0 ? parentComment.replies[parentComment.replies.length - 1].id : parentId * 100;
-        const tempId = lastReplyId + 1;
-
-        parentComment.replies.push({
-            id: tempId,
+        parent.replies.push({
+            commentID: newID,
+            parentCommentID: parentCommentID,
             nickname: '현재사용자',
             content: newReplyContent.value.trim(),
-            date: dateStr
+            date: new Date().toLocaleDateString()
         });
 
         newReplyContent.value = '';
-        replyingToId.value = null;
-        alert('답글이 등록되었습니다.');
-
+        replyingToCommentID.value = null;
     } catch(e) {
-        console.error("답글 등록 실패:", e);
-        alert('답글 등록에 실패했습니다.');
+        console.error(e);
     }
 }
 
@@ -323,7 +319,7 @@ async function submitReply(parentId) {
 // ======================================
 const isModalOpen = ref(false);
 const detailData = reactive({
-  id: null,
+  reviewID: null,
   title: '',
   content: '',
   tag: ''
@@ -335,7 +331,7 @@ const openEditModal = () => {
 
   // 현재 게시물 데이터를 모달용 데이터에 복사
   Object.assign(detailData, {
-    id: post.value.reviewID,
+    reviewID: post.value.reviewID,
     title: post.value.title,
     content: post.value.content,
     tag: post.value.tag
