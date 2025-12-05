@@ -2,6 +2,8 @@ package com.bridgeX.review.domain;
 
 import java.time.LocalDateTime;
 
+import com.bridgeX.review.dto.ReviewUpdateRequest;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,12 +11,18 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.validation.constraints.NotNull;
+
+
+import lombok.Builder;
 import lombok.Data;
+import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 
 @Data
 @Entity
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 public class ReviewInfo {
 
@@ -44,5 +52,10 @@ public class ReviewInfo {
         this.date = LocalDateTime.now();
     }
 
-    // getters/setters
+    public void update(ReviewUpdateRequest request) {
+        this.title = request.getTitle();
+        this.content = request.getContent();
+        this.tag = request.getTag();
+    }
+
 }
