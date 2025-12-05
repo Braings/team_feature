@@ -70,10 +70,13 @@
 </template>
 
 <script setup>
-import { reactive, ref, watch } from 'vue';
-// Store의 데이터는 사용하지 않고, API 요청만 가정합니다.
-// 실제 API가 없으므로 더미 데이터를 사용합니다.
-import localFacilityData from '@/stores/facilityListState.js'
+import { watch } from 'vue';
+
+// 💡 변경: 더미 데이터 대신 Store에서 필요한 상태와 함수를 가져옵니다.
+import {
+    facilityDetailState,      // 상세 정보를 담고 있는 반응형 상태
+    fetchFacilityDetailById   // 상세 정보 API를 호출하는 함수
+} from '@/stores/exerciseFacilitiesStore'
 
 // props 정의: 모달 열림 상태와 상세 조회할 시설 ID
 const props = defineProps({
@@ -89,58 +92,56 @@ const props = defineProps({
 
 const emit = defineEmits(['close']);
 
-// 로컬 상태
-const facilityDetail = reactive({});
-const isLoading = ref(false);
-const hasError = ref(false);
+// 💡 변경: 로컬 상태 대신 Store 상태를 직접 사용합니다.
+// Store의 상태에서 필요한 정보(데이터, 로딩, 에러)를 직접 가져와 변수로 사용합니다.
+const facilityDetail = facilityDetailState.data;
+const isLoading = facilityDetailState.isLoading;
+const hasError = facilityDetailState.hasError;
+
 
 /**
- * 💡 시설 ID를 사용하여 상세 정보를 조회하는 함수 (더미 데이터 사용)
- * 실제 환경에서는 `getFacilityDetail(id)`와 같은 API 함수를 호출해야 합니다.
+ * 💡 시설 ID를 사용하여 상세 정보를 조회하는 함수 (Store 함수 호출로 변경)
+ * 실제 환경에서는 fetchFacilityDetailById(id) Store 함수를 호출합니다.
  */
-const fetchFacilityDetail = async (id) => {
+const fetchDetail = async (id) => {
     if (id === null || id === undefined) return;
 
-    isLoading.value = true;
-    hasError.value = false;
-
-    // 이전에 로드된 데이터를 초기화
-    Object.keys(facilityDetail).forEach(key => delete facilityDetail[key]);
-
     try {
-        const targetId = String(id);
+        console.log('fetchFacilityDetailById Store 함수 호출됨. 검색 ID:', id);
+        // 💡 핵심 변경: Store의 비동기 함수를 호출하여 API 요청을 위임합니다.
+        // 이 함수 내에서 로딩 및 에러 상태를 Store가 관리한다고 가정합니다.
+        await fetchFacilityDetailById(id);
 
-        console.log('fetchFacilityDetail 호출됨. 검색 ID:', targetId);
-        console.log('더미 데이터 로드 상태:', localFacilityData ? '성공' : '실패', '총 항목 수:', localFacilityData ? localFacilityData.length : 0);
-
-        // 더 안전한 ID 비교 (더미 데이터의 id는 문자열)
-        const detail = localFacilityData.find(f => String(f.id) === targetId); // String()을 한번 더 사용하여 안전성 강화
-        if (detail) {
-            // 상세 정보를 reactive 객체에 복사
-            Object.assign(facilityDetail, detail);
-            console.log('시설 상세 정보 로드 성공:', detail);
-        } else {
-          throw new Error(`시설 ID ${targetId} 정보를 찾을 수 없습니다.`);
-        }
     } catch (error) {
-        console.error('시설 상세 정보 로드 실패:', error);
-        hasError.value = true;
-    } finally {
-        isLoading.value = false;
+        // Store에서 에러를 처리하지만, 컴포넌트에서도 추가적인 처리가 필요하다면 여기에 추가합니다.
+        console.error('시설 상세 정보 로드 실패 (컴포넌트 레벨):', error);
+        // Store가 에러 상태를 관리하므로 별도의 상태 변경은 필요하지 않습니다.
     }
 }
 
 watch(() => [props.isOpen, props.facilityId], ([newOpen, newId]) => {
   if (newOpen && newId !== null && newId !== undefined) {
-    fetchFacilityDetail(newId);
+    // 💡 변경: 로컬 함수 이름을 fetchDetail로 변경하고 호출합니다.
+    fetchDetail(newId);
   }
+
   // 모달이 닫히면 상태 초기화
   if (!newOpen) {
+    // 💡 변경: Store에서 상세 정보 초기화 로직을 담당한다고 가정하고,
+    // Store에 초기화 함수를 호출하거나, Store가 자동으로 초기화하도록 설계할 수 있습니다.
+    // 여기서는 props.isOpen이 false가 될 때 Store의 초기화 함수를 호출한다고 가정합니다.
+    // 만약 Store에 초기화 함수가 없다면, Store의 data를 직접 초기화해야 합니다.
+
+    // 예시: Store 초기화 함수를 호출한다고 가정 (Store 파일에 구현해야 함)
+    // resetFacilityDetailState();
+
+    // 현재 코드에서는 Store의 상태 객체를 직접 조작하는 대신,
+    // Store가 닫힐 때 상태를 초기화하도록 설계하는 것이 일반적입니다.
+    // 만약 Store를 수정할 수 없다면, 모달이 닫힐 때 데이터만 수동으로 지워줍니다.
     Object.keys(facilityDetail).forEach(key => delete facilityDetail[key]);
-    isLoading.value = false;
-    hasError.value = false;
+
   }
-});
+}, { immediate: true }); // 즉시 실행 옵션 추가 (Store 상태가 초기값으로 설정되도록)
 </script>
 
 <style lang="scss" scoped>

@@ -39,7 +39,11 @@ export const facilityListState = reactive({
     hasError: ref(false),  // 에러 상태
 })
 
-
+export const facilityDetailState = reactive({
+    data: {},
+    isLoading: ref(false),
+    hasError: ref(false),
+});
 // -------------------------------------------------------------
 // 2. 함수 (ACTIONS) 정의
 // -------------------------------------------------------------
@@ -109,3 +113,34 @@ export async function fetchExerciseFacilities(region, city) {
     facilityListState.isLoading = false
   }
 }
+
+// 2. 상세 정보 조회를 위한 비동기 함수
+export const fetchFacilityDetailById = async (id) => {
+    facilityDetailState.isLoading.value = true;
+    facilityDetailState.hasError.value = false;
+    // 이전 데이터 초기화
+    Object.keys(facilityDetailState.data).forEach(key => delete facilityDetailState.data[key]);
+
+    try {
+        // 🚨 실제 API 호출 로직을 여기에 구현합니다.
+        // 예: const response = await axios.get(`/api/facilities/${id}`);
+
+        // 🚨 임시: 2초 지연 후 더미 데이터 로드 시뮬레이션
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        // API에서 받은 상세 정보라고 가정합니다.
+        const mockDetail = { id: id, FCLTY_NM: `테스트 시설 ${id}` };
+
+        if (mockDetail) {
+             Object.assign(facilityDetailState.data, mockDetail);
+        } else {
+            throw new Error(`ID ${id} 시설 정보를 찾을 수 없습니다.`);
+        }
+    } catch (error) {
+        facilityDetailState.hasError.value = true;
+        console.error("Store: 시설 상세 정보 조회 실패", error);
+        throw error; // 컴포넌트에서 에러를 잡을 수 있도록 다시 throw
+    } finally {
+        facilityDetailState.isLoading.value = false;
+    }
+};
