@@ -14,10 +14,14 @@ import com.bridgeX.user.dto.LoginResponse;
 import com.bridgeX.user.dto.SignupRequest;
 import com.bridgeX.user.dto.UserBodyInfoRequest;
 import com.bridgeX.user.dto.UserBodyInfoResponse;
+import com.bridgeX.user.dto.UserInfoModifyRequest;
 import com.bridgeX.user.dto.UserInfoResponse;
+import com.bridgeX.user.exception.CustomException;
+import com.bridgeX.user.exception.ErrorCode;
 import com.bridgeX.user.repository.UserBodyRepository;
 import com.bridgeX.user.repository.UserRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -40,6 +44,7 @@ public class UserService {
         }
         // create User
         SiteUser user = SiteUser.builder()
+        		.nickname(dto.getNickname())
         		.username(dto.getUsername())
         		.password(passwordEncoder.encode(dto.getPassword()))
         		.email(dto.getEmail())
@@ -88,6 +93,50 @@ public class UserService {
         return response;
     }
 	
+    
+    
+    @Transactional
+    public void modifyUserInfo(String username, UserInfoModifyRequest dto) {
+
+        SiteUser user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        
+        // Site User
+        if (dto.getNickname() != null && !dto.getNickname().isBlank()) {
+            user.setNickname(dto.getNickname());
+        }
+        if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
+            user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        }
+        if (dto.getBirthday() != null) {
+            user.setBirthday(dto.getBirthday());
+        }
+        if (dto.getEmail() != null && !dto.getEmail().isBlank()) {
+            user.setEmail(dto.getEmail());
+        }
+
+        // Site User Body
+        SiteUserBody body = user.getBodyInfo();
+        
+        if (dto.getSex() != null) {
+            body.setGender(dto.getSex());
+        }
+
+        if (dto.getHeight() != null) {
+            body.setHeight(dto.getHeight());
+        }
+
+        if (dto.getWeight() != null) {
+            body.setWeight(dto.getWeight());
+        }
+
+        // userRepository.save(user);
+
+        // return UserInfoResponse.from(user);
+    }
+    
+    
+    
     // User Information Response
     public UserInfoResponse getMyInfo(String username) {
     	
@@ -96,6 +145,7 @@ public class UserService {
         
         return new UserInfoResponse(
                 user.getId(),
+                user.getNickname(),
                 user.getUsername(),
                 user.getEmail(),
                 user.getBirthday(),
@@ -139,6 +189,14 @@ public class UserService {
         );
     }
     
+    // Profile Photo Update: only URL
+    @Transactional
+    public void updateProfileImage(Long userId, String imageUrl) {
+        SiteUser user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("유저 없음"));
+
+        user.setProfileImageUrl(imageUrl);
+    }
     
     
 	// Back-end Test only.

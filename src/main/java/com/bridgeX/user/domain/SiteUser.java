@@ -27,13 +27,19 @@ import lombok.Setter;
 @NoArgsConstructor
 public class SiteUser {
 
+	// User ID
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	// Login ID
 	@Column(unique = true)
 	private String username;
 
+	// NickName
+	@Column(unique = true)
+	private String nickname;
+	
 	private String password;
 
 	@Column(unique = true)
@@ -44,6 +50,9 @@ public class SiteUser {
 	
 	@Enumerated(EnumType.STRING) // Use e-num
     private UserRole role;
+	
+	// Profile Photo
+	private String profileImageUrl;
 	
 	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private SiteUserBody bodyInfo;

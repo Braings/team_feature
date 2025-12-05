@@ -17,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.bridgeX.user.domain.SiteUser;
+import com.bridgeX.user.domain.UserGender;
 import com.bridgeX.user.repository.UserRepository;
 
 @SpringBootTest
@@ -36,13 +37,14 @@ public class UserApiIntegrationTest {
         // 1) Sign-up
         String signupJson = """
         {
-            "username": "Im_Test_User",
-            "email": "PlzSuccess@test.com",
-            "password": "1234",
-            "passwordCheck": "1234",
-            "birthday": "2025-12-25",
-            "height": "190",
-            "weight": "108"
+            "nickname": "Im_Test_User3",
+            "username": "TestUser03",
+            "email": "tu3@test.com",
+            "password": "12345678a!",
+            "sex": "FEMALE",
+            "birthday": "2003-12-25",
+            "height": "150",
+            "weight": "45"
         }
         """;
 
@@ -54,15 +56,17 @@ public class UserApiIntegrationTest {
                 .andExpect(status().isOk()); // Success Sign-up
 
         // 2) Check from DB
-        SiteUser savedUser = userRepository.findByUsername("Im_Test_User")
+        SiteUser savedUser = userRepository.findByUsername("TestUser03")
                 .orElseThrow(() -> new RuntimeException("회원가입 후 DB에서 유저를 찾지 못했습니다."));
 
         // 3) Confirm Data
-        assertEquals("Im_Test_User", savedUser.getUsername());
-        assertEquals("PlzSuccess@test.com", savedUser.getEmail());
-        assertEquals(LocalDate.of(2025, 12, 25), savedUser.getBirthday());
-        assertEquals(190, savedUser.getBodyInfo().getHeight());
-        assertEquals(108, savedUser.getBodyInfo().getWeight());
+        assertEquals("Im_Test_User3", savedUser.getNickname());
+        assertEquals("TestUser03", savedUser.getUsername());
+        assertEquals("tu3@test.com", savedUser.getEmail());
+        assertEquals(UserGender.FEMALE, savedUser.getBodyInfo().getGender());
+        assertEquals(LocalDate.of(2003, 12, 25), savedUser.getBirthday());
+        assertEquals(150, savedUser.getBodyInfo().getHeight());
+        assertEquals(45, savedUser.getBodyInfo().getWeight());
     }
     
     /*

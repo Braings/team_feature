@@ -32,11 +32,18 @@ public class SecurityConfig {
 		                "/assets/**",
 		                "/static/**", "/css/**", "/js/**", "/images/**"
 		                ).permitAll()
+				.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
 				.requestMatchers("/api/sign", "/api/sign/**", "/api/login").permitAll()
 				.requestMatchers("/test/**", "/h2_BX-console/**").permitAll()
 
-				// read forum => Everyone 
+				// forum read (GET) is public
 				.requestMatchers(HttpMethod.GET, "/api/forum/**").permitAll()
+
+				// forum write (POST, PUT, DELETE)는 인증 필요
+				.requestMatchers(HttpMethod.POST, "/api/forum/**").authenticated()
+				.requestMatchers(HttpMethod.PUT, "/api/forum/**").authenticated()
+				.requestMatchers(HttpMethod.DELETE, "/api/forum/**").authenticated()
 				
 				// else => private
 				.anyRequest().authenticated()

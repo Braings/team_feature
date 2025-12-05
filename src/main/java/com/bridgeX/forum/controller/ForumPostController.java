@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/forum")
+@RequestMapping("/api/reviews")
 public class ForumPostController {
 
     private final ForumPostService service;

@@ -7,13 +7,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
-
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
-
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -27,11 +25,11 @@ public class SiteUserBody {
 	
 	@OneToOne
     @MapsId
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "id")
     private SiteUser user;
 	
-	private int height;
-	private int weight;
+	private Integer height;
+	private Integer weight;
 	
 	@Enumerated(EnumType.STRING) // Use e-num
     private UserGender gender;

@@ -8,7 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
-
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -27,9 +27,16 @@ public class ForumPost {
     @Column(columnDefinition = "TEXT")
     private String content;
 
+    @NotNull
+    private ContentTag tag;
+    
     private String author;
 
     private LocalDateTime date;
+    
+    private Integer suggestion;
+    
+    private Integer views;
 
     @PrePersist
     public void onCreate() {
