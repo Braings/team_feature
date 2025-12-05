@@ -279,6 +279,7 @@ const handleReviewSubmit = (newReview) => {
 </script>
 
 <style lang="scss" scoped>
+@use 'sass:color';
 @use 'sass:map';
 @use '@/styles/_variables' as *;
 

@@ -128,7 +128,9 @@ const submitReview = async () => {
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/_variables.scss';
+@use 'sass:color';
+@use 'sass:map';
+@use '@/styles/_variables.scss'as*;
 
 /* --- 모달 기본 스타일 --- */
 .modal-overlay {
@@ -145,8 +147,8 @@ const submitReview = async () => {
 }
 
 .modal-content {
-  background: map-get($colors, 'white');
-  border-radius: map-get($radius, 'lg');
+  background: map.get($colors, 'white');
+  border-radius: map.get($radius, 'lg');
   width: 95%;
   max-width: 600px; /* 적절한 크기 설정 */
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
@@ -154,8 +156,8 @@ const submitReview = async () => {
 }
 
 .modal-header {
-  padding: map-get($spacing, 'xl');
-  border-bottom: 1px solid map-get($colors, 'border-light');
+  padding: map.get($spacing, 'xl');
+  border-bottom: 1px solid map.get($colors, 'border-light');
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -172,48 +174,48 @@ const submitReview = async () => {
   border: none;
   font-size: 2rem;
   cursor: pointer;
-  color: map-get($colors, 'text-placeholder');
+  color: map.get($colors, 'text-placeholder');
   padding: 0;
 
   &:hover {
-    color: map-get($colors, 'black');
+    color: map.get($colors, 'black');
   }
 }
 
 .modal-body {
-  padding: map-get($spacing, '3xl');
+  padding: map.get($spacing, '3xl');
   width: 100%;
 }
 
 .form-group {
-    margin-bottom: map-get($spacing, 'xl');
+    margin-bottom: map.get($spacing, 'xl');
     width: 100%;
   .form-header{
     display: flex;
-    gap: map-get($spacing, 'lg');
-    margin-bottom: map-get($spacing, 'lg');
+    gap: map.get($spacing, 'lg');
+    margin-bottom: map.get($spacing, 'lg');
     .form-tag {
       flex: 1;
-      padding: map-get($spacing, 'md');
-      border: 1px solid map-get($colors, 'border');
-      border-radius: map-get($radius, 'md');
-      font-size: map-get($typography, 'base');
+      padding: map.get($spacing, 'md');
+      border: 1px solid map.get($colors, 'border');
+      border-radius: map.get($radius, 'md');
+      font-size: map.get($typography, 'base');
     }
     select {
       flex: 1;
       width: 30%;
-      padding: map-get($spacing, 'md');
-      border: 1px solid map-get($colors, 'border');
-      border-radius: map-get($radius, 'md');
-      font-size: map-get($typography, 'base');
+      padding: map.get($spacing, 'md');
+      border: 1px solid map.get($colors, 'border');
+      border-radius: map.get($radius, 'md');
+      font-size: map.get($typography, 'base');
     }
   }
   .form-title{
     flex: 3;
-    padding: map-get($spacing, 'md');
-    border: 1px solid map-get($colors, 'border');
-    border-radius: map-get($radius, 'md');
-    font-size: map-get($typography, 'base');
+    padding: map.get($spacing, 'md');
+    border: 1px solid map.get($colors, 'border');
+    border-radius: map.get($radius, 'md');
+    font-size: map.get($typography, 'base');
   }
   .form-content {
     position: relative;
@@ -222,10 +224,10 @@ const submitReview = async () => {
     textarea {
     width: 100%;
     height: 150px;
-    padding: map-get($spacing, 'md');
-    border: 1px solid map-get($colors, 'border');
-    border-radius: map-get($radius, 'md');
-    font-size: map-get($typography, 'base');
+    padding: map.get($spacing, 'md');
+    border: 1px solid map.get($colors, 'border');
+    border-radius: map.get($radius, 'md');
+    font-size: map.get($typography, 'base');
     resize: vertical;
     box-sizing: border-box;
     }
@@ -234,34 +236,34 @@ const submitReview = async () => {
 
 .form-group label {
     display: block;
-    margin-bottom: map-get($spacing, 'md');
+    margin-bottom: map.get($spacing, 'md');
     font-weight: bold;
 }
 
 .modal-footer {
     display: flex;
     justify-content: flex-end;
-    gap: map-get($spacing, 'lg');
-    padding-top: map-get($spacing, 'xl');
-    border-top: 1px solid map-get($colors, 'border-light');
+    gap: map.get($spacing, 'lg');
+    padding-top: map.get($spacing, 'xl');
+    border-top: 1px solid map.get($colors, 'border-light');
 }
 
 .submit-button, .cancel-button {
-    padding: map-get($spacing, 'md') map-get($spacing, 'lg');
-    border-radius: map-get($radius, 'md');
+    padding: map.get($spacing, 'md') map.get($spacing, 'lg');
+    border-radius: map.get($radius, 'md');
     font-weight: bold;
     cursor: pointer;
     border: none;
 }
 
 .submit-button {
-    background-color: map-get($colors, 'black');
-    color: map-get($colors, 'white');
+    background-color: map.get($colors, 'black');
+    color: map.get($colors, 'white');
 }
 
 .cancel-button {
     background-color: #e0e0e0;
-    color: map-get($colors, 'black');
+    color: map.get($colors, 'black');
 }
 
 @keyframes modalFadeIn {

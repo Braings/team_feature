@@ -98,7 +98,7 @@ export default {
 
 @font-face {
   font-family: 'TheJamsilOTF6ExtraBold';
-  src: url('../public/fonts/The Jamsil OTF 6 ExtraBold.otf') format('opentype');
+  src: url('../fonts/The Jamsil OTF 6 ExtraBold.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
 }

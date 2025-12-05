@@ -150,6 +150,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@use 'sass:color';
+@use 'sass:map';
 
 .cursorPointer {
     cursor: pointer;

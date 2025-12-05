@@ -145,7 +145,9 @@ watch(() => [props.isOpen, props.facilityId], ([newOpen, newId]) => {
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/_variables.scss';
+@use 'sass:color';
+@use 'sass:map';
+@use '@/styles/_variables.scss'as *;
 // 변수 파일 경로를 실제 경로로 수정하세요.
 // 만약 _variables.scss가 없다면, 아래의 스타일 코드를 일반 CSS로 변경해야 합니다.
 

@@ -78,7 +78,9 @@ const saveChanges = () => {
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/_variables.scss';
+@use 'sass:color';
+@use 'sass:map';
+@use '@/styles/_variables.scss'as*;
 
 .modal-overlay {
   position: fixed;
@@ -93,8 +95,8 @@ const saveChanges = () => {
   z-index: 1000;
 }
 .modal-content {
-  background: map-get($colors, 'white');
-  border-radius: map-get($radius, 'lg');
+  background: map.get($colors, 'white');
+  border-radius: map.get($radius, 'lg');
   width: 90%;
   max-width: 450px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
@@ -107,51 +109,51 @@ const saveChanges = () => {
 }
 
 .modal-header {
-  padding: map-get($spacing, 'xl');
-  border-bottom: 1px solid map-get($colors, 'border-light');
+  padding: map.get($spacing, 'xl');
+  border-bottom: 1px solid map.get($colors, 'border-light');
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 .modal-body {
-  padding: map-get($spacing, 'xl');
+  padding: map.get($spacing, 'xl');
 }
 
-.form-group { margin-bottom: map-get($spacing, 'lg'); }
+.form-group { margin-bottom: map.get($spacing, 'lg'); }
 .form-group label {
   display: block;
-  margin-bottom: map-get($spacing, 'sm');
+  margin-bottom: map.get($spacing, 'sm');
   font-weight: 500;
 }
 
 .form-group input {
   width: 100%;
-  padding: map-get($spacing, 'md');
-  border: 1px solid map-get($colors, 'border');
-  border-radius: map-get($radius, 'md');
+  padding: map.get($spacing, 'md');
+  border: 1px solid map.get($colors, 'border');
+  border-radius: map.get($radius, 'md');
   box-sizing: border-box;
 }
 
 .disabled-input {
     background-color: #f0f0f0;
-    color: map-get($colors, 'text-placeholder');
+    color: map.get($colors, 'text-placeholder');
 }
 
 .modal-footer {
-  margin-top: map-get($spacing, 'xl');
+  margin-top: map.get($spacing, 'xl');
   display: flex;
   justify-content: flex-end;
-  gap: map-get($spacing, 'lg');
+  gap: map.get($spacing, 'lg');
 }
 
 
 .save-button,
 .cancel-button {
   flex: 1;
-  padding: map-get($spacing, 'lg') map-get($spacing, 'md');
+  padding: map.get($spacing, 'lg') map.get($spacing, 'md');
   border: none;
-  border-radius: map-get($radius, 'md');
+  border-radius: map.get($radius, 'md');
   font-size: 1rem;
   font-weight: bold;
   cursor: pointer;
@@ -159,18 +161,18 @@ const saveChanges = () => {
 }
 
 .save-button {
-  background-color: map-get($colors, 'black');
-  color: map-get($colors, 'white');
+  background-color: map.get($colors, 'black');
+  color: map.get($colors, 'white');
 
   &:hover {
-    background-color: map-get($colors, 'gray-hover');
+    background-color: map.get($colors, 'gray-hover');
   }
 }
 
 .cancel-button {
   background-color: #f5f5f5;
-  color: map-get($colors, 'black');
-  border: 1px solid map-get($colors, 'border');
+  color: map.get($colors, 'black');
+  border: 1px solid map.get($colors, 'border');
 
   &:hover {
     background-color: #e0e0e0;

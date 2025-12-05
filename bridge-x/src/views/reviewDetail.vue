@@ -364,6 +364,7 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
+@use 'sass:color';
 @use 'sass:map';
 @use '@/styles/_variables' as *;
 
@@ -577,7 +578,7 @@ onMounted(() => {
                 border-color: transparent;
 
                 &:hover {
-                  background-color: darken(map.get($colors,'error'), 10%);
+                  background-color: color.adjust(map.get($colors,'error'), $lightness: -10%);
                 }
               }
 
@@ -591,7 +592,7 @@ onMounted(() => {
               background: map.get($colors,'error');
               border-color: map.get($colors,'error');
               &:hover {
-                background-color: darken(map.get($colors,'error'), 10%);
+                background-color: color.adjust(map.get($colors,'error'), $lightness: -10%);
               }
             }
           }
@@ -677,7 +678,7 @@ onMounted(() => {
                 border-color: transparent;
 
                 &:hover {
-                  background-color: darken(map.get($colors,'error'), 10%);
+                  background-color: color.adjust(map.get($colors,'error'), $lightness: -10%);
                 }
               }
 
@@ -691,7 +692,7 @@ onMounted(() => {
               background: map.get($colors,'error');
               border-color: map.get($colors,'error');
               &:hover {
-                background-color: darken(map.get($colors,'error'), 10%);
+                background-color: color.adjust(map.get($colors,'error'), $lightness: -10%);
               }
             }
           }

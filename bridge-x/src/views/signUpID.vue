@@ -147,25 +147,27 @@ const handleNext = async () => {
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/_variables.scss';
+@use 'sass:color';
+@use 'sass:map';
+@use '@/styles/_variables.scss'as *;
 
 .signup-page {
   @include flex-center;
   min-height: 100vh;
-  background-color: map-get($colors, 'dark');
+  background-color: map.get($colors, 'dark');
 
   .signup-card {
     @include card;
-    padding: map-get($spacing, '2xl') map-get($spacing, '3xl');
-    width: map-get($sizes, 'card-width');
+    padding: map.get($spacing, '2xl') map.get($spacing, '3xl');
+    width: map.get($sizes, 'card-width');
     display: flex;
     flex-direction: column;
     align-items: center;
 
     .title {
-      font-size: map-get($typography, 'title');
+      font-size: map.get($typography, 'title');
       font-weight: bold;
-      margin-bottom: map-get($spacing, '2xl');
+      margin-bottom: map.get($spacing, '2xl');
       letter-spacing: 5px;
     }
 
@@ -177,18 +179,18 @@ const handleNext = async () => {
     .next-button {
       @include button-base;
       @include flex-center;
-      background-color: map-get($colors, 'black');
-      color: map-get($colors, 'white');
+      background-color: map.get($colors, 'black');
+      color: map.get($colors, 'white');
       padding: 15px 30px;
-      border-radius: map-get($radius, 'md');
-      font-size: map-get($typography, 'button');
-      margin-top: map-get($spacing, 'xl');
+      border-radius: map.get($radius, 'md');
+      font-size: map.get($typography, 'button');
+      margin-top: map.get($spacing, 'xl');
       align-self: flex-end;
-      width: map-get($sizes, 'button-width');
-      height: map-get($sizes, 'button-height');
+      width: map.get($sizes, 'button-width');
+      height: map.get($sizes, 'button-height');
 
       &:hover {
-        background-color: map-get($colors, 'gray-hover');
+        background-color: map.get($colors, 'gray-hover');
       }
     }
   }

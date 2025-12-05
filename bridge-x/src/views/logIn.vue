@@ -155,7 +155,9 @@ const goToSignUp = () => {
 
 
 <style lang="scss" scoped>
-@import '@/styles/_variables.scss';
+@use 'sass:color';
+@use 'sass:map';
+@use '@/styles/_variables.scss'as *;
 
 .login-container {
   display: flex;
@@ -163,7 +165,7 @@ const goToSignUp = () => {
   height: 100vh;
   font-family: 'TheJamsilOTF6ExtraBold', sans-serif;
   overflow: hidden;
-  background-color: map-get($colors, 'white');
+  background-color: map.get($colors, 'white');
 }
 
 // ========================
@@ -171,8 +173,8 @@ const goToSignUp = () => {
 // ========================
 .left-section {
   width: 50vw;
-  background-color: map-get($colors, 'dark-gray');
-  color: map-get($colors, 'white');
+  background-color: map.get($colors, 'dark-gray');
+  color: map.get($colors, 'white');
   position: relative;
   background-image: url('@/img/gym.png');
   background-size: 100%;
@@ -210,17 +212,17 @@ const goToSignUp = () => {
 // ========================
 .right-section {
   width: 50vw;
-  background-color: map-get($colors, 'white');
+  background-color: map.get($colors, 'white');
   position: relative;
   @include flex-center;
   flex-direction: column;
-  padding: map-get($spacing, '3xl');
+  padding: map.get($spacing, '3xl');
 }
 
 .login-header {
-  font-size: map-get($typography, 'button');
+  font-size: map.get($typography, 'button');
   font-weight: bold;
-  margin-bottom: map-get($spacing, '3xl');
+  margin-bottom: map.get($spacing, '3xl');
   letter-spacing: 2px;
 }
 
@@ -228,22 +230,22 @@ const goToSignUp = () => {
   @include flex-column;
   width: 100%;
   max-width: 350px;
-  gap: map-get($spacing, 'xl');
+  gap: map.get($spacing, 'xl');
 }
 
 .login-button {
   @include button-base;
   @include flex-center;
-  background-color: map-get($colors, 'black');
-  color: map-get($colors, 'white');
-  padding: map-get($spacing, 'lg') map-get($spacing, 'xl');
-  border-radius: map-get($radius, 'md');
-  font-size: map-get($typography, 'button');
-  margin-top: map-get($spacing, 'xl');
+  background-color: map.get($colors, 'black');
+  color: map.get($colors, 'white');
+  padding: map.get($spacing, 'lg') map.get($spacing, 'xl');
+  border-radius: map.get($radius, 'md');
+  font-size: map.get($typography, 'button');
+  margin-top: map.get($spacing, 'xl');
   width: 100%;
 
   &:hover:not(:disabled) {
-    background-color: map-get($colors, 'gray-hover');
+    background-color: map.get($colors, 'gray-hover');
   }
 
   &:disabled {
@@ -256,12 +258,12 @@ const goToSignUp = () => {
   width: 100%;
   max-width: 350px;
   height: 1px;
-  background-color: map-get($colors, 'border');
-  margin: map-get($spacing, '2xl') 0;
+  background-color: map.get($colors, 'border');
+  margin: map.get($spacing, '2xl') 0;
 }
 
 .signup-prompt {
-  font-size: map-get($typography, 'base');
+  font-size: map.get($typography, 'base');
   cursor: pointer;
   transition: opacity 0.2s ease;
 
@@ -271,7 +273,7 @@ const goToSignUp = () => {
 }
 
 .signup-link {
-  color: map-get($colors, 'error');
+  color: map.get($colors, 'error');
   font-weight: bold;
 }
 </style>
