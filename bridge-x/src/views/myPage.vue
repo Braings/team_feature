@@ -215,7 +215,6 @@ const calculateBMI = () => {
 };
 
 const handleLogout = () => {
-  localStorage.removeItem('authToken');
   localStorage.removeItem('username');
   router.push({ name: 'homePage' });
 };

@@ -48,7 +48,6 @@ export async function submitSignup() {
     username: signupFormData.username,
     nickname: signupFormData.nickname,
     password: signupFormData.password,
-    passwordcheck: signupFormData.passwordcheck,
 
     email: signupFormData.email,
     birthday: signupFormData.birthday,

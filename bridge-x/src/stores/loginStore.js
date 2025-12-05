@@ -35,13 +35,8 @@ export async function submitLogin() {
     const response = await post('/api/login', dataToSend)
     console.log('로그인 성공:', response)
 
-    if (response && response.token) {
-      // 토큰 저장 (쿠키)
-      localStorage.setItem('authToken', response.token);
-
-    } else {
-      // 토큰 저장 실패
-      throw new Error(response.message || '로그인 인증 정보가 부족합니다.');
+    if (response && response.success === false) {
+      throw new Error(response.message || '로그인에 실패했습니다.');
     }
 
     return response;

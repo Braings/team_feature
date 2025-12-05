@@ -53,7 +53,7 @@ async function request(path, options = {}) {
 
   // 응답 상태가 성공(res.ok = 2xx)이 아닐 경우 에러 처리
   if (!res.ok) {
-    const err = new Error(data?.message || res.statusText || 'API error');
+    const err = new Error(data?.message || res.statusText || 'API 문제');
     err.status = res.status; // HTTP 상태 코드 저장
     err.raw = data; // 응답 데이터 원본 저장
     throw err; // 호출 함수에서 catch 할 수 있도록 에러 발생
@@ -228,6 +228,69 @@ export async function deleteReview(reviewId) {
     method: 'DELETE', // DELETE 메서드 사용
   });
 }
+
+
+// --------------------------------------------------------------- //
+
+// Comment Board API Endpoints (/api/comments)
+
+// ===============================================================
+// 댓글 목록 조회 API 함수
+// ===============================================================
+
+// 댓글 목록을 검색 및 필터링하여 조회합니다.
+  // @param {Object} query - 검색 및 페이지네이션을 위한 쿼리 파라미터 객체
+  // @returns {Promise<Object>} 댓글 목록 및 관련 메타데이터
+
+export async function getComments(query = {}) {
+  // 쿼리 객체를 'page=1&limit=10' 형태의 URLSearchParams로 변환
+  const params = new URLSearchParams(query);
+  return get(`/api/comments?${params.toString()}`);
+}
+
+// ===============================================================
+// 댓글 생성 API 함수
+// ===============================================================
+
+// 새로운 댓글을 생성합니다.
+  // @param {Object} data - 생성할 댓글 데이터 (제목, 내용, 태그 등)
+  // @returns {Promise<Object>} 생성된 댓글 데이터 (ID, 생성 시간 등 포함)
+
+export async function createComment(data) {
+  return post('/api/comments', data);
+}
+
+// ===============================================================
+// 댓글 수정 API 함수
+// ===============================================================
+
+// 특정 ID를 가진 댓글을 수정합니다.
+ // @param {string|number} reviewId - 수정할 댓글의 고유 ID
+ // @param {Object} data - 수정 내용이 담긴 데이터 객체
+ // @returns {Promise<Object>} 업데이트된 댓글 데이터
+
+export async function updateComment(commentId, data) {
+  return request(`/api/comments/${commentId}`, {
+    method: 'PUT', // PUT 메서드 사용: 리소스 전체를 업데이트
+    body: JSON.stringify(data),
+  });
+}
+
+
+// ===============================================================
+// 댓글 삭제 API 함수
+// ===============================================================
+
+// 특정 ID를 가진 댓글을 삭제합니다.
+  // @param {string|number} reviewId - 삭제할 댓글의 고유 ID
+  // @returns {Promise<Object>} 삭제 성공 응답
+
+export async function deletlComment(commentId) {
+  return request(`/api/comments/${commentId}`, {
+    method: 'DELETE', // DELETE 메서드 사용
+  });
+}
+
 
 // --------------------------------------------------------------- //
 

@@ -85,7 +85,6 @@ import FacilityDetailModal from './facilityDetailModal.vue'
 const showDropdown = ref(false)
 const selectedRegion = ref('')
 const selectedCity = ref('')
-const selectedRegionElement = ref(null)
 const dropdownPosition = reactive({ top: '0px', left: '0px' })
 
 // 드롭다운 스타일 계산
@@ -117,65 +116,103 @@ const selectCity = async (city) => {
 
 // SVG 지도 클릭 이벤트 처리
 const handleMapClick = (event) => {
-  const target = event.target
-  const regionGroup = target.closest('[data-name]')
+  const target = event.target;
+  const regionGroup = target.closest('[data-name]');
 
   if (regionGroup) {
-    // 이전 선택 영역 스타일 제거
-    if (selectedRegionElement.value) {
-      const prevPaths = selectedRegionElement.value.querySelectorAll('path, polygon')
-      prevPaths.forEach(el => {
-        el.style.stroke = ''
-        el.style.strokeWidth = ''
-        el.style.fill = ''
-      })
+    // 1. SVG의 data-name 값 (약칭, 예: '충북')을 가져옵니다.
+    const svgRegionName = regionGroup.getAttribute('data-name');
+
+    // 2. 매핑 객체를 사용하여 정식 명칭으로 변환합니다. (예: '충청북도')
+    const fullRegionName = regionNameMap[svgRegionName];
+
+    // 3. 지역 데이터가 유효하지 않거나 이미 선택된 지역을 다시 클릭한 경우 처리
+    if (!fullRegionName || !regionCities[fullRegionName]) {
+      // 유효하지 않은 지역 경고 (기존 로직 유지)
+      if (!regionCities[fullRegionName]) {
+        console.warn(`[지도 클릭 경고] 매핑된 '${fullRegionName}'에 대한 시/군/구 데이터가 regionCities에 없습니다.`);
+      }
+      return;
     }
 
-    // 새로운 영역 선택
-    const region = regionGroup.getAttribute('data-name')
-    selectedRegionElement.value = regionGroup
+    // 4. 이전 선택 영역 스타일 제거
+    // 이전에 선택되었던 지역의 DOM 요소를 찾아서 스타일을 초기화합니다.
+    if (selectedRegion.value) {
+      // 기존 선택된 지역의 data-name 약칭을 다시 찾아야 합니다.
+      const prevSvgRegionName = Object.keys(regionNameMap).find(key => regionNameMap[key] === selectedRegion.value);
 
-    // 선택된 영역 내 모든 path/polygon에 스타일 적용
-    const paths = regionGroup.querySelectorAll('path, polygon')
+      if (prevSvgRegionName) {
+        // SVG 내에서 이전 data-name을 가진 그룹 요소를 찾습니다.
+        const prevRegionGroup = document.querySelector(`.svg-wrapper g[data-name="${prevSvgRegionName}"]`);
+
+        if (prevRegionGroup && prevRegionGroup !== regionGroup) {
+          const prevPaths = prevRegionGroup.querySelectorAll('path, polygon');
+          prevPaths.forEach(el => {
+            el.style.fill = ''; // 초기화
+            el.style.stroke = '';
+            el.style.strokeWidth = '';
+          });
+        }
+      }
+    }
+
+    // 5. 새로운 영역 선택 및 변수 업데이트
+    // 선택된 지역을 정식 명칭으로 업데이트하고 도시를 초기화합니다.
+    if (selectedRegion.value !== fullRegionName) {
+      selectedRegion.value = fullRegionName;
+      selectedCity.value = '';
+      setSelectedRegionAndCity(fullRegionName, ''); // 외부 함수 호출
+    }
+
+    // 6. 선택된 영역에 스타일 적용
+    const paths = regionGroup.querySelectorAll('path, polygon');
     paths.forEach(el => {
-      el.style.fill = '#4caf50'
-      el.style.stroke = 'none'
-    })
+      el.style.fill = '#4caf50';
+      el.style.stroke = 'none';
+    });
 
-    // SVG 컨테이너의 위치 기준으로 드롭다운 위치 계산
-    const mapContainer = document.querySelector('.map-container')
-    const containerRect = mapContainer.getBoundingClientRect()
+    // 7. 드롭다운 위치 계산 및 표시 로직 최적화
+    const mapContainer = document.querySelector('.map-container');
+    if (!mapContainer) return;
 
-    // 마우스 위치 (클릭 위치 기준)
-    let mouseX = event.clientX - containerRect.left
-    let mouseY = event.clientY - containerRect.top
+    const containerRect = mapContainer.getBoundingClientRect();
 
-    // 드롭다운 크기 (대략적인 크기로 초기 계산)
-    const dropdownWidth = 200
-    const dropdownHeight = 300
+    let mouseX = event.clientX - containerRect.left;
+    let mouseY = event.clientY - containerRect.top;
 
-    // 오른쪽 여백 체크: 드롭다운이 컨테이너를 벗어나면 왼쪽에 배치
-    if (mouseX + dropdownWidth + 10 > containerRect.width) {
-      mouseX = Math.max(10, mouseX - dropdownWidth - 10)
-    } else {
-      mouseX = mouseX + 10
+    // 드롭다운 크기 변수화
+    const DROPDOWN_WIDTH = 250;
+    const DROPDOWN_HEIGHT = 350;
+    const PADDING = 10;
+
+    // 오른쪽 여백 체크 및 위치 조정
+    let newLeft = mouseX + PADDING;
+    if (newLeft + DROPDOWN_WIDTH > containerRect.width) {
+      newLeft = mouseX - DROPDOWN_WIDTH - PADDING;
+      // 왼쪽으로 조정해도 컨테이너 밖으로 나가는 경우, 컨테이너 왼쪽 끝에 붙입니다.
+      if (newLeft < PADDING) {
+        newLeft = PADDING;
+      }
     }
 
-    // 아래쪽 여백 체크: 드롭다운이 컨테이너를 벗어나면 위쪽에 배치
-    if (mouseY + dropdownHeight > containerRect.height) {
-      mouseY = Math.max(10, mouseY - dropdownHeight - 10)
+    // 아래쪽 여백 체크 및 위치 조정
+    let newTop = mouseY;
+    if (newTop + DROPDOWN_HEIGHT > containerRect.height) {
+      newTop = mouseY - DROPDOWN_HEIGHT - PADDING;
+      // 위로 조정해도 컨테이너 밖으로 나가는 경우, 컨테이너 상단 끝에 붙입니다.
+      if (newTop < PADDING) {
+        newTop = PADDING;
+      }
     }
+
 
     // 드롭다운 위치 설정
-    dropdownPosition.top = Math.max(0, mouseY) + 'px'
-    dropdownPosition.left = Math.max(0, mouseX) + 'px'
+    dropdownPosition.top = Math.max(0, newTop) + 'px';
+    dropdownPosition.left = Math.max(0, newLeft) + 'px';
 
-    selectedRegion.value = region
-    selectedCity.value = ''
-    showDropdown.value = true
-    setSelectedRegionAndCity(region, '')
+    showDropdown.value = true;
   }
-}
+};
 
 // SVG 지도 초기화 (마운트 시 실행)
 const initializeMap = () => {
@@ -222,87 +259,562 @@ onMounted(() => {
   initializeMap()
 })
 
+// svg.data -> regionCities 맵핑
+const regionNameMap = {
+  '서울': '서울특별시',
+  '부산': '부산광역시',
+  '대구': '대구광역시',
+  '인천': '인천광역시',
+  '광주': '광주광역시',
+  '대전': '대전광역시',
+  '울산': '울산광역시',
+  '세종': '세종특별자치시',
+  '경기': '경기도',
+  '강원': '강원특별자치도', // CSV 데이터에서 '강원특별자치도'로 추출되었습니다.
+  '충북': '충청북도',
+  '충남': '충청남도',
+  '전북': '전라북도',
+  '전남': '전라남도',
+  '경북': '경상북도',
+  '경남': '경상남도',
+  '제주': '제주특별자치도',
+};
+
 // 지역별 도시/구 데이터
 const regionCities = reactive({
-'서울': [
-    '강남구', '강동구', '강북구', '강서구', '관악구', '광진구', '구로구', '금천구', '노원구',
-    '도봉구', '동대문구', '동작구', '마포구', '서대문구', '서초구', '성동구', '성북구',
-    '송파구', '양천구', '영등포구', '용산구', '은평구', '종로구', '중구', '중랑구'
+
+  '강원특별자치도': [
+
+    '강릉시',
+
+    '고성군',
+
+    '동해시',
+
+    '삼척시',
+
+    '속초시',
+
+    '양구군',
+
+    '양양군',
+
+    '영월군',
+
+    '원주시',
+
+    '인제군',
+
+    '정선군',
+
+    '철원군',
+
+    '춘천시',
+
+    '태백시',
+
+    '평창군',
+
+    '홍천군',
+
+    '화천군',
+
+    '횡성군',
+
   ],
-  '경기': [
-    '수원시 장안구', '수원시 권선구', '수원시 팔달구', '수원시 영통구',
-    '성남시 수정구', '성남시 중원구', '성남시 분당구',
-    '안양시 만안구', '안양시 동안구',
-    '안산시 상록구', '안산시 단원구',
-    '용인시 처인구', '용인시 기흥구', '용인시 수지구',
-    '고양시 덕양구', '고양시 일산동구', '고양시 일산서구',
+
+  '경기도': [
+
+    '고양시',
+
+    '과천시',
+
+    '광명시',
+
+    '광주시',
+
+    '구리시',
+
+    '군포시',
+
+    '김포시',
+
+    '남양주시',
+
+    '동두천시',
+
     '부천시',
-    '평택시', '화성시', '남양주시', '광명시', '동두천시', '과천시', '구리시', '오산시',
-    '시흥시', '군포시', '의왕시', '하남시', '이천시', '안성시', '김포시', '광주시',
-    '파주시', '포천시', '양주시', '여주시', '연천군', '가평군', '양평군'
+
+    '성남시',
+
+    '수원시',
+
+    '시흥시',
+
+    '안산시',
+
+    '안성시',
+
+    '안양시',
+
+    '양주시',
+
+    '양평군',
+
+    '여주시',
+
+    '연천군',
+
+    '오산시',
+
+    '용인시',
+
+    '의왕시',
+
+    '의정부시',
+
+    '이천시',
+
+    '파주시',
+
+    '평택시',
+
+    '포천시',
+
+    '하남시',
+
+    '화성시',
+
   ],
-  '인천': [
-    '중구', '동구', '미추홀구', '연수구', '남동구', '부평구', '계양구', '서구',
-    '강화군', '옹진군'
+
+  '경상남도': [
+
+    '거제시',
+
+    '거창군',
+
+    '고성군',
+
+    '김해시',
+
+    '남해군',
+
+    '밀양시',
+
+    '사천시',
+
+    '산청군',
+
+    '양산시',
+
+    '의령군',
+
+    '진주시',
+
+    '창녕군',
+
+    '창원시',
+
+    '창원시 마산합포구',
+
+    '창원시 마산회원구',
+
+    '창원시 성산구',
+
+    '창원시 의창구',
+
+    '창원시 진해구',
+
+    '통영시',
+
+    '하동군',
+
+    '함안군',
+
+    '함양군',
+
+    '합천군',
+
   ],
-  '강원': [
-    '춘천시', '원주시', '강릉시', '동해시', '태백시', '속초시', '삼척시', '홍천군',
-    '횡성군', '영월군', '평창군', '정선군', '철원군', '화천군', '양구군', '인제군',
-    '고성군', '양양군'
+
+  '경상북도': [
+
+    '경산시',
+
+    '경주시',
+
+    '고령군',
+
+    '구미시',
+
+    '김천시',
+
+    '문경시',
+
+    '봉화군',
+
+    '상주시',
+
+    '성주군',
+
+    '안동시',
+
+    '영덕군',
+
+    '영양군',
+
+    '영주시',
+
+    '영천시',
+
+    '예천군',
+
+    '울릉군',
+
+    '울진군',
+
+    '의성군',
+
+    '청도군',
+
+    '청송군',
+
+    '칠곡군',
+
+    '포항시',
+
   ],
-  '충북': [
-    '청주시 상당구', '청주시 서원구', '청주시 흥덕구', '청주시 청원구',
-    '충주시', '제천시', '보은군', '옥천군', '영동군', '증평군', '진천군',
-    '괴산군', '음성군', '단양군'
+
+  '광주광역시': [
+
+    '광산구',
+
+    '남구',
+
+    '동구',
+
+    '북구',
+
+    '서구',
+
   ],
-  '충남': [
-    '천안시 동남구', '천안시 서북구',
-    '공주시', '보령시', '아산시', '서산시', '논산시', '계룡시', '당진시', '금산군',
-    '부여군', '서천군', '청양군', '홍성군', '예산군', '태안군'
+
+  '대구광역시': [
+
+    '남구',
+
+    '달서구',
+
+    '달성군',
+
+    '동구',
+
+    '북구',
+
+    '서구',
+
+    '수성구',
+
+    '중구',
+
   ],
-  '전북': [
-    '전주시 완산구', '전주시 덕진구',
-    '군산시', '익산시', '정읍시', '남원시', '김제시', '완주군', '진안군', '무주군',
-    '장수군', '임실군', '순창군', '고창군', '부안군'
+
+  '대전광역시': [
+
+    '대덕구',
+
+    '동구',
+
+    '서구',
+
+    '유성구',
+
+    '중구',
+
   ],
-  '전남': [
-    '목포시', '여수시', '순천시', '나주시', '광양시', '담양군', '곡성군', '구례군',
-    '고흥군', '보성군', '화순군', '장흥군', '강진군', '해남군', '영암군', '무안군',
-    '함평군', '영광군', '장성군', '완도군', '진도군', '신안군'
+
+  '부산광역시': [
+
+    '강서구',
+
+    '금정구',
+
+    '기장군',
+
+    '남구',
+
+    '동구',
+
+    '동래구',
+
+    '부산진구',
+
+    '북구',
+
+    '사상구',
+
+    '사하구',
+
+    '서구',
+
+    '수영구',
+
+    '연제구',
+
+    '영도구',
+
+    '중구',
+
+    '해운대구',
+
   ],
-  '경북': [
-    '포항시 남구', '포항시 북구',
-    '경주시', '김천시', '안동시', '구미시', '영주시', '영천시', '상주시', '문경시',
-    '경산시', '군위군', '의성군', '청송군', '영양군', '영덕군', '청도군', '고령군',
-    '성주군', '예천군', '봉화군', '울진군', '울릉군', '칠곡군'
+
+  '서울특별시': [
+
+    '강남구',
+
+    '강동구',
+
+    '강북구',
+
+    '강서구',
+
+    '관악구',
+
+    '광진구',
+
+    '구로구',
+
+    '금천구',
+
+    '노원구',
+
+    '도봉구',
+
+    '동대문구',
+
+    '동작구',
+
+    '마포구',
+
+    '서대문구',
+
+    '서초구',
+
+    '성동구',
+
+    '성북구',
+
+    '송파구',
+
+    '양천구',
+
+    '영등포구',
+
+    '용산구',
+
+    '은평구',
+
+    '종로구',
+
+    '중구',
+
+    '중랑구',
+
   ],
-  '경남': [
-    '창원시 의창구', '창원시 성산구', '창원시 마산합포구', '창원시 마산회원구', '창원시 진해구',
-    '진주시', '통영시', '사천시', '김해시', '밀양시', '거제시', '양산시', '의령군',
-    '함안군', '창녕군', '고성군', '남해군', '하동군', '산청군', '함양군', '거창군', '합천군'
+
+  '세종특별자치시': [
+
+    '세종특별자치시',
+
   ],
-  '부산': [
-    '중구', '서구', '동구', '영도구', '부산진구', '동래구', '남구', '북구',
-    '해운대구', '사하구', '금정구', '강서구', '연제구', '수영구', '사상구', '기장군'
+
+  '울산광역시': [
+
+    '남구',
+
+    '동구',
+
+    '북구',
+
+    '울주군',
+
+    '중구',
+
   ],
-  '대구': [
-    '중구', '동구', '서구', '남구', '북구', '수성구', '달서구', '달성군', '군위군'
+
+  '인천광역시': [
+
+    '강화군',
+
+    '계양구',
+
+    '남동구',
+
+    '동구',
+
+    '미추홀구',
+
+    '부평구',
+
+    '서구',
+
+    '연수구',
+
+    '옹진군',
+
+    '중구',
+
   ],
-  '광주': [
-    '동구', '서구', '남구', '북구', '광산구'
+
+  '전라남도': [
+
+    '강진군',
+
+    '고흥군',
+
+    '곡성군',
+
+    '광양시',
+
+    '구례군',
+
+    '나주시',
+
+    '담양군',
+
+    '목포시',
+
+    '무안군',
+
+    '보성군',
+
+    '순천시',
+
+    '신안군',
+
+    '여수시',
+
+    '영광군',
+
+    '영암군',
+
+    '완도군',
+
+    '장성군',
+
+    '장흥군',
+
+    '진도군',
+
+    '함평군',
+
+    '해남군',
+
+    '화순군',
+
   ],
-  '대전': [
-    '동구', '중구', '서구', '유성구', '대덕구'
+
+  '전라북도': [
+
+    '고창군',
+
+    '군산시',
+
+    '김제시',
+
+    '남원시',
+
+    '무주군',
+
+    '부안군',
+
+    '순창군',
+
+    '완주군',
+
+    '익산시',
+
+    '임실군',
+
+    '장수군',
+
+    '전주시',
+
+    '정읍시',
+
+    '진안군',
+
   ],
-  '울산': [
-    '중구', '남구', '동구', '북구', '울주군'
+
+  '제주특별자치도': [
+
+    '서귀포시',
+
+    '제주시',
+
   ],
-  '세종': [
-    '세종시'
+
+  '충청남도': [
+
+    '계룡시',
+
+    '공주시',
+
+    '금산군',
+
+    '논산시',
+
+    '당진시',
+
+    '보령시',
+
+    '부여군',
+
+    '서산시',
+
+    '서천군',
+
+    '아산시',
+
+    '예산군',
+
+    '천안시',
+
+    '청양군',
+
+    '태안군',
+
+    '홍성군',
+
   ],
-  '제주': [
-    '제주시', '서귀포시'
-  ]
+
+  '충청북도': [
+
+    '괴산군',
+
+    '단양군',
+
+    '보은군',
+
+    '영동군',
+
+    '옥천군',
+
+    '음성군',
+
+    '제천시',
+
+    '증평군',
+
+    '진천군',
+
+    '청주시',
+
+    '충주시',
+
+  ],
+
 })
 </script>
 

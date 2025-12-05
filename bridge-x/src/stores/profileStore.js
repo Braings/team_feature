@@ -75,7 +75,7 @@ export async function submitUserProfileData() {
     const response = await post('/api/users/profile', dataToSend)
     console.log('로그인 성공:', response)
 
-    if (response && response.token) {
+    if (response) {
       localStorage.setItem('username', response.username || '' );
       localStorage.setItem('email', response.email || '' );
       localStorage.setItem('birthday', response.birthday || '' );

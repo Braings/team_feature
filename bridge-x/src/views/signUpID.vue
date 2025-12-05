@@ -138,9 +138,8 @@ const handleNext = async () => {
 
   // 전역 store에 데이터 저장
   signupFormData.username = formData.username;
-  signupFormData.password = formData.nickname;
+  signupFormData.nickname = formData.nickname;
   signupFormData.password = formData.password;
-  signupFormData.password = formData.passwordCheck;
 
   // 다음 단계로 이동
   router.push({ name: 'sign.private' });
