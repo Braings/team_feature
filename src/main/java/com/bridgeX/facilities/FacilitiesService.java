@@ -32,7 +32,7 @@ public class FacilitiesService {
 	// 하나만 검색
 	public FacilitiesResponse getFacility(Long id) {
         FacilitiesInfo entity = facilitiesRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("시설을 찾을 수 없습니다. id=" + id));
+                .orElseThrow(() -> new IllegalArgumentException("[SERVER]: 시설을 찾을 수 없습니다. id=" + id));
         return toResponse(entity);
     }
 	

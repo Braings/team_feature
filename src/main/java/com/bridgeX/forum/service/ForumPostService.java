@@ -32,7 +32,7 @@ public class ForumPostService {
 
     public ForumPost getPost(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Post not found"));
+                .orElseThrow(() -> new RuntimeException("[SERVER]: Post not found"));
     }
 
     public void deletePost(Long id) {

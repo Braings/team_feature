@@ -36,7 +36,7 @@ public class UserApiController {
     @PostMapping("/sign")
     public ResponseEntity<?> signup(@RequestBody @Valid SignupRequest dto) {
         userService.signup(dto);
-        return ResponseEntity.ok("signup success");
+        return ResponseEntity.ok("[SERVER]: signup success");
     }
     
     // Login

@@ -23,7 +23,7 @@ public class UserExceptionHandler {
                 })
                 .map(err -> err.getDefaultMessage())
                 .findFirst()
-                .orElse("잘못된 요청입니다.");
+                .orElse("[SERVER]: 잘못된 요청입니다.");
 
         return ResponseEntity.badRequest().body(message);
     }
