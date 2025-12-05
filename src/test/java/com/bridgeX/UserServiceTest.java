@@ -26,7 +26,6 @@ public class UserServiceTest {
         LoginResponse response = userService.login(request);
 
         assertThat(response.isSuccess()).isTrue();
-        assertThat(response.getMessage()).isEqualTo("로그인 성공");
     }
     /*
     @Test

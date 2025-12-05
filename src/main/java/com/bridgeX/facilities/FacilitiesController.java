@@ -1,5 +1,7 @@
 package com.bridgeX.facilities;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -26,10 +28,13 @@ public class FacilitiesController {
     
     @GetMapping
     public ResponseEntity<List<FacilitiesResponse>> search(
-            @RequestParam String region,
-            @RequestParam String city
+            @RequestParam("region") String region,
+            @RequestParam("city") String city
     ) {
-        List<FacilitiesResponse> list = facilitiesService.searchFacilities(region, city);
+    	String decodedRegion = URLDecoder.decode(region, StandardCharsets.UTF_8);
+        String decodedCity   = URLDecoder.decode(city, StandardCharsets.UTF_8);
+        
+        List<FacilitiesResponse> list = facilitiesService.searchFacilities(decodedRegion, decodedCity);
         return ResponseEntity.ok(list);
     }
 

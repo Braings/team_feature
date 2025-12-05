@@ -73,7 +73,7 @@ public class UserService {
 
         if (siteUserOpt.isEmpty()) {
             response.setSuccess(false);
-            response.setMessage("[SERVER]: 존재하지 않는 아이디입니다.");
+            // response.setMessage("[SERVER]: 존재하지 않는 아이디입니다.");
             return response;
         }
 
@@ -82,12 +82,12 @@ public class UserService {
         // Check Password
         if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
             response.setSuccess(false);
-            response.setMessage("[SERVER]: 비밀번호가 일치하지 않습니다.");
+            // response.setMessage("[SERVER]: 비밀번호가 일치하지 않습니다.");
             return response;
         }
 
         response.setSuccess(true);
-        response.setMessage("[SERVER]: 로그인 성공");
+        // response.setMessage("[SERVER]: 로그인 성공");
         // TODO: 나중에 토큰, 만료시간 등도 여기에
 
         return response;

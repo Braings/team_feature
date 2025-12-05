@@ -12,6 +12,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class LoginResponse {
 	private boolean success;
-	private String message;
+	// private String message;
 // TODO: 나중에 토큰이나 유저 정보도 추가 가능
 }

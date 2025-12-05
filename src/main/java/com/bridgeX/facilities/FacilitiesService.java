@@ -22,11 +22,24 @@ public class FacilitiesService {
 	
     // 시군구 입력 값 기반 검색
     public List<FacilitiesResponse> searchFacilities(String region, String city) {
+        System.out.println(">>> service 입력: region=" + region + ", city=" + city);
+
+        List<FacilitiesInfo> result =
+                facilitiesRepository.searchByRegionAndCity(region, city);
+
+        System.out.println(">>> service 결과 개수 = " + result.size());
+
+        return result.stream()
+                .map(FacilitiesResponse::from) // 혹은 직접 매핑
+                .toList();
+    }
+    /*
+    public List<FacilitiesResponse> searchFacilities(String region, String city) {
         return facilitiesRepository.findByFcltyManageCtprvnNmAndFcltyManageSignguNm(region, city)
             .stream().map(FacilitiesResponse::from)
             .toList();
     }
-
+	*/
 
     
 	// 하나만 검색
