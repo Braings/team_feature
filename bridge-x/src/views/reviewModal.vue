@@ -46,7 +46,6 @@ const props = defineProps({
     type: Boolean,
     required: true
   },
-  // 수정 기능을 위해 reviewId를 받기.
   reviewId: {
     type: [String, Number],
     default: null
@@ -54,11 +53,10 @@ const props = defineProps({
   // 수정 시 기존 데이터를 받기 위한 prop
   initialData: {
     type: Object,
-    default: () => ({ content: '' })
+    default: () => ({ title: '', content: '', tag: '' })
   }
 });
 
-// Events 정의
 const emit = defineEmits(['close', 'submit-success']);
 
 // 리뷰 데이터 상태
@@ -66,19 +64,21 @@ const reviewData = reactive({
   content: props.initialData.content,
   title: props.initialData.title || '',
   tag: props.initialData.tag || '',
-  suggestion: props.initialData.suggestion || 0,
+  recommend: props.initialData.recommend || 0,
   views: props.initialData.views || 0,
   nickname: props.initialData.nickname || '',
   username: props.initialData.username || '',
 });
 
-// 4. 모달이 열릴 때 초기 데이터를 설정합니다.
+// 모달이 열릴 때 초기 데이터를 설정합니다.
 watch(() => props.isOpen, (newVal) => {
     if (newVal) {
+        // prop에서 현재 값을 가져와 reactive 상태에 복사
         reviewData.content = props.initialData.content;
         reviewData.title = props.initialData.title || '';
         reviewData.tag = props.initialData.tag || '';
-        reviewData.suggestion = props.initialData.suggestion || 0;
+        // 💡 'recommend' 필드 사용
+        reviewData.recommend = props.initialData.recommend || 0;
         reviewData.views = props.initialData.views || 0;
         reviewData.nickname = props.initialData.nickname || '';
         reviewData.username = props.initialData.username || '';
@@ -94,12 +94,13 @@ const closeModal = () => {
 // 리뷰 제출 로직
 const submitReview = async () => {
 
-    // 서버로 보낼 데이터 (rating은 폼에 없으므로 제외하고, 있다면 추가 가능)
+    // 서버로 보낼 데이터
     const payload = {
       tag: reviewData.tag,
       title: reviewData.title,
       content: reviewData.content,
-      suggestion: reviewData.suggestion,
+      // 💡 'recommend' 필드 사용
+      recommend: reviewData.recommend,
       views: reviewData.views,
       nickname: reviewData.nickname,
       username: reviewData.username,
@@ -109,14 +110,16 @@ const submitReview = async () => {
 
     try {
         if (props.reviewId) {
+            // 수정
             result = await updateReview(props.reviewId, payload);
             console.log('리뷰 수정 성공:', result);
         } else {
+            // 작성
             result = await createReview(payload);
             console.log('리뷰 작성 성공:', result);
         }
 
-        // 부모 컴포넌트에 서버 응답 결과를 전달
+        // 부모 컴포넌트(reviewDetail.vue)에 서버 응답 결과 전달
         emit('submit-success', result);
         closeModal();
 

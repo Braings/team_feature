@@ -285,7 +285,7 @@ export async function updateComment(commentId, data) {
   // @param {string|number} reviewId - 삭제할 댓글의 고유 ID
   // @returns {Promise<Object>} 삭제 성공 응답
 
-export async function deletlComment(commentId) {
+export async function deleteComment(commentId) {
   return request(`/api/comments/${commentId}`, {
     method: 'DELETE', // DELETE 메서드 사용
   });
@@ -301,5 +301,6 @@ export async function deletlComment(commentId) {
 export default {
     API_BASE, request, post, get,
     getReviews, getReviewDetail, createReview, updateReview, deleteReview,
-    getUserProfile, updateProfile, loadExerciseFacilities
+    getUserProfile, updateProfile, loadExerciseFacilities,
+    createComment, updateComment, deleteComment
 };
