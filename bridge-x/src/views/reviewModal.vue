@@ -68,6 +68,7 @@ const reviewData = reactive({
   views: props.initialData.views || 0,
   nickname: props.initialData.nickname || '',
   username: props.initialData.username || '',
+  reviewId: props.initialData.reviewId || '',
 });
 
 // 모달이 열릴 때 초기 데이터를 설정합니다.
@@ -77,11 +78,11 @@ watch(() => props.isOpen, (newVal) => {
         reviewData.content = props.initialData.content;
         reviewData.title = props.initialData.title || '';
         reviewData.tag = props.initialData.tag || '';
-        // 💡 'recommend' 필드 사용
         reviewData.recommend = props.initialData.recommend || 0;
         reviewData.views = props.initialData.views || 0;
         reviewData.nickname = props.initialData.nickname || '';
         reviewData.username = props.initialData.username || '';
+        reviewData.reviewId = props.initialData.reviewId || '';
     }
 });
 
@@ -104,6 +105,7 @@ const submitReview = async () => {
       views: reviewData.views,
       nickname: reviewData.nickname,
       username: reviewData.username,
+      reviewId: reviewData.reviewId,
     };
 
     let result = null;

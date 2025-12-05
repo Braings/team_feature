@@ -11,6 +11,7 @@ export const reviewsData = reactive({
   views: 0,
   nickname: '',
   username: '',
+  reviewID: '',
 
   // Reset 함수
   reset() {
@@ -22,6 +23,7 @@ export const reviewsData = reactive({
     this.views = 0
     this.nickname = ''
     this.username = ''
+    this.reviewID = ''
   }
 })
 
@@ -37,6 +39,7 @@ export async function submitReviews() {
     tag: reviewsData.tag,
     nickname: reviewsData.nickname,
     username: reviewsData.username,
+    reviewID: reviewsData.reviewID,
   }
 
   try {

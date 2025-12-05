@@ -50,7 +50,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(post) in pagedPosts" :key="post.username" :style="{ fontFamily: 'SCDream5'}"  @click="openPost(post)" >
+              <tr v-for="(post) in pagedPosts" :key="post.reviewID" :style="{ fontFamily: 'SCDream5'}"  @click="openPost(post)" >
                 <td class="col-no">{{ post.no }}</td>
                 <td class="col-tag">{{ post.tag }}</td>
                 <td class="col-title">{{ post.title }}</td>
@@ -85,7 +85,7 @@
       <div class="trending-box" :style="{  boxShadow: '1px 1px 3px black'}">
         <h3 :style="{ paddingBottom: '18px', borderBottom: '2px solid #ccc', fontSize: '20px' }" > &nbsp;&nbsp; 인기글</h3>
         <ul class="trending-list">
-          <li v-for="post in trendingPosts" :key="post.username" @click="openPost(post)">
+          <li v-for="post in trendingPosts" :key="post.reviewID" @click="openPost(post)">
             <span class="trending-title" :style="{ fontFamily: 'SCDream5'}">{{ post.title }}</span>
             <span class="trending-count">{{ post.recommend }}</span>
           </li>
@@ -97,7 +97,7 @@
       <div class="recent-box" :style="{  boxShadow: '1px 1px 3px black'}">
         <h3 :style="{ paddingBottom: '18px', borderBottom: '2px solid #ccc', fontSize: '20px'}" > &nbsp;&nbsp; 최근글</h3>
         <ul class="recent-list">
-          <li v-for="post in recentPosts" :key="post.username" @click="openPost(post)">
+          <li v-for="post in recentPosts" :key="post.reviewID" @click="openPost(post)">
             <span class="recent-title" :style="{ fontFamily: 'SCDream5'}">{{ post.title }}</span>
             <span class="recent-date">{{ post.date }}</span>
           </li>
@@ -149,6 +149,7 @@ async function loadReviews() {
     // 폴백: 샘플 데이터 (37개 전체를 생성하여 클라이언트 측 필터링을 허용)
     // 💡 이 샘플 데이터는 어떤 필터링 조건에서도 항상 동일하게 전체를 생성해야 합니다.
     posts.value = Array.from({ length: 100  }).map((_, i) => ({
+      reviewID: `${i + 1}` ,
       username: `nickname${i + 1}`,
       no: 100 - i,
       tag: i % 5 === 0 ? '질문' : i % 3 === 0 ? '정보' : '리뷰',
@@ -186,7 +187,7 @@ function selectCategory(cat) {
 }
 
 function openPost(post) {
-  if (router) router.push({ name: 'reviewDetail', params: { username: post.username } }).catch(()=>{});
+  if (router) router.push({ name: 'reviewDetail', params: { reviewID: post.reviewID } }).catch(()=>{});
 }
 
 function prevPage() {

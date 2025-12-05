@@ -139,7 +139,7 @@ const route = useRoute();
 const router = useRouter();
 
 // 상세 보기 관련 상태
-const username = computed(() => route.params.username || '');
+const reviewID = computed(() => route.params.reviewID || '');
 const post = ref(null);
 const loading = ref(false);
 const error = ref(null);
@@ -154,7 +154,8 @@ async function loadPost(id) {
   try {
     const data = await getReviewDetail(id);
     post.value = data.data || data || {
-      username: id,
+      reviewID: id,
+      username: 'sss12',
       title: `샘플 게시물 제목 ${id}`,
       nickname: '운영자1',
       date: '25/11/24',
@@ -183,7 +184,7 @@ async function toggleRecommend() {
   const action = isRecommended.value ? '추천' : '추천 취소';
 
   try {
-    console.log(`[Mock API] ${action} 요청: Post ${post.value.username}`);
+    console.log(`[Mock API] ${action} 요청: Post ${post.value.reviewID}`);
     alert(`${action}되었습니다! (현재 추천 수: ${post.value.recommend})`);
   } catch (error) {
     isRecommended.value = isCurrentlyRecommended;
@@ -200,7 +201,7 @@ function goBack() {
 async function deletePost() {
   if (!post.value || !confirm('정말 삭제하시겠습니까?')) return;
   try {
-    await deleteReview(post.value.username);
+    await deleteReview(post.value.reviewID);
     alert('삭제되었습니다.');
     router.push({ name: 'reviews' }).catch(()=>{});
   } catch (error) {
@@ -210,9 +211,9 @@ async function deletePost() {
 }
 
 // Watch (상세 보기 로직 처리)
-watch(username, (newUsername) => {
-  if (newUsername) {
-    loadPost(newUsername);
+watch(reviewID, (newreviewID) => {
+  if (newreviewID) {
+    loadPost(newreviewID);
   } else {
     post.value = null;
   }
@@ -334,7 +335,7 @@ const openEditModal = () => {
 
   // 현재 게시물 데이터를 모달용 데이터에 복사
   Object.assign(detailData, {
-    id: post.value.username, // reviewId
+    id: post.value.reviewID,
     title: post.value.title,
     content: post.value.content,
     tag: post.value.tag
@@ -351,7 +352,7 @@ const closeModal = () => {
 
 const handleReviewEdit = (updatedReview) => {
   console.log('리뷰가 수정되었습니다:', updatedReview);
-  loadPost(post.value.username);
+  loadPost(post.value.reviewID);
   closeModal();
 };
 
