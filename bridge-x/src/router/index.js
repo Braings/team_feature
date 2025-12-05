@@ -64,11 +64,6 @@ const routes = [
     component: ReviewsWrite
   },
   {
-    path: '/reviews/write/:username',
-    name: 'reviewsEdit',
-    component: ReviewsWrite
-  },
-  {
     path: '/login',
     name: 'logIn',
     component: LogIn

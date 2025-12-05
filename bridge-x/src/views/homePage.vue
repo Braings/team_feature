@@ -26,26 +26,32 @@
               <div class="bar pink-bar" style="height: 10%;">21</div>
               <div class="bar green-bar" style="height: 40%;">108</div>
             </div>
-             <div class="bar-group">
-              <div class="bar pink-bar" style="height: 10%;">21</div>
-              <div class="bar green-bar" style="height: 40%;">108</div>
-            </div>
-             <div class="bar-group">
-              <div class="bar pink-bar" style="height: 10%;">21</div>
-              <div class="bar green-bar" style="height: 40%;">108</div>
-            </div>
-                         <div class="bar-group">
-              <div class="bar pink-bar" style="height: 10%;">21</div>
-              <div class="bar green-bar" style="height: 40%;">108</div>
-            </div>
-                         <div class="bar-group">
-              <div class="bar pink-bar" style="height: 10%;">21</div>
-              <div class="bar green-bar" style="height: 40%;">108</div>
-            </div>
+
             <div class="bar-group">
               <div class="bar pink-bar" style="height: 10%;">21</div>
               <div class="bar green-bar" style="height: 40%;">108</div>
             </div>
+
+            <div class="bar-group">
+              <div class="bar pink-bar" style="height: 10%;">21</div>
+              <div class="bar green-bar" style="height: 40%;">108</div>
+            </div>
+
+            <div class="bar-group">
+              <div class="bar pink-bar" style="height: 10%;">21</div>
+              <div class="bar green-bar" style="height: 40%;">108</div>
+            </div>
+
+            <div class="bar-group">
+              <div class="bar pink-bar" style="height: 10%;">21</div>
+              <div class="bar green-bar" style="height: 40%;">108</div>
+            </div>
+
+            <div class="bar-group">
+              <div class="bar pink-bar" style="height: 10%;">21</div>
+              <div class="bar green-bar" style="height: 40%;">108</div>
+            </div>
+
             <div class="x-axis-line"></div>
             <div class="y-axis-line"></div>
           </div>
@@ -58,6 +64,7 @@
           <span class="user-name">{{ userName }}</span>님의<br />
           추천 운동
         </p>
+
         <div class="recommendation-box">
           <p class="recommendation-text cursorPointer"  @click="goToPage('recommend')" >{{ exercise }}</p>
         </div>
