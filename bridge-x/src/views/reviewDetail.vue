@@ -14,7 +14,7 @@
           <select v-model="search.type" class="select">
             <option value="all">전체</option>
             <option value="title">제목</option>
-            <option value="author">작성자</option>
+            <option value="nickname">작성자</option>
           </select>
           <input v-model="search.query" placeholder="검색어 입력" class="search-input"/>
           <button class="search-btn" @click=handleSearchAndBlur($event)>검색</button>
@@ -28,7 +28,7 @@
             <header class="post-header">
               <h1 class="post-title">{{ post.title }}</h1>
               <div class="post-meta">
-                <span class="author">{{ post.nickname }}</span>
+                <span class="nickname">{{ post.nickname }}</span>
                 <span class="date">{{ post.creationTime }}</span>
                 <span class="views">조회 {{ post.views }}</span>
               </div>
@@ -80,7 +80,7 @@
                 <th class="col-no">No</th>
                 <th class="col-tag">분류</th>
                 <th class="col-title">제목</th>
-                <th class="col-author">작성자</th>
+                <th class="col-nickname">작성자</th>
                 <th class="col-date">날짜</th>
                 <th class="col-views">조회</th>
                 <th class="col-rec">추천</th>
@@ -91,7 +91,7 @@
                 <td class="col-no">{{ p.no }}</td>
                 <td class="col-tag">{{ p.tag }}</td>
                 <td class="col-title">{{ p.title }}</td>
-                <td class="col-author">{{ p.author }}</td>
+                <td class="col-nickname">{{ p.nickname }}</td>
                 <td class="col-date">{{ p.date }}</td>
                 <td class="col-views">{{ p.views }}</td>
                 <td class="col-rec">{{ p.recommend }}</td>
@@ -133,8 +133,8 @@ import { ref, reactive, onMounted, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { getReviews, getReviewDetail, deleteReview } from '@/api.js';
 import ReviewWriteModal from './reviewModal.vue';
-import { sortItems } from 'vuetify/lib/components/VDataTable/composables/sort';
-import { submitUserProfileData } from '@/stores/profileStore';
+// import { sortItems } from 'vuetify/lib/components/VDataTable/composables/sort';
+// import { submitUserProfileData } from '@/stores/profileStore';
 
 const route = useRoute();
 const router = useRouter();
@@ -185,11 +185,11 @@ async function loadReviews() {
     error.value = error.message;
     // 폴백: 샘플 데이터
     posts.value = Array.from({ length: 100 }).map((_, i) => ({
-      username: `author${i + 1}`,
+      username: `nickname${i + 1}`,
       no: 100 - i,
       tag: i % 5 === 0 ? '질문' : i % 3 === 0 ? '정보' : (i % 7 === 0 ? '잡담' : '리뷰'),
       title: `샘플 게시물 제목 ${i + 1}`,
-      author: `운영자${(i % 6) + 1}`,
+      nickname: `운영자${(i % 6) + 1}`,
       date: '25/11/' + ((i % 30) + 1).toString().padStart(2, '0'),
       views: Math.floor(Math.random() * 500),
       recommend: Math.floor(Math.random() * 50)
@@ -234,7 +234,7 @@ async function loadPost(id) {
     post.value = data.data || data || {
       username: id,
       title: `샘플 게시물 제목 ${id}`,
-      author: '운영자1',
+      nickname: '운영자1',
       date: '25/11/24',
       views: 123,
       tag: id.length % 3 === 0 ? '정보' : '질문',
@@ -247,7 +247,7 @@ async function loadPost(id) {
     post.value = {
       username: id,
       title: `샘플 게시물 제목 ${id}`,
-      author: '운영자1',
+      nickname: '운영자1',
       date: '25/11/24',
       views: 123,
       tag: id.length % 3 === 0 ? '정보' : '질문',
@@ -488,7 +488,7 @@ onMounted(() => {
           .col-no { width:7%; }
           .col-tag { width:8%; }
           .col-title { width:50%; text-align: left;}
-          .col-author { width:10%; }
+          .col-nickname { width:10%; }
           .col-date { width:10%; }
           .col-views, .col-rec { width:8%; text-align:center; }
         }

@@ -54,7 +54,7 @@ const props = defineProps({
   // 수정 시 기존 데이터를 받기 위한 prop
   initialData: {
     type: Object,
-    default: () => ({ rating: 5, content: '' })
+    default: () => ({ content: '' })
   }
 });
 
@@ -66,11 +66,10 @@ const reviewData = reactive({
   content: props.initialData.content,
   title: props.initialData.title || '',
   tag: props.initialData.tag || '',
-  creationTime: props.initialData.tag || '',
   suggestion: props.initialData.suggestion || 0,
   views: props.initialData.views || 0,
   nickname: props.initialData.nickname || '',
-
+  username: props.initialData.username || '',
 });
 
 // 4. 모달이 열릴 때 초기 데이터를 설정합니다.
@@ -79,10 +78,10 @@ watch(() => props.isOpen, (newVal) => {
         reviewData.content = props.initialData.content;
         reviewData.title = props.initialData.title || '';
         reviewData.tag = props.initialData.tag || '';
-        reviewData.creationTime = props.initialData.creationTime || '';
         reviewData.suggestion = props.initialData.suggestion || 0;
         reviewData.views = props.initialData.views || 0;
         reviewData.nickname = props.initialData.nickname || '';
+        reviewData.username = props.initialData.username || '';
     }
 });
 
@@ -100,6 +99,10 @@ const submitReview = async () => {
       tag: reviewData.tag,
       title: reviewData.title,
       content: reviewData.content,
+      suggestion: reviewData.suggestion,
+      views: reviewData.views,
+      nickname: reviewData.nickname,
+      username: reviewData.username,
     };
 
     let result = null;
