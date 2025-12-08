@@ -31,8 +31,8 @@ public class MainDbConfig {
     @Bean(name = "mainDataSource")
     public DataSource mainDataSource() {
         HikariDataSource ds = new HikariDataSource();
-        ds.setJdbcUrl("jdbc:mariadb://localhost:3306/bridgex_db");
-        ds.setUsername("bridge_user");
+        ds.setJdbcUrl("jdbc:mariadb://localhost:3306/brangx");
+        ds.setUsername("root");
         ds.setPassword("1234");
         ds.setDriverClassName("org.mariadb.jdbc.Driver");
         return ds;

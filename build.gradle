@@ -13,48 +13,35 @@ java {
 
 repositories {
 	mavenCentral()
+	maven { url 'https://repo.spring.io/milestone' }
 }
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.apache.commons:commons-csv:1.10.0'
+	// implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter:1.1.0'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	
 	// Junit Test
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test' // MockUser(Login at test)
-	
 	
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	
 	// Lombok
 	compileOnly 'org.projectlombok:lombok' 
 	annotationProcessor 'org.projectlombok:lombok'
-	
-	// DATABASE: H2 and MariaDB
-	runtimeOnly 'com.h2database:h2'
-	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client:3.4.1'
-	
-	// Thymeleaf (Backend Test Only)
-	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-	
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	testImplementation 'org.junit.jupiter:junit-jupiter' 
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
 	implementation 'org.commonmark:commonmark:0.21.0'
 	runtimeOnly 'org.postgresql:postgresql'
+	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client:3.2.0'
 	
 	// R2 Client - CloudFlare[R2 Object Storage]
-	implementation 'software.amazon.awssdk:s3:2.21.0'
-}
-
-tasks.named('test') {
-	useJUnitPlatform()
-}
-
-test {
-    useJUnitPlatform()
-}
+		implementation 'software.amazon.awssdk:s3:2.21.0'
+	}
+	
+	test {
+	    useJUnitPlatform()
+	}
+	
