@@ -1,8 +1,8 @@
 package com.bridgeX.facilities;
 
-import static org.assertj.core.api.Assertions.assertThat;
+// import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
+// import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class FacilitiesSearchTest {
 
     @Autowired
-    private FacilitiesService facilitiesService;
+    // private FacilitiesService facilitiesService;
 
     @Test
     void search_real_db() {

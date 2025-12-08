@@ -3,19 +3,21 @@ package com.bridgeX.review.domain;
 import java.time.LocalDateTime;
 
 import com.bridgeX.review.dto.ReviewUpdateRequest;
+import com.bridgeX.user.domain.SiteUser;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.validation.constraints.NotNull;
-
-
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 
@@ -29,6 +31,10 @@ public class ReviewInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private SiteUser user;
 
     private String title;
 
@@ -37,8 +43,6 @@ public class ReviewInfo {
 
     @NotNull
     private ContentTag tag;
- 
-    private String username;
 
     // DTO: creationTime
     private LocalDateTime date;
@@ -58,4 +62,8 @@ public class ReviewInfo {
         this.tag = request.getTag();
     }
 
+    public void increaseViews() {
+        if(this.views == null) { this.views = 0; } // 예외 처리
+        this.views += 1; // else
+    }
 }

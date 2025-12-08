@@ -6,8 +6,12 @@ import org.springframework.stereotype.Service;
 
 import com.bridgeX.review.domain.ReviewInfo;
 import com.bridgeX.review.dto.ReviewCreateRequest;
+import com.bridgeX.review.dto.ReviewListResponse;
+import com.bridgeX.review.dto.ReviewResponse;
 import com.bridgeX.review.dto.ReviewUpdateRequest;
 import com.bridgeX.review.repository.ReviewPostRepository;
+import com.bridgeX.user.domain.SiteUser;
+import com.bridgeX.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -16,25 +20,32 @@ import lombok.RequiredArgsConstructor;
 public class ReviewService {
 
     private final ReviewPostRepository repository;
+    private final UserRepository userRepository;
+    
+    
+    // Post Review
+    public void createPost(ReviewCreateRequest request, String currentUser) {
+        SiteUser user = userRepository.findByUsername(currentUser)
+                .orElseThrow(() -> new RuntimeException("[SERVER] 유저를 찾을 수 없습니다."));
 
-    public ReviewInfo createPost(ReviewCreateRequest request) {
         ReviewInfo post = ReviewInfo.builder()
-        		.title(request.getTitle())
-        		.content(request.getContent())
-        		.tag(request.getTag())
-        		.username(request.getUsername())
-        		.suggestion(request.getSuggestion())
-        		.views(request.getViews())
-        		.build();
-        
-        return repository.save(post);
+                .user(user)
+                .title(request.getTitle())
+                .content(request.getContent())
+                .tag(request.getTag())
+                .suggestion(request.getSuggestion())
+                .views(0)
+                .build();
+
+        repository.save(post);
     }
     
+    // Edit Review
     public void updatePost(Long id, ReviewUpdateRequest request, String currentUser) {
-        ReviewInfo post = repository.findById(id)
-            .orElseThrow(() -> new RuntimeException("[SERVER] 리뷰를 찾을 수 없습니다."));
+    	ReviewInfo post = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("[SERVER] 리뷰를 찾을 수 없습니다."));
 
-        if (!post.getUsername().equals(currentUser)) {
+        if (!post.getUser().getUsername().equals(currentUser)) {
             throw new RuntimeException("[SERVER] 게시글을 수정할 권한이 없습니다.");
         }
 
@@ -42,17 +53,71 @@ public class ReviewService {
         repository.save(post);
     }
 
-
-    public List<ReviewInfo> getAllPosts() {
-        return repository.findAll();
+    // Review List
+    public List<ReviewListResponse> getAllPosts() {
+        return repository.findAll()
+                .stream()
+                .map(this::convertToDto)
+                .toList();
     }
-
-    public ReviewInfo getPost(Long id) {
-        return repository.findById(id)
+    
+    private ReviewListResponse convertToDto(ReviewInfo entity) {
+    	ReviewListResponse dto = ReviewListResponse.builder()
+    			.id(entity.getId())
+    			.title(entity.getTitle())
+    			.username(entity.getUser().getUsername())
+    			.nickname(entity.getUser().getNickname())
+    			.tag(entity.getTag().name())
+    			.creationTime(entity.getDate())
+    			.suggestion(entity.getSuggestion())
+    			.views(entity.getViews())
+    			.build();
+    	
+        return dto;
+    }
+    
+    
+    // Review
+    public ReviewResponse getPost(Long id) {
+        ReviewInfo post = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("[SERVER] 리뷰를 찾을 수 없습니다."));
+        
+        // 조회수 +1
+        post.increaseViews();
+        repository.save(post);
+        
+        return convertToDetailDto(post);
+    }
+    
+    private ReviewResponse convertToDetailDto(ReviewInfo entity) {
+        return ReviewResponse.builder()
+                .id(entity.getId())
+                .title(entity.getTitle())
+                .content(entity.getContent())
+                .username(entity.getUser().getUsername())
+                .nickname(entity.getUser().getNickname())
+                .tag(entity.getTag().name())
+                .creationTime(entity.getDate())
+                .suggestion(entity.getSuggestion())
+                .views(entity.getViews())
+                .build();
     }
 
-    public void deletePost(Long id) {
-        repository.deleteById(id);
+
+    
+    // Delect Review
+    public void deletePost(Long id, String currentUser) {
+        ReviewInfo post = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("[SERVER] 리뷰를 찾을 수 없습니다."));
+
+        // 작성자 확인
+        String author = post.getUser().getUsername();
+
+        if (!author.equals(currentUser)) {
+            throw new RuntimeException("[SERVER] 게시글 삭제 권한이 없습니다.");
+        }
+
+        repository.delete(post);
     }
+
 }
