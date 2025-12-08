@@ -8,5 +8,6 @@ import com.bridgeX.user.domain.SiteUser;
 
 public interface UserRepository extends JpaRepository<SiteUser, Long> {
 	Optional<SiteUser> findByUsername(String username);
+	Optional<SiteUser> findByNickname(String nickname);
 	Optional<SiteUser> findByEmail(String email);
 }

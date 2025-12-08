@@ -28,10 +28,19 @@ public class SiteUserBody {
     @JoinColumn(name = "id")
     private SiteUser user;
 	
+	/* basic info field */
+	
 	private Integer height;
 	private Integer weight;
 	
 	@Enumerated(EnumType.STRING) // Use e-num
     private UserGender gender;
 	
+	
+	/* athletic ability field */
+	
+	private Integer user_grip;
+	private Integer user_flex;
+	private Integer user_situp;
+	private Integer user_jump;
 }

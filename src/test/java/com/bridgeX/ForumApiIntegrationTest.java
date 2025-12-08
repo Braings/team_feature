@@ -13,7 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.bridgeX.forum.dto.ForumPostCreateRequest;
+import com.bridgeX.review.dto.ReviewCreateRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SpringBootTest
@@ -42,10 +42,10 @@ class ForumApiIntegrationTest {
 //    	        """;
     	
     	// Use DTO
-    	ForumPostCreateRequest request = new ForumPostCreateRequest();
+    	ReviewCreateRequest request = new ReviewCreateRequest();
         request.setTitle("This is title");
         request.setContent("The title is about the content");
-        request.setAuthor("Potato");
+        // request.setAuthor("Potato");
 
         String NewContentJson = objectMapper.writeValueAsString(request);
     	

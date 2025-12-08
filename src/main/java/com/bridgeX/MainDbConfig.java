@@ -20,7 +20,7 @@ import java.util.Map;
 @EnableJpaRepositories(
         basePackages = {
                 "com.bridgeX.user",
-                "com.bridgeX.forum"
+                "com.bridgeX.review"
         },
         entityManagerFactoryRef = "mainEntityManagerFactory",
         transactionManagerRef = "mainTransactionManager"
@@ -45,7 +45,7 @@ public class MainDbConfig {
     ) {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(mainDataSource);
-        em.setPackagesToScan("com.bridgeX.user", "com.bridgeX.forum");
+        em.setPackagesToScan("com.bridgeX.user", "com.bridgeX.review");
         em.setPersistenceUnitName("main");
 
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();

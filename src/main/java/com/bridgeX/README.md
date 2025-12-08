@@ -14,7 +14,7 @@
 
 > 로그인 및 회원가입을 포함한 사용자(User) 관련 작업을 처리하는 패키지
 
-### 2. **forum** Package (**com.bridgeX.forum** Package)
+### 2. **review** Package (**com.bridgeX.review** Package)
 
 > 사용자 커뮤니티(Review)와 관련된 작업을 처리하는 패키지
 
@@ -43,15 +43,19 @@
 ## - 전체 구조
 ```
 src/main/java/com/bridgeX
+ ├── Application, config, etc..
  ├── facilities
+ │    └── ...
  ├── image
+ │    └── ...
  ├── user
  │    ├── controller
  │    ├── service
  │    ├── repository
  │    ├── dto
+ │    ├── exception
  │    └── domain
- └── forum
+ └── review
       ├── controller
       ├── service
       ├── repository

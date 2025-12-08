@@ -28,7 +28,7 @@ public class UserSecurityService implements UserDetailsService {
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		Optional<SiteUser> _siteUser = this.userRepository.findByUsername(username);
 		if (_siteUser.isEmpty()) {
-			throw new UsernameNotFoundException("Can not find User.");
+			throw new UsernameNotFoundException("[SERVER] Can not find User.");
 		}
 		SiteUser siteUser = _siteUser.get();
 		List<GrantedAuthority> authorities = new ArrayList<>();

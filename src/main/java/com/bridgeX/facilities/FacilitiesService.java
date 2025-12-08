@@ -21,18 +21,31 @@ public class FacilitiesService {
     }
 	
     // 시군구 입력 값 기반 검색
-    public List<FacilitiesInfo> searchFacilities(FacilitiesRequeest req) {
-        return facilitiesRepository
-                .findByFcltyManageCtprvnNmAndFcltyManageSignguNm(
-                        req.getFCLTY_MANAGE_CTPRVN_NM(),
-                        req.getFCLTY_MANAGE_SIGNGU_NM()
-                );
+    public List<FacilitiesResponse> searchFacilities(String region, String city) {
+        System.out.println(">>> service 입력: region=" + region + ", city=" + city);
+
+        List<FacilitiesInfo> result =
+                facilitiesRepository.searchByRegionAndCity(region, city);
+
+        System.out.println(">>> service 결과 개수 = " + result.size());
+
+        return result.stream()
+                .map(FacilitiesResponse::from) // 혹은 직접 매핑
+                .toList();
     }
+    /*
+    public List<FacilitiesResponse> searchFacilities(String region, String city) {
+        return facilitiesRepository.findByFcltyManageCtprvnNmAndFcltyManageSignguNm(region, city)
+            .stream().map(FacilitiesResponse::from)
+            .toList();
+    }
+	*/
+
     
 	// 하나만 검색
 	public FacilitiesResponse getFacility(Long id) {
         FacilitiesInfo entity = facilitiesRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("시설을 찾을 수 없습니다. id=" + id));
+                .orElseThrow(() -> new IllegalArgumentException("[SERVER] 시설을 찾을 수 없습니다. id=" + id));
         return toResponse(entity);
     }
 	

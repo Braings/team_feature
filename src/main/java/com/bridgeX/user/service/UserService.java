@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.bridgeX.DataNotFoundException;
+// import com.bridgeX.DataNotFoundException;
 import com.bridgeX.user.domain.SiteUser;
 import com.bridgeX.user.domain.SiteUserBody;
 import com.bridgeX.user.domain.UserRole;
@@ -37,10 +37,13 @@ public class UserService {
     public void signup(SignupRequest dto) {
         // Check ID duplication.
         if (userRepository.findByUsername(dto.getUsername()).isPresent()) {
-            throw new IllegalArgumentException("이미 등록된 사용자입니다.");
+            throw new IllegalArgumentException("[SERVER] 이미 등록된 사용자입니다.");
         }
         if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
-        	throw new IllegalArgumentException("이미 등록된 이메일입니다.");
+        	throw new IllegalArgumentException("[SERVER] 이미 등록된 이메일입니다.");
+        }
+        if (userRepository.findByNickname(dto.getNickname()).isPresent()) {
+        	throw new IllegalArgumentException("[SERVER] 중복되는 닉네임입니다.");
         }
         // create User
         SiteUser user = SiteUser.builder()
@@ -73,7 +76,7 @@ public class UserService {
 
         if (siteUserOpt.isEmpty()) {
             response.setSuccess(false);
-            response.setMessage("존재하지 않는 아이디입니다.");
+            // response.setMessage("[SERVER]: 존재하지 않는 아이디입니다.");
             return response;
         }
 
@@ -82,12 +85,12 @@ public class UserService {
         // Check Password
         if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
             response.setSuccess(false);
-            response.setMessage("비밀번호가 일치하지 않습니다.");
+            // response.setMessage("[SERVER]: 비밀번호가 일치하지 않습니다.");
             return response;
         }
 
         response.setSuccess(true);
-        response.setMessage("로그인 성공");
+        // response.setMessage("[SERVER]: 로그인 성공");
         // TODO: 나중에 토큰, 만료시간 등도 여기에
 
         return response;
@@ -129,7 +132,23 @@ public class UserService {
         if (dto.getWeight() != null) {
             body.setWeight(dto.getWeight());
         }
-
+        
+        if (dto.getUser_grip() != null) {
+            body.setUser_grip(dto.getUser_grip());
+        }
+        
+        if (dto.getUser_flex() != null) {
+            body.setUser_flex(dto.getUser_flex());
+        }
+    	
+        if (dto.getUser_situp() != null) {
+            body.setUser_situp(dto.getUser_situp());
+        }
+    	
+        if (dto.getUser_jump() != null) {
+            body.setUser_jump(dto.getUser_jump());
+        }
+    	
         // userRepository.save(user);
 
         // return UserInfoResponse.from(user);
@@ -141,7 +160,7 @@ public class UserService {
     public UserInfoResponse getMyInfo(String username) {
     	
     	SiteUser user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("유저가 존재하지 않습니다."));
+                .orElseThrow(() -> new RuntimeException("[SERVER]: 유저가 존재하지 않습니다."));
         
         return new UserInfoResponse(
                 user.getId(),
@@ -156,7 +175,7 @@ public class UserService {
     // User Body Information Request
     public void updateBodyInfo(String username, UserBodyInfoRequest dto) {
         SiteUser user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("유저가 없습니다."));
+                .orElseThrow(() -> new RuntimeException("[SERVER]: 유저가 없습니다."));
 
         // Not Exist BodyInfo -> Generation
         SiteUserBody body = userBodyRepository.findByUser(user)
@@ -180,12 +199,16 @@ public class UserService {
     public UserBodyInfoResponse getBodyInfo(String username) {
     	
     	SiteUserBody user = userBodyRepository.findByUser_Username(username)
-                .orElseThrow(() -> new RuntimeException("유저가 존재하지 않습니다."));
+                .orElseThrow(() -> new RuntimeException("[SERVER] 유저가 존재하지 않습니다."));
         
         return new UserBodyInfoResponse(
                 user.getHeight(),
                 user.getWeight(),
-                user.getGender().name()
+                user.getGender().name(),
+                user.getUser_grip(),
+            	user.getUser_flex(),
+            	user.getUser_situp(),
+            	user.getUser_jump()
         );
     }
     
@@ -193,7 +216,7 @@ public class UserService {
     @Transactional
     public void updateProfileImage(Long userId, String imageUrl) {
         SiteUser user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("유저 없음"));
+            .orElseThrow(() -> new RuntimeException("[SERVER] 유저 없음"));
 
         user.setProfileImageUrl(imageUrl);
     }
@@ -201,6 +224,7 @@ public class UserService {
     
 	// Back-end Test only.
     // Dummy Function
+    /*
 	public SiteUser create(String username, String email, String password) {
 		SiteUser user = SiteUser.builder()
 				.username(username)
@@ -217,7 +241,8 @@ public class UserService {
 		if (siteUser.isPresent()) {
 			return siteUser.get();
 		} else {
-			throw new DataNotFoundException("유저가 존재하지 않습니다.");
+			throw new DataNotFoundException("[SERVER]: 유저가 존재하지 않습니다.");
 		}
 	}
+	*/
 }
