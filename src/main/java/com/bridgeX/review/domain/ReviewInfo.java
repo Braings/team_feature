@@ -62,8 +62,21 @@ public class ReviewInfo {
         this.tag = request.getTag();
     }
 
+    // views +1
     public void increaseViews() {
         if(this.views == null) { this.views = 0; } // 예외 처리
         this.views += 1; // else
+    }
+    
+    // suggestion +1
+    public void increaseSuggestion() {
+        if(this.suggestion == null) { this.suggestion = 0; } // 예외 처리
+        this.suggestion += 1;
+    }
+
+    // suggestion -1
+    public void decreaseSuggestion() {
+        if(this.suggestion == null) this.suggestion = 0; // 예외 처리
+        if(this.suggestion > 0) this.suggestion -= 1;
     }
 }

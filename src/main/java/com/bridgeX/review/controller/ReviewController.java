@@ -48,6 +48,7 @@ public class ReviewController {
         return service.getAllPosts();
     }
 
+    
     @GetMapping("/{id}")
     public ReviewResponse get(@PathVariable Long id) {
         return service.getPost(id);
@@ -60,4 +61,12 @@ public class ReviewController {
         String currentUser = userDetails.getUsername();
         service.deletePost(id, currentUser);
     }
+    
+    
+    @PostMapping("/{id}/suggest")
+    public ResponseEntity<Void> suggest(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
+        service.suggestReview(id, userDetails.getUsername());
+        return ResponseEntity.ok().build();
+    }
+
 }

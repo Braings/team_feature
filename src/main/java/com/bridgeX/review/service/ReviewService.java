@@ -1,18 +1,22 @@
 package com.bridgeX.review.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
 import com.bridgeX.review.domain.ReviewInfo;
+import com.bridgeX.review.domain.ReviewSuggestion;
 import com.bridgeX.review.dto.ReviewCreateRequest;
 import com.bridgeX.review.dto.ReviewListResponse;
 import com.bridgeX.review.dto.ReviewResponse;
 import com.bridgeX.review.dto.ReviewUpdateRequest;
 import com.bridgeX.review.repository.ReviewPostRepository;
+import com.bridgeX.review.repository.ReviewSuggestionRepository;
 import com.bridgeX.user.domain.SiteUser;
 import com.bridgeX.user.repository.UserRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -21,6 +25,7 @@ public class ReviewService {
 
     private final ReviewPostRepository repository;
     private final UserRepository userRepository;
+    private final ReviewSuggestionRepository reviewSuggestionRepository;
     
     
     // Post Review
@@ -40,6 +45,7 @@ public class ReviewService {
         repository.save(post);
     }
     
+    
     // Edit Review
     public void updatePost(Long id, ReviewUpdateRequest request, String currentUser) {
     	ReviewInfo post = repository.findById(id)
@@ -53,6 +59,7 @@ public class ReviewService {
         repository.save(post);
     }
 
+    
     // Review List
     public List<ReviewListResponse> getAllPosts() {
         return repository.findAll()
@@ -60,7 +67,6 @@ public class ReviewService {
                 .map(this::convertToDto)
                 .toList();
     }
-    
     private ReviewListResponse convertToDto(ReviewInfo entity) {
     	ReviewListResponse dto = ReviewListResponse.builder()
     			.id(entity.getId())
@@ -88,7 +94,6 @@ public class ReviewService {
         
         return convertToDetailDto(post);
     }
-    
     private ReviewResponse convertToDetailDto(ReviewInfo entity) {
         return ReviewResponse.builder()
                 .id(entity.getId())
@@ -105,7 +110,7 @@ public class ReviewService {
 
 
     
-    // Delect Review
+    // Delete Review
     public void deletePost(Long id, String currentUser) {
         ReviewInfo post = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("[SERVER] 리뷰를 찾을 수 없습니다."));
@@ -118,6 +123,39 @@ public class ReviewService {
         }
 
         repository.delete(post);
+    }
+
+    
+    // Suggest Review
+    @Transactional
+    public boolean suggestReview(Long reviewId, String currentUsername) {
+
+        ReviewInfo review = repository.findById(reviewId)
+                .orElseThrow(() -> new RuntimeException("[SERVER] 리뷰를 찾을 수 없습니다."));
+
+        SiteUser user = userRepository.findByUsername(currentUsername)
+                .orElseThrow(() -> new RuntimeException("[SERVER] 유저를 찾을 수 없습니다."));
+
+        // 이미 추천했는지 확인
+        Optional<ReviewSuggestion> existing = reviewSuggestionRepository.findByReviewAndUser(review, user);
+
+        if (existing.isPresent()) {
+            // 이미 추천했으면 추천 취소
+            reviewSuggestionRepository.delete(existing.get());
+            review.decreaseSuggestion();
+            return false;
+        } else {
+            // 아직 안 했으면 추천
+            ReviewSuggestion suggestion = ReviewSuggestion.builder()
+            		.review(review)
+            		.user(user)
+            		.build();
+            
+            reviewSuggestionRepository.save(suggestion);
+
+            review.increaseSuggestion();
+            return true;
+        }
     }
 
 }
