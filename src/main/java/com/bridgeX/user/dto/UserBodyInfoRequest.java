@@ -20,5 +20,13 @@ public class UserBodyInfoRequest {
 	@NotNull
 	private UserGender gender; // e-num { MALE, FEMALE }
 
+	private Integer user_grip;
+	
+	private Integer user_flex;
+	
+	private Integer user_situp;
+	
+	private Integer user_jump;
+	
 	// TODO: Add Other fields
 }

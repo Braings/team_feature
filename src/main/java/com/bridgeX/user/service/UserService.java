@@ -132,7 +132,23 @@ public class UserService {
         if (dto.getWeight() != null) {
             body.setWeight(dto.getWeight());
         }
-
+        
+        if (dto.getUser_grip() != null) {
+            body.setUser_grip(dto.getUser_grip());
+        }
+        
+        if (dto.getUser_flex() != null) {
+            body.setUser_flex(dto.getUser_flex());
+        }
+    	
+        if (dto.getUser_situp() != null) {
+            body.setUser_situp(dto.getUser_situp());
+        }
+    	
+        if (dto.getUser_jump() != null) {
+            body.setUser_jump(dto.getUser_jump());
+        }
+    	
         // userRepository.save(user);
 
         // return UserInfoResponse.from(user);
@@ -188,7 +204,11 @@ public class UserService {
         return new UserBodyInfoResponse(
                 user.getHeight(),
                 user.getWeight(),
-                user.getGender().name()
+                user.getGender().name(),
+                user.getUser_grip(),
+            	user.getUser_flex(),
+            	user.getUser_situp(),
+            	user.getUser_jump()
         );
     }
     

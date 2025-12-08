@@ -16,8 +16,12 @@ public class UserBodyInfoResponse {
 	private Integer weight;
 	private String gender; // e-num { MALE, FEMALE }
 	
-	//TODO: Add Other fields
+	private Integer user_grip;
+	private Integer user_flex;
+	private Integer user_situp;
+	private Integer user_jump;
 	
+	// Can add Other fields
 	public static UserBodyInfoResponse from(SiteUserBody body) {
         if (body == null) {
             return null; // or 기본값 builder()
@@ -27,6 +31,11 @@ public class UserBodyInfoResponse {
                 .gender(body.getGender().name())
                 .height(body.getHeight())
                 .weight(body.getWeight())
+                .user_grip(body.getUser_grip())
+                .user_flex(body.getUser_flex())
+                .user_situp(body.getUser_situp())
+                .user_jump(body.getUser_jump())
                 .build();
     }
+    
 }
