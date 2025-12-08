@@ -4,19 +4,28 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.bridgeX.review.domain.ReviewComment;
 import com.bridgeX.review.domain.ReviewInfo;
 import com.bridgeX.review.domain.ReviewSuggestion;
+
+import com.bridgeX.review.dto.CommentCreateRequest;
+import com.bridgeX.review.dto.CommentResponse;
+import com.bridgeX.review.dto.CommentUpdateRequest;
 import com.bridgeX.review.dto.ReviewCreateRequest;
 import com.bridgeX.review.dto.ReviewListResponse;
 import com.bridgeX.review.dto.ReviewResponse;
 import com.bridgeX.review.dto.ReviewUpdateRequest;
+
+import com.bridgeX.review.repository.ReviewCommentRepository;
 import com.bridgeX.review.repository.ReviewPostRepository;
 import com.bridgeX.review.repository.ReviewSuggestionRepository;
+
 import com.bridgeX.user.domain.SiteUser;
+
 import com.bridgeX.user.repository.UserRepository;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -26,7 +35,7 @@ public class ReviewService {
     private final ReviewPostRepository repository;
     private final UserRepository userRepository;
     private final ReviewSuggestionRepository reviewSuggestionRepository;
-    
+    private final ReviewCommentRepository reviewCommentRepository;
     
     // Post Review
     public void createPost(ReviewCreateRequest request, String currentUser) {
@@ -158,4 +167,69 @@ public class ReviewService {
         }
     }
 
+    // 댓글 작성
+    @Transactional
+    public void addComment(Long reviewId, String currentUsername, CommentCreateRequest request) {
+
+        ReviewInfo review = repository.findById(reviewId)
+                .orElseThrow(() -> new RuntimeException("[SERVER] 리뷰를 찾을 수 없습니다."));
+
+        SiteUser user = userRepository.findByUsername(currentUsername)
+                .orElseThrow(() -> new RuntimeException("[SERVER] 유저를 찾을 수 없습니다."));
+
+        ReviewComment comment = ReviewComment.create(review, user, request.getContent());
+        reviewCommentRepository.save(comment);
+    }
+
+    // 댓글 수정
+    @Transactional
+    public void updateComment(Long reviewId, Long commentId, String currentUsername,
+                              CommentUpdateRequest request) {
+
+        ReviewComment comment = reviewCommentRepository.findById(commentId)
+                .orElseThrow(() -> new RuntimeException("[SERVER] 댓글을 찾을 수 없습니다."));
+
+        // 예외 처리
+        if (!comment.getReview().getId().equals(reviewId)) {
+            throw new RuntimeException("[SERVER] 이 리뷰의 댓글이 아닙니다.");
+        }
+
+        // 작성자 체크
+        if (!comment.getUser().getUsername().equals(currentUsername)) {
+            throw new RuntimeException("[SERVER] 댓글을 수정할 권한이 없습니다.");
+        }
+
+        comment.updateContent(request.getContent());
+    }
+
+    // 댓글 삭제
+    @Transactional
+    public void deleteComment(Long reviewId, Long commentId, String currentUsername) {
+
+        ReviewComment comment = reviewCommentRepository.findById(commentId)
+                .orElseThrow(() -> new RuntimeException("[SERVER] 댓글을 찾을 수 없습니다."));
+        // 예외 처리
+        if (!comment.getReview().getId().equals(reviewId)) {
+            throw new RuntimeException("[SERVER] 이 리뷰의 댓글이 아닙니다.");
+        }
+
+        if (!comment.getUser().getUsername().equals(currentUsername)) {
+            throw new RuntimeException("[SERVER] 댓글을 삭제할 권한이 없습니다.");
+        }
+
+        reviewCommentRepository.delete(comment);
+    }
+
+    // 댓글 목록 요청
+    @Transactional(readOnly = true)
+    public List<CommentResponse> getComments(Long reviewId) {
+
+        ReviewInfo review = repository.findById(reviewId)
+                .orElseThrow(() -> new RuntimeException("[SERVER] 리뷰를 찾을 수 없습니다."));
+
+        return reviewCommentRepository.findByReviewOrderByCreatedAtAsc(review)
+                .stream()
+                .map(CommentResponse::new)
+                .toList();
+    }
 }
