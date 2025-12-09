@@ -210,14 +210,16 @@ const handleNext = async () => {
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/_variables.scss';
+@use 'sass:color';
+@use 'sass:map';
+@use '@/styles/_variables.scss'as *;
 
 .signup-page {
   @include flex-center;
   position: relative;
   overflow: hidden;
   min-height: 100vh;
-  background-color: map-get($colors, 'dark');
+  background-color: map.get($colors, 'dark');
 
   .bg {
     position: absolute;
@@ -239,16 +241,16 @@ const handleNext = async () => {
     @include card;
     position: relative;
     z-index: 2;
-    padding: map-get($spacing, '2xl') map-get($spacing, '3xl');
-    width: map-get($sizes, 'card-width');
+    padding: map.get($spacing, '2xl') map.get($spacing, '3xl');
+    width: map.get($sizes, 'card-width');
     display: flex;
     flex-direction: column;
     align-items: center;
 
     .title {
-      font-size: map-get($typography, 'title');
+      font-size: map.get($typography, 'title');
       font-weight: bold;
-      margin-bottom: map-get($spacing, '2xl');
+      margin-bottom: map.get($spacing, '2xl');
       letter-spacing: 5px;
     }
 
@@ -258,22 +260,22 @@ const handleNext = async () => {
 
       .select-field {
         width: 100%;
-        padding: map-get($spacing, 'lg') map-get($spacing, 'md');
-        margin-bottom: map-get($spacing, 'xl');
-        border: 1px solid map-get($colors, 'border');
-        border-radius: map-get($radius, 'md');
-        font-size: map-get($typography, 'base');
-        background-color: map-get($colors, 'white');
+        padding: map.get($spacing, 'lg') map.get($spacing, 'md');
+        margin-bottom: map.get($spacing, 'xl');
+        border: 1px solid map.get($colors, 'border');
+        border-radius: map.get($radius, 'md');
+        font-size: map.get($typography, 'base');
+        background-color: map.get($colors, 'white');
         cursor: pointer;
         box-sizing: border-box;
 
         &:focus {
           outline: none;
-          border-color: darken(map-get($colors, 'border'), 10%);
+          border-color: color.adjust(map.get($colors, 'border'), $lightness: -10%);
         }
 
         option[value=""] {
-          color: map-get($colors, 'text-placeholder');
+          color: map.get($colors, 'text-placeholder');
         }
       }
 
@@ -287,17 +289,17 @@ const handleNext = async () => {
 
       .error-text {
         @include error-text;
-        margin-bottom: map-get($spacing, 'lg');
+        margin-bottom: map.get($spacing, 'lg');
       }
 
       .birthday-wrapper {
         width: 100%;
-        margin-bottom: map-get($spacing, 'xl');
+        margin-bottom: map.get($spacing, 'xl');
 
         .birthday-input-wrapper {
           width: 100%;
           display: flex;
-          gap: map-get($spacing, 'sm');
+          gap: map.get($spacing, 'sm');
           align-items: center;
           position: relative;
 
@@ -305,18 +307,18 @@ const handleNext = async () => {
             position: absolute;
             top: calc(100% + 8px);
             right: 0;
-            background: map-get($colors, 'white');
-            padding: map-get($spacing, 'sm');
-            border: 1px solid map-get($colors, 'border-light');
-            border-radius: map-get($radius, 'lg');
-            box-shadow: map-get($shadows, 'popover');
+            background: map.get($colors, 'white');
+            padding: map.get($spacing, 'sm');
+            border: 1px solid map.get($colors, 'border-light');
+            border-radius: map.get($radius, 'lg');
+            box-shadow: map.get($shadows, 'popover');
             z-index: 10;
 
             .date-input {
-              width: map-get($sizes, 'date-input-width');
-              padding: map-get($spacing, 'sm') map-get($spacing, 'md');
-              border: 1px solid map-get($colors, 'border');
-              border-radius: map-get($radius, 'sm');
+              width: map.get($sizes, 'date-input-width');
+              padding: map.get($spacing, 'sm') map.get($spacing, 'md');
+              border: 1px solid map.get($colors, 'border');
+              border-radius: map.get($radius, 'sm');
             }
           }
         }
@@ -325,18 +327,18 @@ const handleNext = async () => {
       .next-button {
         @include button-base;
         @include flex-center;
-        background-color: map-get($colors, 'black');
-        color: map-get($colors, 'white');
+        background-color: map.get($colors, 'black');
+        color: map.get($colors, 'white');
         padding: 15px 30px;
-        border-radius: map-get($radius, 'md');
-        font-size: map-get($typography, 'button');
-        margin-top: map-get($spacing, 'xl');
+        border-radius: map.get($radius, 'md');
+        font-size: map.get($typography, 'button');
+        margin-top: map.get($spacing, 'xl');
         align-self: flex-end;
-        width: map-get($sizes, 'button-width');
-        height: map-get($sizes, 'button-height');
+        width: map.get($sizes, 'button-width');
+        height: map.get($sizes, 'button-height');
 
         &:hover {
-          background-color: map-get($colors, 'gray-hover');
+          background-color: map.get($colors, 'gray-hover');
         }
       }
     }

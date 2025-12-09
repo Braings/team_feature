@@ -7,7 +7,6 @@ import ExerciseFacilities from '../views/exerciseFacilities.vue'
 import MyPage from '../views/myPage.vue'
 import Reviews from '../views/reviewsPage.vue'
 import ReviewDetail from '../views/reviewDetail.vue'
-import ReviewsWrite from '../views/reviewsWritePage.vue'
 import LogIn from '../views/logIn.vue'
 import Recommend from '@/views/recommend.vue'
 
@@ -57,16 +56,6 @@ const routes = [
     path: '/reviews/:username',
     name: 'reviewDetail',
     component: ReviewDetail
-  },
-  {
-    path: '/reviews/write',
-    name: 'reviewsWrite',
-    component: ReviewsWrite
-  },
-  {
-    path: '/reviews/write/:username',
-    name: 'reviewsEdit',
-    component: ReviewsWrite
   },
   {
     path: '/login',

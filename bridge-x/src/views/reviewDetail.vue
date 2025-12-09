@@ -10,15 +10,6 @@
 
       <section class="controls">
         <button class="back" @click="goBack">◀ 목록으로</button>
-        <div class="search-area">
-          <select v-model="search.type" class="select">
-            <option value="all">전체</option>
-            <option value="title">제목</option>
-            <option value="author">작성자</option>
-          </select>
-          <input v-model="search.query" placeholder="검색어 입력" class="search-input"/>
-          <button class="search-btn" @click=handleSearchAndBlur($event)>검색</button>
-        </div>
       </section>
 
       <div class="review-detail-wrapper" v-if="post">
@@ -28,241 +19,171 @@
             <header class="post-header">
               <h1 class="post-title">{{ post.title }}</h1>
               <div class="post-meta">
-                <span class="author">{{ post.nickname }}</span>
-                <span class="date">{{ post.creationTime }}</span>
+                <span class="nickname">{{ post.nickname }}</span>
+                <span class="date">{{ post.date }}</span>
                 <span class="views">조회 {{ post.views }}</span>
               </div>
             </header>
 
-            <section class="post-body">
-              <div class="tag">#{{ post.tag }}</div>
-              <p>{{ post.content }}</p>
-            </section>
+            <div class="post-body">
+              <span class="tag">{{ post.tag }}</span>
+              <div v-html="post.content"></div>
+            </div>
 
-            <footer class="post-actions">
-              <button
-                :class="['btn', 'recommend-btn', { 'active': isRecommended }]"
-                @click="toggleRecommend">
-                <span v-if="isRecommended"> 추천 취소 ({{ post.recommend }})</span>
-                <span v-else> 추천 ({{ post.recommend }})</span>
+            <div class="post-actions">
+              <button class="btn recommend-btn" :class="{ active: isRecommended }" @click="toggleRecommend">
+                👍 추천 {{ post.recommend }}
               </button>
-              <button  class="btn" @click="openEditModal">수정</button>
-              <ReviewWriteModal
-                :isOpen="isModalOpen"
-                @close="closeModal"
-                @submit-success="handleReviewEdit"
-                :reviewId="detailData.id"
-                :initialData="detailData"
-              />
+              <button class="btn" @click="openEditModal">수정</button>
               <button class="btn danger" @click="deletePost">삭제</button>
-            </footer>
+            </div>
           </article>
 
-          <!-- 댓글 -->
-          <article  class="comment-card" :style="{ flex: 1, boxShadow: '1px 1px 3px black'}">
-            <section :style="border = '1px solid'" class="comment-body">
-              ss
+          <article class="comment-card">
+            <h3 class="comment-section-title">댓글 ({{ comments.length }})</h3>
+
+            <section class="comment-write-form">
+              <textarea
+                v-model="newComment.content"
+                placeholder="댓글을 작성해 주세요."
+                class="comment-textarea"
+                :disabled="isCommentSubmitting"
+              ></textarea>
+              <div class="comment-submit-area">
+                <span v-if="isCommentSubmitting" class="loading-message">댓글 작성 중...</span>
+                <button
+                  class="btn comment-submit-btn"
+                  @click="submitComment"
+                  :disabled="!newComment.content.trim() || isCommentSubmitting"
+                >
+                  댓글 등록
+                </button>
+              </div>
             </section>
-            <section class="comment-list">
-              <p>{{ post.content }}</p>
+
+            <section class="comment-list-section">
+              <div v-if="isCommentLoading" class="comment-status">댓글을 불러오는 중입니다...</div>
+              <div v-else-if="comments.length === 0 && !isCommentLoading" class="comment-status">등록된 댓글이 없습니다.</div>
+              <div v-else>
+                <div v-for="comment in comments" :key="comment.id" class="comment-item">
+                  <div class="comment-header-row">
+                    <span class="nickname comment-nickname">{{ comment.nickname }}</span>
+                    <span class="date comment-date">{{ comment.date }}</span>
+                  </div>
+                  <p class="comment-content">{{ comment.content }}</p>
+
+                  <div class="comment-actions">
+                    <button class="btn reply-btn" @click="toggleReplyForm(comment.id)">답글 달기</button>
+                  </div>
+
+                  <section v-if="replyingToId === comment.id" class="reply-write-form">
+                    <textarea
+                      v-model="newReplyContent"
+                      placeholder="답글을 작성해 주세요."
+                      class="reply-textarea"
+                    ></textarea>
+                    <div class="reply-submit-area">
+                      <button
+                        class="btn reply-submit-btn"
+                        @click="submitReply(comment.id)"
+                        :disabled="!newReplyContent.trim()"
+                      >
+                        답글 등록
+                      </button>
+                      <button type="button" class="btn cancel-btn" @click="toggleReplyForm(null)">취소</button>
+                    </div>
+                  </section>
+
+                  <section v-if="comment.replies && comment.replies.length > 0" class="reply-list-section">
+                    <div v-for="reply in comment.replies" :key="reply.id" class="reply-item">
+                      <div class="reply-header-row">
+                        <span class="nickname reply-nickname">{{ reply.nickname }}</span>
+                        <span class="date reply-date">{{ reply.date }}</span>
+                      </div>
+                      <p class="reply-content">{{ reply.content }}</p>
+                    </div>
+                  </section>
+
+                </div>
+              </div>
             </section>
           </article>
         </div>
       </div>
 
-      <template v-else>
-        <div v-if="loading" class="list-status">게시물을 로드하는 중...</div>
-        <div v-else-if="error" class="list-status">게시물을 로드하는 데 실패했습니다: {{ error }}</div>
-        <div v-else class="post-list">
-          <table class="posts-table" :style="{ boxShadow: '1px 1px 3px black'}">
-            <thead>
-              <tr>
-                <th class="col-no">No</th>
-                <th class="col-tag">분류</th>
-                <th class="col-title">제목</th>
-                <th class="col-author">작성자</th>
-                <th class="col-date">날짜</th>
-                <th class="col-views">조회</th>
-                <th class="col-rec">추천</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(p) in pagedPosts" :key="p.no" :style="{ fontFamily: 'SCDream5'}" @click="openPost(p)">
-                <td class="col-no">{{ p.no }}</td>
-                <td class="col-tag">{{ p.tag }}</td>
-                <td class="col-title">{{ p.title }}</td>
-                <td class="col-author">{{ p.author }}</td>
-                <td class="col-date">{{ p.date }}</td>
-                <td class="col-views">{{ p.views }}</td>
-                <td class="col-rec">{{ p.recommend }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </template>
+      <div v-else-if="loading" class="list-status detail-status">게시물을 로드하는 중...</div>
+      <div v-else-if="error" class="list-status detail-status error">게시물을 로드하는 데 실패했습니다: {{ error }}</div>
+      <div v-else class="list-status detail-status">게시물 정보가 없습니다.</div>
 
     </div>
 
-    <aside class="gallery-side">
-      <div class="category-padding" :style="{ height: '9.8rem'}"></div>
-      <div class="trending-box" :style="{ boxShadow: '1px 1px 3px black'}">
-        <h3 :style="{ paddingBottom: '18px', borderBottom: '2px solid #ccc', fontSize: '20px' }" > &nbsp;&nbsp; 인기글</h3>
-        <ul class="trending-list">
-          <li v-for="post in trendingPosts" :key="post.username" @click="openPost(post)">
-            <span class="trending-title" :style="{ fontFamily: 'SCDream5'}">{{ post.title }}</span>
-            <span class="trending-count">{{ post.recommend }}</span>
-          </li>
-        </ul>
-      </div>
-      <div class="category-padding"></div>
-      <div class="recent-box" :style="{ boxShadow: '1px 1px 3px black'}">
-        <h3 :style="{ paddingBottom: '18px', borderBottom: '2px solid #ccc', fontSize: '20px'}" > &nbsp;&nbsp; 최근글</h3>
-        <ul class="recent-list">
-          <li v-for="post in recentPosts" :key="post.username" @click="openPost(post)">
-            <span class="recent-title" :style="{ fontFamily: 'SCDream5'}">{{ post.title }}</span>
-            <span class="recent-date">{{ post.date }}</span>
-          </li>
-        </ul>
-      </div>
-    </aside>
+    <ReviewWriteModal
+      :isOpen="isModalOpen"
+      :reviewId="detailData.reviewId"
+      :initialData="detailData"
+      @close="closeModal"
+      @submit-success="handleReviewEdit"
+    />
+
   </div>
 </template>
 
 <script setup>
 import { ref, reactive, onMounted, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { getReviews, getReviewDetail, deleteReview } from '@/api.js';
+import { getReviewDetail, deleteReview } from '@/api.js';
 import ReviewWriteModal from './reviewModal.vue';
-import { sortItems } from 'vuetify/lib/components/VDataTable/composables/sort';
-import { submitUserProfileData } from '@/stores/profileStore';
+
 
 const route = useRoute();
 const router = useRouter();
 
-
-// 목록 관련 상태
-const search = ref({ type: 'all', query: '' });
-const selectedCategory = ref('all');
-const posts = ref([]); // 전체 목록 데이터 (클라이언트 측 필터링용)
-const page = ref(1);
-const pageSize = 10;
-const loading = ref(false); // 목록 로딩 상태
+// 상세 보기 관련 상태
+const reviewID = computed(() => route.params.reviewID || '');
+const post = ref(null);
+const loading = ref(false);
 const error = ref(null);
-
-
-// 상세 보기 관련 상태 (라우트 파라미터 사용)
-// 라우트 파라미터를 사용하여 상세 보기 여부를 결정합니다.
-const username = computed(() => route.params.username || '');
-const post = ref(null); // 상세 게시물 데이터
 
 // 추천 상태
 const isRecommended = ref(false);
 
-// 목록 로직
-async function loadReviews() {
-  // 상세 보기 모드일 때는 목록 로딩을 건너뜁니다.
-  if (username.value) return;
-
-  loading.value = true;
-  error.value = null;
-
-  search.value.type = route.query.searchType || 'all';
-  search.value.query = route.query.query || '';
-
-  selectedCategory.value = route.query.category || 'all';
-  try {
-    // API 호출 (실제 환경에서는 서버가 필터링 및 페이지네이션을 처리해야 합니다)
-    const data = await getReviews({
-      page: page.value,
-      limit: pageSize,
-      category: selectedCategory.value,
-      searchType: search.value.type,
-      query: search.value.query
-    });
-    posts.value = data.data || data || [];
-  } catch (error) {
-    console.error('리뷰 목록 로드 실패:', error);
-    error.value = error.message;
-    // 폴백: 샘플 데이터
-    posts.value = Array.from({ length: 100 }).map((_, i) => ({
-      username: `author${i + 1}`,
-      no: 100 - i,
-      tag: i % 5 === 0 ? '질문' : i % 3 === 0 ? '정보' : (i % 7 === 0 ? '잡담' : '리뷰'),
-      title: `샘플 게시물 제목 ${i + 1}`,
-      author: `운영자${(i % 6) + 1}`,
-      date: '25/11/' + ((i % 30) + 1).toString().padStart(2, '0'),
-      views: Math.floor(Math.random() * 500),
-      recommend: Math.floor(Math.random() * 50)
-    }));
-  } finally {
-    loading.value = false;
-  }
-}
-
-
-function doSearch() {
-  page.value = 1;
-
-  const newQuery = {
-    searchType: search.value.type,
-    query: search.value.query,
-    category: selectedCategory.value
-  };
-
-  router.push({
-    name: 'reviews',
-    query: newQuery
-  }).catch(() => {});
-}
-
-
-function handleSearchAndBlur(event) {
-  doSearch();
-
-  if (event && event.currentTarget) {
-    event.currentTarget.blur();
-  }
-}
-
-
 // 상세 보기 로직
-async function loadPost(id) {
+async function loadPost(reviewID) {
   loading.value = true;
   error.value = null;
+
+  if (!reviewID) {
+      error.value = "유효하지 않은 리뷰 ID입니다.";
+      loading.value = false;
+      return;
+  }
   try {
-    const data = await getReviewDetail(id);
+    const data = await getReviewDetail(reviewID);
+
     post.value = data.data || data || {
-      username: id,
-      title: `샘플 게시물 제목 ${id}`,
-      author: '운영자1',
+      reviewID: reviewID,
+      username: 'sss12',
+      title: `샘플 게시물 제목 ${reviewID}`,
+      nickname: '운영자1',
       date: '25/11/24',
       views: 123,
-      tag: id.length % 3 === 0 ? '정보' : '질문',
-      content: '이것은 샘플 게시물의 본문입니다.'
+      tag: reviewID.length % 3 === 0 ? '정보' : '질문',
+      content: '이것은 샘플 게시물의 본문입니다.',
+      recommend: 5
     };
-  } catch (error) {
-    console.error('게시물 로드 실패:', error);
-    error.value = error.message;
-    // 폴백
-    post.value = {
-      username: id,
-      title: `샘플 게시물 제목 ${id}`,
-      author: '운영자1',
-      date: '25/11/24',
-      views: 123,
-      tag: id.length % 3 === 0 ? '정보' : '질문',
-      content: '백엔드 연동 중입니다.'
-    };
+  } catch (e) {
+    console.error('게시물 로드 실패:', e);
+    error.value = e.message;
+    post.value = null;
   } finally {
     loading.value = false;
   }
 }
 
-// 추천 토글 함수 추가
+// 추천 토글 함수
 async function toggleRecommend() {
   if (!post.value) return;
 
-  // 1. UI 즉시 업데이트 (낙관적 업데이트)
   const isCurrentlyRecommended = isRecommended.value;
   isRecommended.value = !isCurrentlyRecommended;
   post.value.recommend += isCurrentlyRecommended ? -1 : 1;
@@ -270,14 +191,9 @@ async function toggleRecommend() {
   const action = isRecommended.value ? '추천' : '추천 취소';
 
   try {
-    // 2. 서버에 추천 상태 변경 요청
-    // 실제 API: await toggleRecommendApi(post.value.username, !isCurrentlyRecommended);
-    console.log(`[Mock API] ${action} 요청: Post ${post.value.username}`);
-    // 성공 시: 그대로 유지
+    console.log(`[Mock API] ${action} 요청: Post ${post.value.reviewID}`);
     alert(`${action}되었습니다! (현재 추천 수: ${post.value.recommend})`);
-
   } catch (error) {
-    // 3. 실패 시 상태 롤백 (롤백 로직)
     isRecommended.value = isCurrentlyRecommended;
     post.value.recommend += isCurrentlyRecommended ? 1 : -1;
     alert('추천/추천 취소에 실패했습니다: ' + error.message);
@@ -285,7 +201,6 @@ async function toggleRecommend() {
   }
 }
 
-// 상세 보기에서 목록으로 돌아가기 (라우트 파라미터 제거)
 function goBack() {
   router.push({ name: 'reviews' }).catch(()=>{});
 }
@@ -293,7 +208,7 @@ function goBack() {
 async function deletePost() {
   if (!post.value || !confirm('정말 삭제하시겠습니까?')) return;
   try {
-    await deleteReview(post.value.username);
+    await deleteReview(post.value.reviewID);
     alert('삭제되었습니다.');
     router.push({ name: 'reviews' }).catch(()=>{});
   } catch (error) {
@@ -302,75 +217,155 @@ async function deletePost() {
   }
 }
 
-const trendingPosts = computed(() => {
-  // 추천수(recommend) 기반으로 정렬
-  return [...posts.value].sort((a, b) => (b.recommend || 0) - (a.recommend || 0)).slice(0, 5);
-});
-
-const recentPosts = computed(() => {
-  // 최신 순서(no 또는 date)로 정렬
-  return [...posts.value].slice(0, 5);
-});
-
-
-// Watch 및 Mounted (모드 전환 로직)
-// **핵심**: 라우트 파라미터 변경을 감시하여 상세 보기/목록 보기 전환 처리
-watch(username, (newUsername) => {
-  if (newUsername) {
-    loadPost(newUsername); // 상세 보기 로드
+// Watch (상세 보기 로직 처리)
+watch(reviewID, (newId) => {
+  if (newId) {
+    loadPost(newId);
   } else {
-    post.value = null; // 상세 내용 초기화
-    loadReviews(); // 목록 로드 (URL 변경을 통한 목록으로 돌아가기 처리)
+    post.value = null;
   }
-}, { immediate: true }); // 컴포넌트 마운트 시 초기 파라미터 검사
+}, { immediate: true });
 
-watch(() => route.query, (newQuery, oldQuery) => {
-    // 1. 현재 라우트가 목록 페이지('reviews')이고
-    // 2. 상세 게시물(username)이 로드되지 않은 상태일 때만
-    if (!username.value && route.name === 'reviews' && JSON.stringify(newQuery) !== JSON.stringify(oldQuery)) {
-        // 검색 쿼리가 변경되었으므로 목록을 다시 로드합니다.
-        loadReviews();
+
+// ======================================
+// 🌟 댓글 및 대댓글 기능 로직 (ID 기반) 🌟
+// ======================================
+const isCommentLoading = ref(false);
+const isCommentSubmitting = ref(false);
+
+const newComment = reactive({ content: '' });
+const replyingToCommentID = ref(null);
+const newReplyContent = ref('');
+
+const comments = ref([
+  {
+    commentID: 101,
+    reviewID: 1,
+    nickname: '테스터1',
+    content: '좋은 정보 감사합니다!',
+    date: '25/12/05 10:00',
+    replies: [
+      { commentID: 10101, parentCommentID: 101, nickname: '운영자', content: '감사합니다.', date: '25/12/05 10:30' }
+    ]
+  },
+  { commentID: 102, reviewID: 1, nickname: '개발자', content: '댓글 테스트', date: '25/12/05 11:00', replies: [] }
+]);
+
+async function submitComment() {
+  if (!newComment.content.trim()) return;
+
+  isCommentSubmitting.value = true;
+  try {
+    // 💡 API 호출 시 reviewId 전달
+    // await apiCreateComment(post.value.reviewId, { content: newComment.content });
+
+    // Mock Update
+    const newID = Date.now();
+    comments.value.unshift({
+      commentID: newID,
+      reviewID: post.value.reviewId,
+      nickname: '현재사용자',
+      content: newComment.content.trim(),
+      date: new Date().toLocaleDateString(),
+      replies: []
+    });
+    newComment.content = '';
+  } catch(e) {
+      console.error(e);
+      alert('실패');
+  } finally {
+      isCommentSubmitting.value = false;
+  }
+}
+
+function toggleReplyForm(commentID) {
+    if (replyingToCommentID.value === commentID) {
+        replyingToCommentID.value = null;
+    } else {
+        replyingToCommentID.value = commentID;
+        newReplyContent.value = '';
     }
-}, { deep: true }); // route.query 내부의 변경 사항을 감지하기 위해 deep: true 사용
+}
 
-// 모달
-// 3. 모달 상태 관리 변수 추가
+async function submitReply(parentCommentID) {
+    if (!newReplyContent.value.trim()) return;
+
+    // 부모 댓글 찾기 (commentID로 검색)
+    const parent = comments.value.find(c => c.commentID === parentCommentID);
+    if (!parent) return;
+
+    try {
+        // Mock Update
+        const newID = Date.now();
+        if(!parent.replies) parent.replies = [];
+
+        parent.replies.push({
+            commentID: newID,
+            parentCommentID: parentCommentID,
+            nickname: '현재사용자',
+            content: newReplyContent.value.trim(),
+            date: new Date().toLocaleDateString()
+        });
+
+        newReplyContent.value = '';
+        replyingToCommentID.value = null;
+    } catch(e) {
+        console.error(e);
+    }
+}
+
+// ======================================
+// 모달 기능 로직
+// ======================================
 const isModalOpen = ref(false);
 const detailData = reactive({
-  id: 1,
-  rating: 4,
-  content: '기존 리뷰 내용입니다.'
-}); // 기존 상세 데이터 (예시)
+  reviewID: null,
+  title: '',
+  content: '',
+  tag: ''
+});
 
-// 4. 모달 열기/닫기 함수
+// 수정 버튼 클릭 시 호출
 const openEditModal = () => {
+  if (!post.value) return;
+
+  // 현재 게시물 데이터를 모달용 데이터에 복사
+  Object.assign(detailData, {
+    reviewID: post.value.reviewID,
+    title: post.value.title,
+    content: post.value.content,
+    tag: post.value.tag
+  });
+
   isModalOpen.value = true;
 };
+
 
 const closeModal = () => {
   isModalOpen.value = false;
 };
 
+
 const handleReviewEdit = (updatedReview) => {
   console.log('리뷰가 수정되었습니다:', updatedReview);
-  // 5. TODO: API 호출을 통해 서버에 수정된 데이터를 저장하고, 상세 페이지의 데이터를 업데이트합니다.
-  Object.assign(detailData, updatedReview);
+  loadPost(post.value.reviewID);
+  closeModal();
 };
 
 onMounted(() => {
-  // TODO: 실제 리뷰 상세 데이터를 로드하는 로직
+  // 컴포넌트 마운트 시 초기 데이터 로딩은 watch(username, ...)에서 처리됩니다.
 });
 
 </script>
 
 <style lang="scss" scoped>
+@use 'sass:color' as c;
 @use 'sass:map';
 @use '@/styles/_variables' as *;
 
-
 .list-status {
     box-shadow: 1px 1px 2px black;
-    min-height: 200px; /* 메시지가 보일 영역의 최소 높이 */
+    min-height: 200px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -381,6 +376,7 @@ onMounted(() => {
     background: map.get($colors, 'white');
     padding: 2rem;
     text-align: center;
+    margin-top: 20px;
 
     &.error {
       color: map.get($colors, 'error');
@@ -423,79 +419,13 @@ onMounted(() => {
         position: relative;
         margin-bottom: 10px;
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-start;
         align-items: center;
         margin-top: map.get($spacing, 'md');
-
-        .search-area { display:flex; gap:0.5rem; align-items:center; cursor: pointer; position: relative;
-
-          background-color: map.get($colors,'white');
-          padding: 0.6rem; border-radius:4px;
-          border:1px solid map.get($colors,'border');
-
-          .search-input {
-            border: none;
-            outline: none;
-            font-size: 0.9rem;
-            width: 150px;
-          }
-
-          .select {
-            text-align: center;
-            border: none;
-            outline: none;
-            font-size: 0.9rem;
-            padding: 0.1rem;
-          }
-
-          .search-btn {
-            font-weight: bold;
-            transition: background-color 0.1s ease;
-
-            &:hover {
-            box-shadow: map.get($shadows,'sm');
-          }
-
-          &:focus {
-            outline: none;
-            color: map.get($colors, 'gray-hover');
-          }
-          }
-        }
       }
 
-      .post-list {
-        margin-top: map.get($spacing, 'md');
-        .posts-table {
-          width: 100%;
-          border-collapse: collapse;
-          background: map.get($colors,'white');
-          border-radius: map.get($radius,'sm');
-          overflow: hidden;
-          box-shadow: map.get($shadows,'xs');
-
-          th, td {
-            font-size: 0.9rem;
-            padding: 0.9rem 1rem;
-            text-align: center;
-            border-bottom: 1px solid map.get($colors,'border');
-          }
-          thead {
-            background: map.get($colors,'light');
-            color: map.get($colors,'dark');
-          }
-          tbody tr { cursor: pointer; }
-          .col-no { width:7%; }
-          .col-tag { width:8%; }
-          .col-title { width:50%; text-align: left;}
-          .col-author { width:10%; }
-          .col-date { width:10%; }
-          .col-views, .col-rec { width:8%; text-align:center; }
-        }
-      }
     }
 
-      // 상세 보기 전용 스타일
       .review-detail-wrapper {
         position: relative;
 
@@ -504,9 +434,6 @@ onMounted(() => {
         margin: 0 auto;
 
         .back {
-          position: relative;
-          top: 20px;
-          left: 20px;
           background: transparent; border: none;
           color: map.get($colors,'muted');
           cursor: pointer;
@@ -546,7 +473,7 @@ onMounted(() => {
             margin-top:1.2rem;
             display:flex;
             gap:0.8rem;
-            justify-content: flex-end; // 버튼 오른쪽 정렬
+            justify-content: flex-end;
 
             .btn {
               background-color: map.get($colors, 'black');
@@ -565,7 +492,7 @@ onMounted(() => {
               }
             }
             .recommend-btn {
-              margin-right: auto; // 오른쪽 버튼들과 분리하여 왼쪽으로 이동
+              margin-right: auto;
 
               background-color: map.get($colors, 'white');
               color: map.get($colors, 'black');
@@ -577,7 +504,7 @@ onMounted(() => {
                 border-color: transparent;
 
                 &:hover {
-                  background-color: darken(map.get($colors,'error'), 10%);
+                  background-color: c.adjust(map.get($colors,'error'), $lightness: -10%);
                 }
               }
 
@@ -591,174 +518,218 @@ onMounted(() => {
               background: map.get($colors,'error');
               border-color: map.get($colors,'error');
               &:hover {
-                background-color: darken(map.get($colors,'error'), 10%);
+                background-color: c.adjust(map.get($colors,'error'), $lightness: -10%);
               }
             }
           }
         }
 
-        // =================== comment =======================
+      // =================== comment =======================
 
-        .comment-card {
-          min-height: 20vh;
-          background: map.get($colors,'white');
-          padding: map.get($spacing,'lg');
-          border-radius: map.get($radius,'md');
-          box-shadow: map.get($shadows,'sm');
-          margin: 20px auto;
-          .comment-header {
-            position: relative;
-            display:flex; justify-content:space-between; align-items:flex-start;
-            border-bottom: 2px solid map.get($colors,'border');
-            .comment-title { margin:0; font-size:2rem; }
-            .comment-meta { position: relative; top:20px; color: map.get($colors,'muted'); font-size:0.9rem; display:flex; gap:0.8rem; }
-          }
+      .comment-card {
+        min-height: auto;
+        background: map.get($colors,'white');
+        padding: map.get($spacing,'lg');
+        border-radius: map.get($radius,'md');
+        box-shadow: map.get($shadows,'sm');
+        margin: 20px auto;
 
-          .comment-body {
-            margin-bottom: 20px;
-            min-height: 40vh;
-            border: 0.1vw solid gray;
-            border-radius: 15px;
-            padding: 20px;
-            .tag {
-              display:inline-block;
-              background: map.get($colors,'light');
-              padding:0.2rem 0.5rem;
-              border-radius:4px;
-              margin-bottom:0.8rem;
+        .comment-section-title {
+          font-size: 1.5rem;
+          margin-bottom: map.get($spacing, 'md');
+          padding-bottom: map.get($spacing, 'xs');
+          border-bottom: 2px solid map.get($colors, 'border');
+          font-family: 'TheJamsilOTF6ExtraBold', sans-serif;
+        }
+
+        .comment-write-form {
+          margin-bottom: map.get($spacing, 'lg');
+
+          .comment-textarea {
+            width: 100%;
+            padding: 15px;
+            border-radius: map.get($radius, 'sm');
+            border: 1px solid map.get($colors, 'border');
+            resize: vertical;
+            outline: none;
+            font-family: 'SCDream5', sans-serif;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+
+            &:focus {
+              border-color: map.get($colors, 'dark');
+            }
+            &:disabled {
+              background-color: map.get($colors, 'light');
+              cursor: not-allowed;
             }
           }
 
-         .comment-list {
-            margin-bottom: 20px;
-            border-bottom: 0.1vw solid gray;
-            padding: 20px;
-            .writer {
-              display:inline-block;
-              background: map.get($colors,'light');
-              padding:0.2rem 0.5rem;
-              border-radius:4px;
-              margin-bottom:0.8rem;
+          .comment-submit-area {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-top: map.get($spacing, 'sm');
+
+            .loading-message {
+              color: map.get($colors, 'muted');
+              font-size: 0.9rem;
+              margin-right: map.get($spacing, 'md');
             }
-          }
 
-          .comment-actions {
-            margin-top:1.2rem;
-            display:flex;
-            gap:0.8rem;
-            justify-content: flex-end; // 버튼 오른쪽 정렬
-
-            .btn {
+            .comment-submit-btn {
               background-color: map.get($colors, 'black');
               color: map.get($colors, 'white');
               border: 1px solid map.get($colors,'black');
-              font-size: 1rem;
-              padding: 0.3rem 0.8rem;
-              cursor: pointer;
-              transition: background-color 0.1s ease;
-              border-radius:4px;
+              padding: map.get($spacing, 'xs') map.get($spacing, 'md');
               box-shadow: 1px 1px 3px black;
 
-              &:hover {
-                background-color: map.get($colors, 'dark');
-                color: map.get($colors, 'white');
-              }
-            }
-            .recommend-btn {
-              margin-right: auto; // 오른쪽 버튼들과 분리하여 왼쪽으로 이동
-
-              background-color: map.get($colors, 'white');
-              color: map.get($colors, 'black');
-              border: 1px solid map.get($colors,'border');
-
-              &.active {
-                background-color: map.get($colors, 'dark');
-                color: map.get($colors, 'white');
-                border-color: transparent;
-
-                &:hover {
-                  background-color: darken(map.get($colors,'error'), 10%);
-                }
-              }
-
-              &:hover:not(.active) {
-                background-color: map.get($colors, 'gray-hover');
-                color: map.get($colors, 'black');
-              }
-            }
-
-            .danger {
-              background: map.get($colors,'error');
-              border-color: map.get($colors,'error');
-              &:hover {
-                background-color: darken(map.get($colors,'error'), 10%);
+              &:disabled {
+                background-color: map.get($colors, 'muted');
+                border-color: map.get($colors, 'muted');
+                cursor: not-allowed;
               }
             }
           }
         }
-      }
-    }
 
-  .gallery-side { width: 18vw; display:flex; flex-direction:column;
+        .comment-list-section {
+          .comment-status {
+              text-align: center;
+              color: map.get($colors, 'muted');
+              padding: map.get($spacing, 'md');
+              border-top: 1px solid map.get($colors, 'light');
+          }
 
-    .category-padding { height: 2rem; }
-    .trending-box, .recent-box {
-      background: map.get($colors,'white');
-      padding: map.get($spacing,'md');
-      border-radius: map.get($radius,'md');
-      box-shadow: map.get($shadows,'sm');
+          .comment-item {
+            padding: map.get($spacing, 'sm') 0;
+            border-bottom: 1px dotted map.get($colors, 'border');
 
-      h3, h4 { margin: 10px 0 0.8rem 0; font-size: 1rem; }
-    }
+            &:first-child { border-top: 1px solid map.get($colors, 'border'); }
+            &:last-child { border-bottom: none; }
+
+            .comment-header-row {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              font-size: 0.85rem;
+              color: map.get($colors, 'muted');
+              margin-bottom: 5px;
+            }
+
+            .comment-nickname {
+              font-weight: bold;
+              color: map.get($colors, 'dark');
+              padding-right: map.get($spacing, 'sm');
+            }
+
+            .comment-content {
+              margin: 0;
+              padding-left: map.get($spacing, 'sm');
+              font-size: 1rem;
+            }
+
+            .comment-actions {
+                display: flex;
+                justify-content: flex-end;
+                padding: 0 0 5px;
+            }
+
+            .reply-btn {
+                background: map.get($colors, 'light');
+                color: map.get($colors, 'dark');
+                font-size: 0.8rem;
+                padding: 0.1rem 0.6rem;
+                border-radius: 3px;
+                border: 1px solid map.get($colors, 'border');
+
+                &:hover {
+                    background: map.get($colors, 'gray-hover');
+                }
+            }
 
 
-    .trending-list, .recent-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
+            .reply-write-form {
+                margin: 10px 0 15px 20px;
+                padding: 10px;
+                background: #f7f7f7;
+                border: 1px solid map.get($colors, 'border-light');
+                border-radius: map.get($radius, 'sm');
 
-      li {
-        padding: 0.5rem 0;
-        border-bottom: 1px solid map.get($colors,'border');
+                .reply-textarea {
+                    width: 100%;
+                    min-height: 60px;
+                    padding: 8px;
+                    border-radius: map.get($radius, 'xs');
+                    border: 1px solid map.get($colors, 'border');
+                    resize: vertical;
+                    outline: none;
+                    font-family: 'SCDream5', sans-serif;
+                    font-size: 0.9rem;
+                }
 
-        &:last-child { border-bottom: none; }
-      }
-    }
+                .reply-submit-area {
+                    display: flex;
+                    justify-content: flex-end;
+                    gap: 5px;
+                    margin-top: 5px;
 
-    .trending-list li {
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:0.5rem;
-      cursor: pointer;
+                    .reply-submit-btn, .cancel-btn {
+                        font-size: 0.8rem;
+                        padding: 0.2rem 0.5rem;
+                        background-color: map.get($colors, 'dark');
+                        color: map.get($colors, 'white');
+                        border: none;
+                        border-radius: 3px;
+                        box-shadow: 1px 1px 3px map.get($colors, 'muted');
 
-      &:hover { background:map.get($colors,'light'); padding-left:0.3rem; }
+                        &:disabled {
+                            background-color: map.get($colors, 'muted');
+                            cursor: not-allowed;
+                            box-shadow: none;
+                        }
+                    }
 
-      .trending-title { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-      .trending-count {
-        background: map.get($colors,'black');
-        color: white;
-        padding:0.2rem 0.5rem;
-        border-radius:12px;
-        font-size:0.8rem;
-        font-weight:bold;
-      }
-    }
+                    .cancel-btn {
+                        background-color: map.get($colors, 'muted');
+                    }
+                }
+            }
 
-    .recent-list li {
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:0.5rem;
-      cursor: pointer;
+            .reply-list-section {
+                margin-left: 20px;
+                padding-left: 10px;
+                border-left: 2px solid map.get($colors, 'light');
 
-      &:hover { background:map.get($colors,'light'); padding-left:0.3rem; }
+                .reply-item {
+                    padding: 8px 0;
+                    border-bottom: 1px dotted map.get($colors, 'border-light');
 
-      .recent-title { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-      .recent-date {
-        color: map.get($colors,'muted');
-        font-size:0.8rem;
-        white-space:nowrap;
+                    &:last-child { border-bottom: none; }
+
+                    .reply-header-row {
+                        padding-left: map.get($spacing, 'sm');
+                        font-size: 0.75rem;
+                        color: map.get($colors, 'muted');
+                        display: flex;
+                        justify-content: space-between;
+                        margin-bottom: 3px;
+                    }
+
+                    .reply-nickname {
+                        font-weight: bold;
+                        color: map.get($colors, 'dark');
+                    }
+
+                    .reply-content {
+                        margin: 0;
+                        padding-left: map.get($spacing, 'md');
+                        font-size: 0.9rem;
+                    }
+                }
+            }
+          }
+        }
       }
     }
   }

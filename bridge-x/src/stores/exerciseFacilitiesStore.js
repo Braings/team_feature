@@ -1,5 +1,5 @@
 import { reactive, ref } from 'vue'
-import { loadExerciseFacilities } from '@/api' // api.js에서 가져온 실제 API 헬퍼 함수
+import { loadExerciseFacilities, get } from '@/api' // api.js에서 가져온 실제 API 헬퍼 함수, [FIX] get 추가
 import localFacilityData from './facilityListState.js'
 
 // -------------------------------------------------------------
@@ -41,8 +41,8 @@ export const facilityListState = reactive({
 
 export const facilityDetailState = reactive({
     data: {},
-    isLoading: ref(false),
-    hasError: ref(false),
+    isLoading: false, // [FIX} ref() 제거 후, 값만 남기기
+    hasError: false,  // ref(false) -> false
 });
 // -------------------------------------------------------------
 // 2. 함수 (ACTIONS) 정의
@@ -114,7 +114,43 @@ export async function fetchExerciseFacilities(region, city) {
   }
 }
 
-// 2. 상세 정보 조회를 위한 비동기 함수
+// 2. 상세 정보 조회를 위한 비동기 함수.
+// [FIX] 실제 기능 구현된 새 함수
+export const fetchFacilityDetailById = async (id) => {
+    // Store 상태 접근 방식 통일 (isLoading.value 사용 유지 시)
+    facilityDetailState.isLoading = true;
+    facilityDetailState.hasError = false;
+
+    // [FIX] 이전 데이터 초기화하는 부분은 불필요하므로 삭제
+    // Object.keys(facilityDetailState.data).forEach(key => delete facilityDetailState.data[key]);
+  
+    try {
+        // 백엔드의 ID 기반 탐색 엔드포인트 호출
+        const response = await get(`/api/exerciseFacilities/${id}`);
+
+        if (response) {
+            // API 응답 객체를 상태에 할당
+            // +AddPoint
+            // Object.assign(facilityDetailState.data, response);
+            facilityDetailState.data = response;
+        } else {
+            // 응답은 받았지만 데이터가 없는 경우
+            throw new Error(`ID ${id} 시설 정보를 찾을 수 없습니다.`);
+        }
+
+    } catch (error) {
+        console.error(`시설 상세 정보 로드 실패 (ID: ${id}):`, error);
+        facilityDetailState.hasError = true;
+        // 실패 시 데이터 초기화 유지
+        Object.keys(facilityDetailState.data).forEach(key => delete facilityDetailState.data[key]);
+
+    } finally {
+        // 로딩 상태 해제
+        facilityDetailState.isLoading = false;
+    }
+};
+
+/* // [FIX] API 통신이 구현되어 있지 않은 기존 더미 함수 제거
 export const fetchFacilityDetailById = async (id) => {
     facilityDetailState.isLoading.value = true;
     facilityDetailState.hasError.value = false;
@@ -144,3 +180,4 @@ export const fetchFacilityDetailById = async (id) => {
         facilityDetailState.isLoading.value = false;
     }
 };
+*/

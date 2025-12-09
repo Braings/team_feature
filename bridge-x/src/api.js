@@ -1,10 +1,6 @@
 // 환경 변수에서 API 기본 URL을 가져오거나 기본값(로컬호스트)을 설정합니다.
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8080';
 
-// --------------------------------------------------------------- //
-
-// 공통 API 헬퍼 함수
-
 // ===============================================================
 //  REQUEST 함수
 // ===============================================================
@@ -58,18 +54,12 @@ async function request(path, options = {}) {
     err.raw = data; // 응답 데이터 원본 저장
     throw err; // 호출 함수에서 catch 할 수 있도록 에러 발생
   }
-
-  // 성공적으로 파싱된 데이터 반환
   return data;
 }
 
 // ===============================================================
 //  POST 함수
 // ===============================================================
-
-// POST 요청을 간편하게 수행하는 헬퍼 함수 (데이터 생성)
-  // @param {string} path - 요청 경로
-  // @param {Object} body - 요청 본문에 포함할 데이터 객체
 
 export async function post(path, body = {}, opts = {}) {
   return request(path, Object.assign({
@@ -82,217 +72,108 @@ export async function post(path, body = {}, opts = {}) {
 //  GET 함수
 // ===============================================================
 
-// GET 요청을 간편하게 수행하는 헬퍼 함수 (데이터 조회)
-  // @param {string} path - 요청 경로
-
 export async function get(path, opts = {}) {
   return request(path, Object.assign({
-    method: 'GET', // GET 메서드 지정
+    method: 'GET',
   }, opts));
 }
 
-// --------------------------------------------------------------- //
-
-// User Exercise Board API Endpoints (사용자 운동 게시판)
-
-
 // ===============================================================
-// 사용자 운동 기록 조회 API 함수 /api/userExercise
+// 사용자 운동 기록 조회 API 함수
 // ===============================================================
-
-// 사용자 운동 기록 목록을 조회합니다.
-  // @returns {Promise<Object>} 운동 기록 데이터 목록
 
 export async function getUserExercise() {
   return get('/api/userExercise');
 }
 
 // ===============================================================
-//  운동 시설 조회 API 함수 api/exerciseFacilities
+//  운동 시설 조회 API 함수
 // ===============================================================
-
-// 운동 시설 목록을 조회합니다.
-  // @param {Object} query - 지역 정보를 포함하는 쿼리 파라미터 객체 ({ region: '도', city: '시군구' })
-  // @returns {Promise<Object>} 운동 시설 데이터 목록
 
 export async function loadExerciseFacilities(query = {}) {
   // 쿼리 객체를 'region=도&city=시군구' 형태의 URLSearchParams로 변환
   // 예: { region: '서울', city: '강남구' } -> ?region=서울&city=강남구
   const params = new URLSearchParams(query);
-
-  // GET 요청 경로를 '/api/exerciseFacilities?region=...&city=...' 형태로 구성
   return get(`/api/exerciseFacilities?${params.toString()}`);
 }
 
-// --------------------------------------------------------------- //
-
-// User Profile API Endpoints (/api/users/profile)
 
 //================================================================
-// 사용자 프로필 조회 API 함수
+// 사용자 프로필 관련 API 함수
 // ===============================================================
 
-// 현재 로그인된 사용자의 프로필 정보를 조회합니다.
-  // @returns {Promise<Object>} 사용자 프로필 데이터
-
-  export async function getUserProfile() {
-  // 인증 정보를 통해 서버가 현재 사용자를 식별하여 데이터를 반환합니다.
+export async function getUserProfile() {
   return get('/api/users/profile');
 }
 
-// ===============================================================
-// 사용자 프로필 수정 API 함수
-// ===============================================================
-
-// 현재 로그인된 사용자의 프로필 정보를 수정합니다.
-  // @param {Object} data - 수정할 프로필 데이터
-  // @returns {Promise<Object>} 업데이트된 프로필 데이터
-
-
 export async function updateProfile(data) {
   return request('/api/users/profile', {
-    method: 'PUT', // PUT 메서드 사용: 리소스 전체를 업데이트
+    method: 'PUT',
     body: JSON.stringify(data),
   });
 }
 
-// --------------------------------------------------------------- //
-
-// Review Board API Endpoints (/api/reviews)
-
 // ===============================================================
-// 리뷰 목록 조회 API 함수
+// 사용자 신체 정보 조회 API 함수 (새로 추가)
 // ===============================================================
 
-// 리뷰 목록을 검색 및 필터링하여 조회합니다.
-  // @param {Object} query - 검색 및 페이지네이션을 위한 쿼리 파라미터 객체
-  // @returns {Promise<Object>} 리뷰 목록 및 관련 메타데이터
-
-export async function getReviews(query = {}) {
-  // 쿼리 객체를 'page=1&limit=10' 형태의 URLSearchParams로 변환
-  const params = new URLSearchParams(query);
-  return get(`/api/reviews?${params.toString()}`);
+export async function getUserBodyInfo() {
+  // 백엔드 URL을 /users/body에 맞춰서 호출
+  return get('/api/users/body');
 }
 
 // ===============================================================
-// 리뷰 상세 조회 API 함수
+// 리뷰(게시물) 관련 API
 // ===============================================================
 
-// 특정 ID를 가진 리뷰 상세 정보를 조회합니다.
- // @param {string|number} reviewId - 조회할 리뷰의 고유 ID
- // @returns {Promise<Object>} 리뷰 상세 데이터
+export async function getReviews(params) {
+  const query = new URLSearchParams(params).toString();
+  return get(`/api/reviews?${query}`);
+}
 
 export async function getReviewDetail(reviewId) {
   return get(`/api/reviews/${reviewId}`);
 }
 
-// ===============================================================
-// 리뷰 생성 API 함수
-// ===============================================================
-
-// 새로운 리뷰를 생성합니다.
-  // @param {Object} data - 생성할 리뷰 데이터 (제목, 내용, 태그 등)
-  // @returns {Promise<Object>} 생성된 리뷰 데이터 (ID, 생성 시간 등 포함)
-
 export async function createReview(data) {
   return post('/api/reviews', data);
 }
 
-// ===============================================================
-// 리뷰 수정 API 함수
-// ===============================================================
-
-// 특정 ID를 가진 리뷰를 수정합니다.
- // @param {string|number} reviewId - 수정할 리뷰의 고유 ID
- // @param {Object} data - 수정 내용이 담긴 데이터 객체
- // @returns {Promise<Object>} 업데이트된 리뷰 데이터
-
 export async function updateReview(reviewId, data) {
   return request(`/api/reviews/${reviewId}`, {
-    method: 'PUT', // PUT 메서드 사용: 리소스 전체를 업데이트
+    method: 'PUT',
     body: JSON.stringify(data),
   });
 }
-
-
-// ===============================================================
-// 리뷰 삭제 API 함수
-// ===============================================================
-
-// 특정 ID를 가진 리뷰를 삭제합니다.
-  // @param {string|number} reviewId - 삭제할 리뷰의 고유 ID
-  // @returns {Promise<Object>} 삭제 성공 응답
 
 export async function deleteReview(reviewId) {
   return request(`/api/reviews/${reviewId}`, {
-    method: 'DELETE', // DELETE 메서드 사용
+    method: 'DELETE',
   });
 }
 
-
-// --------------------------------------------------------------- //
-
-// Comment Board API Endpoints (/api/comments)
-
 // ===============================================================
-// 댓글 목록 조회 API 함수
+// 댓글 관련 API
 // ===============================================================
 
-// 댓글 목록을 검색 및 필터링하여 조회합니다.
-  // @param {Object} query - 검색 및 페이지네이션을 위한 쿼리 파라미터 객체
-  // @returns {Promise<Object>} 댓글 목록 및 관련 메타데이터
-
-export async function getComments(query = {}) {
-  // 쿼리 객체를 'page=1&limit=10' 형태의 URLSearchParams로 변환
-  const params = new URLSearchParams(query);
-  return get(`/api/comments?${params.toString()}`);
+export async function createComment(reviewId, data) {
+  // 예: /api/reviews/{reviewId}/comments 또는 data 안에 reviewId 포함
+  // 여기서는 data에 reviewId를 포함하여 전송하는 방식 예시
+  return post(`/api/reviews/${reviewId}/comments`, data);
 }
-
-// ===============================================================
-// 댓글 생성 API 함수
-// ===============================================================
-
-// 새로운 댓글을 생성합니다.
-  // @param {Object} data - 생성할 댓글 데이터 (제목, 내용, 태그 등)
-  // @returns {Promise<Object>} 생성된 댓글 데이터 (ID, 생성 시간 등 포함)
-
-export async function createComment(data) {
-  return post('/api/comments', data);
-}
-
-// ===============================================================
-// 댓글 수정 API 함수
-// ===============================================================
-
-// 특정 ID를 가진 댓글을 수정합니다.
- // @param {string|number} reviewId - 수정할 댓글의 고유 ID
- // @param {Object} data - 수정 내용이 담긴 데이터 객체
- // @returns {Promise<Object>} 업데이트된 댓글 데이터
 
 export async function updateComment(commentId, data) {
   return request(`/api/comments/${commentId}`, {
-    method: 'PUT', // PUT 메서드 사용: 리소스 전체를 업데이트
+    method: 'PUT',
     body: JSON.stringify(data),
   });
 }
 
-
-// ===============================================================
-// 댓글 삭제 API 함수
-// ===============================================================
-
-// 특정 ID를 가진 댓글을 삭제합니다.
-  // @param {string|number} reviewId - 삭제할 댓글의 고유 ID
-  // @returns {Promise<Object>} 삭제 성공 응답
-
-export async function deletlComment(commentId) {
+export async function deleteComment(commentId) {
   return request(`/api/comments/${commentId}`, {
-    method: 'DELETE', // DELETE 메서드 사용
+    method: 'DELETE',
   });
 }
-
-
-// --------------------------------------------------------------- //
 
 // ===============================================================
 // 기본 내보내기 (모든 API 함수 일괄 접근용)
@@ -301,5 +182,6 @@ export async function deletlComment(commentId) {
 export default {
     API_BASE, request, post, get,
     getReviews, getReviewDetail, createReview, updateReview, deleteReview,
-    getUserProfile, updateProfile, loadExerciseFacilities
+    getUserProfile, updateProfile, loadExerciseFacilities,
+    createComment, updateComment, deleteComment
 };

@@ -120,7 +120,7 @@ import { reactive, ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import ProfileEditModal from './ProfileEditModal.vue';
 import { userExerciseData } from '@/stores/exerciseStore';
-import { updateProfile, getUserProfile } from '@/api.js';
+import { updateProfile, getUserProfile, getUserBodyInfo } from '@/api.js'; // [FIX] 유저 기본 정보 외에 신체 및 운동 정보를 받아오기 위해 'getUserBodyInfo'추가
 const router = useRouter();
 
 const userProfile = reactive({
@@ -150,20 +150,27 @@ const userExercise = reactive({
 const loadProfile = async () => {
   try {
     const profile = await getUserProfile();
+    const bodyInfo = await getUserBodyInfo(); // [FIX] 유저 신체 및 운동 정보 받기 위함
+    
     userProfile.username = profile.username || 'N/A';
+    userProfile.nickname = profile.nickname || 'N/A';
 
     userProfile.email = profile.email || 'N/A';
     userProfile.birthday = profile.birthday || 'N/A';
-    userProfile.sex = profile.sex || 'N/A';
 
-    userProfile.height = profile.height || 'N/A';
-    userProfile.weight = profile.weight || 'N/A';
+    // [FIX] 유저의 신체 정보는 DB에서 별도 테이블에 저장되므로 따로 분리
+    if (bodyInfo) {
+      userProfile.sex = bodyInfo.gender || 'N/A';
+      userProfile.height = bodyInfo.height || 'N/A';
+      userProfile.weight = bodyInfo.weight || 'N/A';
 
-    userProfile.user_flex = profile.user_flex || 'N/A';
-    userProfile.user_situp = profile.user_situp || 'N/A';
-    userProfile.user_jump = profile.user_jump || 'N/A';
-    userProfile.user_grip = profile.user_grip || 'N/A';
-
+      // 운동 능력 정보 할당
+      userProfile.user_grip = bodyInfo.user_grip || 'N/A';
+      userProfile.user_flex = bodyInfo.user_flex || 'N/A';
+      userProfile.user_situp = bodyInfo.user_situp || 'N/A';
+      userProfile.user_jump = bodyInfo.user_jump || 'N/A';
+    }
+    
   } catch (error) {
     console.error('프로필 로드 실패:', error);
   }
@@ -201,7 +208,7 @@ const formatBirthday = (birthday) => {
 };
 
 const formatGender = (sex) => {
-  return sex === 'male' ? '남성' : sex === 'female' ? '여성' : 'N/A';
+  return sex === 'MALE' ? '남성' : sex === 'FEMALE' ? '여성' : 'N/A'; // [FIX] 성별 데이터를 대소문자 구분하여 올바르게 파싱
 };
 
 const calculateBMI = () => {
@@ -252,12 +259,14 @@ const handleProfileUpdate = async (newProfileData) => {
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/_variables.scss';
+@use 'sass:color';
+@use 'sass:map';
+@use '@/styles/_variables.scss'as *;
 
 .my-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, map-get($colors, 'dark') 0%, #1a1a1a 100%);
-  padding: map-get($spacing, '3xl') map-get($spacing, 'xl');
+  background: linear-gradient(135deg, map.get($colors, 'dark') 0%, #1a1a1a 100%);
+  padding: map.get($spacing, '3xl') map.get($spacing, 'xl');
 }
 
 .profile-container {
@@ -267,8 +276,8 @@ const handleProfileUpdate = async (newProfileData) => {
 
 .profile-header {
   text-align: center;
-  margin-bottom: map-get($spacing, '3xl');
-  color: map-get($colors, 'white');
+  margin-bottom: map.get($spacing, '3xl');
+  color: map.get($colors, 'white');
 }
 
 .profile-title {
@@ -280,7 +289,7 @@ const handleProfileUpdate = async (newProfileData) => {
 
 .profile-card {
   @include card;
-  padding: map-get($spacing, '3xl');
+  padding: map.get($spacing, '3xl');
   animation: slideUp 0.5s ease-out;
 }
 
@@ -298,7 +307,7 @@ const handleProfileUpdate = async (newProfileData) => {
 .profile-avatar {
   display: flex;
   justify-content: center;
-  margin-bottom: map-get($spacing, '3xl');
+  margin-bottom: map.get($spacing, '3xl');
 }
 
 .avatar-placeholder {
@@ -316,9 +325,9 @@ const handleProfileUpdate = async (newProfileData) => {
 }
 
 .info-section {
-  margin-bottom: map-get($spacing, '2xl');
-  padding-bottom: map-get($spacing, '2xl');
-  border-bottom: 1px solname map-get($colors, 'border-light');
+  margin-bottom: map.get($spacing, '2xl');
+  padding-bottom: map.get($spacing, '2xl');
+  border-bottom: 1px solname map.get($colors, 'border-light');
 
   &:last-of-type {
     border-bottom: none;
@@ -328,84 +337,84 @@ const handleProfileUpdate = async (newProfileData) => {
 .section-title {
   font-size: 1.1rem;
   font-weight: bold;
-  margin-bottom: map-get($spacing, 'xl');
-  color: map-get($colors, 'black');
+  margin-bottom: map.get($spacing, 'xl');
+  color: map.get($colors, 'black');
 }
 
 .info-grname {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: map-get($spacing, 'lg');
+  gap: map.get($spacing, 'lg');
 }
 
 .info-item {
   display: flex;
   flex-direction: column;
-  gap: map-get($spacing, 'sm');
+  gap: map.get($spacing, 'sm');
 }
 
 .label {
   font-size: 0.9rem;
-  color: map-get($colors, 'text-placeholder');
+  color: map.get($colors, 'text-placeholder');
   font-weight: 500;
 }
 
 .value {
   font-size: 1rem;
-  color: map-get($colors, 'black');
+  color: map.get($colors, 'black');
   font-weight: bold;
 }
 
 .health-grname {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: map-get($spacing, 'lg');
+  gap: map.get($spacing, 'lg');
 }
 
 .health-item {
   background: #f5f5f5;
-  padding: map-get($spacing, 'lg');
-  border-radius: map-get($radius, 'md');
+  padding: map.get($spacing, 'lg');
+  border-radius: map.get($radius, 'md');
   display: flex;
   flex-direction: column;
-  gap: map-get($spacing, 'sm');
+  gap: map.get($spacing, 'sm');
   text-align: center;
 }
 
 .exercise-grname {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: map-get($spacing, 'lg');
+  gap: map.get($spacing, 'lg');
 }
 
 .exercise-item {
   background: #f5f5f5;
-  padding: map-get($spacing, 'lg');
-  border-radius: map-get($radius, 'md');
+  padding: map.get($spacing, 'lg');
+  border-radius: map.get($radius, 'md');
   display: flex;
   flex-direction: column;
-  gap: map-get($spacing, 'sm');
+  gap: map.get($spacing, 'sm');
   text-align: center;
 }
 
 .contact-item {
   display: flex;
   flex-direction: column;
-  gap: map-get($spacing, 'sm');
+  gap: map.get($spacing, 'sm');
 }
 
 .button-area {
   display: flex;
-  gap: map-get($spacing, 'lg');
-  margin-top: map-get($spacing, '2xl');
+  gap: map.get($spacing, 'lg');
+  margin-top: map.get($spacing, '2xl');
 }
 
 .edit-button,
 .logout-button {
   flex: 1;
-  padding: map-get($spacing, 'lg') map-get($spacing, 'md');
+  padding: map.get($spacing, 'lg') map.get($spacing, 'md');
   border: none;
-  border-radius: map-get($radius, 'md');
+  border-radius: map.get($radius, 'md');
   font-size: 1rem;
   font-weight: bold;
   cursor: pointer;
@@ -413,18 +422,18 @@ const handleProfileUpdate = async (newProfileData) => {
 }
 
 .edit-button {
-  background-color: map-get($colors, 'black');
-  color: map-get($colors, 'white');
+  background-color: map.get($colors, 'black');
+  color: map.get($colors, 'white');
 
   &:hover {
-    background-color: map-get($colors, 'gray-hover');
+    background-color: map.get($colors, 'gray-hover');
   }
 }
 
 .logout-button {
   background-color: #f5f5f5;
-  color: map-get($colors, 'black');
-  border: 1px solid map-get($colors, 'border');
+  color: map.get($colors, 'black');
+  border: 1px solid map.get($colors, 'border');
 
   &:hover {
     background-color: #e0e0e0;

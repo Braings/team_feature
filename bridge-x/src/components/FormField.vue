@@ -36,6 +36,8 @@ defineEmits(['update:modelValue']);
 </script>
 
 <style lang="scss" scoped>
+@use "sass:color";
+
 $color-border: #ccc;
 $color-text-placeholder: #888;
 $color-error: #e74c3c;
@@ -68,7 +70,7 @@ $font-size-base: 1rem;
 
   &:focus {
     outline: none;
-    border-color: darken($color-border, 10%);
+    border-color: color.adjust($color-border, $lightness: -10%);
   }
 }
 

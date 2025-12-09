@@ -25,7 +25,7 @@
           <select v-model="search.type" class="select">
             <option value="all">전체</option>
             <option value="title">제목</option>
-            <option value="author">작성자</option>
+            <option value="nickname">작성자</option>
           </select>
           <input v-model="search.query" placeholder="검색어 입력" class="search-input"/>
           <button class="search-btn" @click=handleSearchAndBlur($event)>검색</button>
@@ -43,18 +43,18 @@
                 <th class="col-no">번호</th>
                 <th class="col-tag">태그</th>
                 <th class="col-title" :style="{ textAlign: 'center' }" >제목</th>
-                <th class="col-author">글쓴이</th>
+                <th class="col-nickname">글쓴이</th>
                 <th class="col-date">작성일</th>
                 <th class="col-views">조회</th>
                 <th class="col-rec">추천</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(post) in pagedPosts" :key="post.username" :style="{ fontFamily: 'SCDream5'}"  @click="openPost(post)" >
+              <tr v-for="(post) in pagedPosts" :key="post.reviewID" :style="{ fontFamily: 'SCDream5'}"  @click="openPost(post)" >
                 <td class="col-no">{{ post.no }}</td>
                 <td class="col-tag">{{ post.tag }}</td>
                 <td class="col-title">{{ post.title }}</td>
-                <td class="col-author">{{ post.author }}</td>
+                <td class="col-nickname">{{ post.nickname }}</td>
                 <td class="col-date">{{ post.date }}</td>
                 <td class="col-views">{{ post.views }}</td>
                 <td class="col-rec">{{ post.recommend }}</td>
@@ -85,7 +85,7 @@
       <div class="trending-box" :style="{  boxShadow: '1px 1px 3px black'}">
         <h3 :style="{ paddingBottom: '18px', borderBottom: '2px solid #ccc', fontSize: '20px' }" > &nbsp;&nbsp; 인기글</h3>
         <ul class="trending-list">
-          <li v-for="post in trendingPosts" :key="post.username" @click="openPost(post)">
+          <li v-for="post in trendingPosts" :key="post.reviewID" @click="openPost(post)">
             <span class="trending-title" :style="{ fontFamily: 'SCDream5'}">{{ post.title }}</span>
             <span class="trending-count">{{ post.recommend }}</span>
           </li>
@@ -97,7 +97,7 @@
       <div class="recent-box" :style="{  boxShadow: '1px 1px 3px black'}">
         <h3 :style="{ paddingBottom: '18px', borderBottom: '2px solid #ccc', fontSize: '20px'}" > &nbsp;&nbsp; 최근글</h3>
         <ul class="recent-list">
-          <li v-for="post in recentPosts" :key="post.username" @click="openPost(post)">
+          <li v-for="post in recentPosts" :key="post.reviewID" @click="openPost(post)">
             <span class="recent-title" :style="{ fontFamily: 'SCDream5'}">{{ post.title }}</span>
             <span class="recent-date">{{ post.date }}</span>
           </li>
@@ -146,14 +146,15 @@ async function loadReviews() {
     console.error('리뷰 목록 로드 실패:', error);
     error.value = error.message;
 
-    // 폴백: 샘플 데이터 (37개 전체를 생성하여 클라이언트 측 필터링을 허용)
-    // 💡 이 샘플 데이터는 어떤 필터링 조건에서도 항상 동일하게 전체를 생성해야 합니다.
+
+    // 이 샘플 데이터는 어떤 필터링 조건에서도 항상 동일하게 전체를 생성해야 합니다.
     posts.value = Array.from({ length: 100  }).map((_, i) => ({
-      username: `author${i + 1}`,
+      reviewId: 100 - i,
+      username: `nickname${i + 1}`,
       no: 100 - i,
       tag: i % 5 === 0 ? '질문' : i % 3 === 0 ? '정보' : '리뷰',
       title: `샘플 게시물 제목 ${i + 1}`,
-      author: `운영자${(i % 6) + 1}`,
+      nickname: `운영자${(i % 6) + 1}`,
       date: '25/11/' + ((i % 30) + 1).toString().padStart(2, '0'),
       views: Math.floor(Math.random() * 500),
       recommend: Math.floor(Math.random() * 50)
@@ -186,7 +187,9 @@ function selectCategory(cat) {
 }
 
 function openPost(post) {
-  if (router) router.push({ name: 'reviewDetail', params: { username: post.username } }).catch(()=>{});
+  if (router) router.push({
+    name: 'reviewDetail',
+    params: { reviewID: post.reviewID } }).catch(()=>{});
 }
 
 function prevPage() {
@@ -219,11 +222,11 @@ const filteredPosts = computed(() => {
     const q = search.value.query.toLowerCase();
     result = result.filter(p => {
       const titleMatch = (p.title || '').toLowerCase().includes(q);
-      const authorMatch = (p.author || '').toLowerCase().includes(q);
+      const nicknameMatch = (p.nickname || '').toLowerCase().includes(q);
 
       if (search.value.type === 'title') return titleMatch;
-      if (search.value.type === 'author') return authorMatch;
-      return titleMatch || authorMatch;
+      if (search.value.type === 'nickname') return nicknameMatch;
+      return titleMatch || nicknameMatch;
     });
   }
 
@@ -279,6 +282,7 @@ const handleReviewSubmit = (newReview) => {
 </script>
 
 <style lang="scss" scoped>
+@use 'sass:color';
 @use 'sass:map';
 @use '@/styles/_variables' as *;
 
@@ -436,7 +440,7 @@ const handleReviewSubmit = (newReview) => {
         .col-no { width:7%; }
         .col-tag { width:8%; }
         .col-title { width:50%; text-align: left;}
-        .col-author { width:10%; }
+        .col-nickname { width:10%; }
         .col-date { width:10%; }
         .col-views, .col-rec { width:8%; text-align:center; }
       }
