@@ -4,7 +4,8 @@
       <div class="modal-header">
         <h3 class="modal-title">
           <span v-if="isLoading">상세 정보 불러오는 중...</span>
-          <span v-else-if="facilityDetail.FCLTY_NM">{{ facilityDetail.FCLTY_NM }} 상세 정보</span>
+          <!-- [FIX] 이 부분부터 template내에 있는, 정보 받는 변수 첫 어절은 싹 다 소문자로 변경 -->
+          <span v-else-if="facilityDetail.fclty_NM">{{ facilityDetail.fclty_NM }} 상세 정보</span>
           <span v-else>시설 상세 정보</span>
         </h3>
         <button class="close-button" @click="emit('close')">&times;</button>
@@ -20,39 +21,45 @@
             🚨 정보를 불러오는 데 실패했습니다. ID: {{ facilityId }}
         </div>
 
-        <div v-else-if="facilityDetail.FCLTY_NM" class="detail-content">
+        <div v-else-if="facilityDetail.fclty_NM" class="detail-content">
 
           <div class="detail-group">
             <label>사업 분류</label>
-            <p>{{ facilityDetail.INDUTY_NM }}</p>
+            <!-- [FIX] 여기부터 if-else 추가. (초기화 부분 제거) -->
+            <p v-if="facilityDetail.induty_NM">{{ facilityDetail.induty_NM }}</p>
+            <p v-else>해당 정보가 없습니다.</p>
           </div>
 
           <div class="detail-group">
             <label>시설 주소 (도로명)</label>
-            <p>{{ facilityDetail.RDNMADR_ONE_NM }}</p>
+            <p v-if="facilityDetail.rdnmadr_ONE_NM">{{ facilityDetail.rdnmadr_ONE_NM }}</p>
+            <p v-else>해당 정보가 없습니다.</p>
           </div>
 
           <div class="detail-group">
             <label>시설 주소 (지번)</label>
-            <p>{{ facilityDetail.FCLTY_ADDR_ONE_NM }}</p>
+            <p v-if="facilityDetail.fclty_NM_ADDR_ONE_NM">{{ facilityDetail.fclty_ADDR_ONE_NM }}</p>
+            <p v-else>해당 정보가 없습니다.</p>
           </div>
 
           <div class="detail-group half">
             <label>시설 연락처</label>
-            <p>{{ facilityDetail.FCLTY_TEL_NO }}</p>
+            <p v-if="facilityDetail.fclty_TEL_NO">{{ facilityDetail.fclty_TEL_NO }}</p>
+            <p v-else>해당 정보가 없습니다.</p>
           </div>
 
           <div class="detail-group half">
             <label>담당자 연락처</label>
-            <p>{{ facilityDetail.RSPNSBLTY_TEL_NO }}</p>
+            <p v-if="facilityDetail.rspnsblty_TEL_NO">{{ facilityDetail.rspnsblty_TEL_NO }}</p>
+            <p v-else>해당 정보가 없습니다.</p>
           </div>
 
           <div class="detail-group">
             <label>홈페이지</label>
-            <p v-if="facilityDetail.FCLTY_HMPG_URL">
-                <a :href="facilityDetail.FCLTY_HMPG_URL" target="_blank">{{ facilityDetail.FCLTY_HMPG_URL }}</a>
+            <p v-if="facilityDetail.fclty_HMPG_URL">
+                <a :href="facilityDetail.fclty_HMPG_URL" target="_blank">{{ facilityDetail.fclty_HMPG_URL }}</a>
             </p>
-            <p v-else>정보 없음</p>
+            <p v-else>해당 정보가 없습니다.</p>
           </div>
 
         </div>
@@ -70,7 +77,7 @@
 </template>
 
 <script setup>
-import { watch } from 'vue';
+import { watch, toRefs } from 'vue'; // [FIX] toRefs 추가
 
 // 💡 변경: 더미 데이터 대신 Store에서 필요한 상태와 함수를 가져옵니다.
 import {
@@ -94,10 +101,12 @@ const emit = defineEmits(['close']);
 
 // 💡 변경: 로컬 상태 대신 Store 상태를 직접 사용합니다.
 // Store의 상태에서 필요한 정보(데이터, 로딩, 에러)를 직접 가져와 변수로 사용합니다.
+const { data: facilityDetail, isLoading, hasError } = toRefs(facilityDetailState); // [FIX] toRefs를 통해 정보 받기
+/* // [FIX] 기존 방식은 주석 처리
 const facilityDetail = facilityDetailState.data;
 const isLoading = facilityDetailState.isLoading;
 const hasError = facilityDetailState.hasError;
-
+*/
 
 /**
  * 💡 시설 ID를 사용하여 상세 정보를 조회하는 함수 (Store 함수 호출로 변경)
@@ -124,7 +133,7 @@ watch(() => [props.isOpen, props.facilityId], ([newOpen, newId]) => {
     // 💡 변경: 로컬 함수 이름을 fetchDetail로 변경하고 호출합니다.
     fetchDetail(newId);
   }
-
+  /* // [FIX] 기존 초기화 방식은 불필요하므로 주석 처리
   // 모달이 닫히면 상태 초기화
   if (!newOpen) {
     // 💡 변경: Store에서 상세 정보 초기화 로직을 담당한다고 가정하고,
@@ -141,6 +150,7 @@ watch(() => [props.isOpen, props.facilityId], ([newOpen, newId]) => {
     Object.keys(facilityDetail).forEach(key => delete facilityDetail[key]);
 
   }
+  */
 }, { immediate: true }); // 즉시 실행 옵션 추가 (Store 상태가 초기값으로 설정되도록)
 </script>
 
