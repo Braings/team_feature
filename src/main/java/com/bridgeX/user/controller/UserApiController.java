@@ -76,7 +76,7 @@ public class UserApiController {
     
     
     // User Info Modify
-    @PostMapping("/me/modify")
+    @PutMapping("/users/profile")
     public ResponseEntity<UserInfoResponse> modifyInfo(Principal principal, @Valid @RequestBody UserInfoModifyRequest request) {
     	// User 정보 꺼내오기
         String username = principal.getName();
@@ -100,7 +100,7 @@ public class UserApiController {
     
     
     // User BodyInfo Request (edit)
-    @PutMapping("/me/body")
+    @PutMapping("/users/body")
     public ResponseEntity<?> putMyBodyInfo(Principal principal, @RequestBody @Valid UserBodyInfoRequest dto){
     	// 로그인 안 됐을 때
     	if (principal == null) {
@@ -114,7 +114,7 @@ public class UserApiController {
     }
     
     // User BodyInfo Response
-    @GetMapping("/me/body")
+    @GetMapping("/users/body")
     public ResponseEntity<UserBodyInfoResponse> getMyBodyInfo(Principal principal){
     	// 로그인 안 됐을 때
         if (principal == null) {

@@ -40,7 +40,7 @@ public class FacilitiesController {
 
     // 단건 조회
     @GetMapping("/{id}")
-    public ResponseEntity<FacilitiesResponse> getFacility(@PathVariable Long id) {
+    public ResponseEntity<FacilitiesResponse> getFacility(@PathVariable("id") Long id) {
         FacilitiesResponse response = facilitiesService.getFacility(id);
         return ResponseEntity.ok(response);
     }

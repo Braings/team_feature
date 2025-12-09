@@ -12,9 +12,14 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
 @Getter
 @Setter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserInfoModifyRequest {
 	// 입력이 없는 대상은 변경하지 않음
 	
