@@ -120,7 +120,7 @@ import { reactive, ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import ProfileEditModal from './ProfileEditModal.vue';
 import { userExerciseData } from '@/stores/exerciseStore';
-import { updateProfile, getUserProfile } from '@/api.js';
+import { updateProfile, getUserProfile, getUserBodyInfo } from '@/api.js'; // [FIX] 유저 기본 정보 외에 신체 및 운동 정보를 받아오기 위해 'getUserBodyInfo'추가
 const router = useRouter();
 
 const userProfile = reactive({
@@ -150,20 +150,26 @@ const userExercise = reactive({
 const loadProfile = async () => {
   try {
     const profile = await getUserProfile();
+    const bodyInfo = await getUserBodyInfo(); // [FIX] 유저 신체 및 운동 정보 받기 위함
+    
     userProfile.username = profile.username || 'N/A';
 
     userProfile.email = profile.email || 'N/A';
     userProfile.birthday = profile.birthday || 'N/A';
-    userProfile.sex = profile.sex || 'N/A';
 
-    userProfile.height = profile.height || 'N/A';
-    userProfile.weight = profile.weight || 'N/A';
+    // [FIX] 유저의 신체 정보는 DB에서 별도 테이블에 저장되므로 따로 분리
+    if (bodyInfo) {
+      userProfile.sex = bodyInfo.gender || 'N/A';
+      userProfile.height = bodyInfo.height || 'N/A';
+      userProfile.weight = bodyInfo.weight || 'N/A';
 
-    userProfile.user_flex = profile.user_flex || 'N/A';
-    userProfile.user_situp = profile.user_situp || 'N/A';
-    userProfile.user_jump = profile.user_jump || 'N/A';
-    userProfile.user_grip = profile.user_grip || 'N/A';
-
+      // 운동 능력 정보 할당
+      userProfile.user_grip = bodyInfo.user_grip || 'N/A';
+      userProfile.user_flex = bodyInfo.user_flex || 'N/A';
+      userProfile.user_situp = bodyInfo.user_situp || 'N/A';
+      userProfile.user_jump = bodyInfo.user_jump || 'N/A';
+    }
+    
   } catch (error) {
     console.error('프로필 로드 실패:', error);
   }
@@ -201,7 +207,7 @@ const formatBirthday = (birthday) => {
 };
 
 const formatGender = (sex) => {
-  return sex === 'male' ? '남성' : sex === 'female' ? '여성' : 'N/A';
+  return sex === 'MALE' ? '남성' : sex === 'FEMALE' ? '여성' : 'N/A'; // [FIX] 성별 데이터를 대소문자 구분하여 올바르게 파싱
 };
 
 const calculateBMI = () => {
