@@ -153,6 +153,7 @@ const loadProfile = async () => {
     const bodyInfo = await getUserBodyInfo(); // [FIX] 유저 신체 및 운동 정보 받기 위함
     
     userProfile.username = profile.username || 'N/A';
+    userProfile.nickname = profile.nickname || 'N/A';
 
     userProfile.email = profile.email || 'N/A';
     userProfile.birthday = profile.birthday || 'N/A';
