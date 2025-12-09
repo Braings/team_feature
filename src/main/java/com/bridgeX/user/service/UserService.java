@@ -1,11 +1,14 @@
 package com.bridgeX.user.service;
 
-import java.util.Optional;
-
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
-// import com.bridgeX.DataNotFoundException;
 import com.bridgeX.user.domain.SiteUser;
 import com.bridgeX.user.domain.SiteUserBody;
 import com.bridgeX.user.domain.UserRole;
@@ -21,6 +24,7 @@ import com.bridgeX.user.exception.ErrorCode;
 import com.bridgeX.user.repository.UserBodyRepository;
 import com.bridgeX.user.repository.UserRepository;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -31,7 +35,9 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserBodyRepository userBodyRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
 
+    
 
     // Sign-up Request
     public void signup(SignupRequest dto) {
@@ -65,9 +71,42 @@ public class UserService {
         userRepository.save(user);
         userBodyRepository.save(body);
     }
-
-
+    
+    
     // Login Request
+    public LoginResponse login(LoginRequest dto) {
+        LoginResponse response = new LoginResponse();
+
+        try {
+            // 1. 시큐리티에게 인증 시키기
+            UsernamePasswordAuthenticationToken authToken =
+                    new UsernamePasswordAuthenticationToken(dto.getUsername(), dto.getPassword());
+
+            Authentication authentication = authenticationManager.authenticate(authToken);
+
+            // 2. 인증 성공했으면 SecurityContext 에 넣기
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            // 3. 세션 생성 (JSESSIONID 발급)
+            ServletRequestAttributes attrs =
+                    (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+            HttpServletRequest request = attrs.getRequest();
+            request.getSession(true);
+
+            // 4. 응답
+            response.setSuccess(true);
+            return response;
+
+        } catch (Exception e) {
+            // 아이디 없거나 비번 틀리면 여기로 옴
+            response.setSuccess(false);
+            return response;
+        }
+    }
+    
+    
+    
+    /*
     public LoginResponse login(LoginRequest dto) {
         LoginResponse response = new LoginResponse();
 
@@ -95,7 +134,7 @@ public class UserService {
 
         return response;
     }
-	
+	*/
     
     
     @Transactional
