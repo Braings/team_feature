@@ -47,9 +47,11 @@
                   <div class="facility-list-wrapper">
                     <ul class="facility-list">
                       <li @click="openFacilityModal(facility.id)" v-for="(facility) in facilityListState.data" :key="facility.id" class="info-item">
-                        <span class="value"> {{ truncateText(facility.FCLTY_NM) }} </span>
-                        <span class="value"> {{ truncateText(facility.INDUTY_NM) }} </span>
-                        <span class="value"> {{ facility.RSPNSBLTY_TEL_NO }} </span>
+                        <!-- [FIX] 변수명의 첫 어절을 소문자로 변경(프론트에서 받는 변수명과 동기화) -->
+                        <!-- ex) FCLTY_NM -> fclty_NM, 어디에서부터 소문자로 받았는진 못찾음.. -->
+                        <span class="value"> {{ truncateText(facility.fclty_NM) }} </span>
+                        <span class="value"> {{ truncateText(facility.induty_NM) }} </span>
+                        <span class="value"> {{ facility.rspnsblty_TEL_NO }} </span>
                       </li>
                     </ul>
                   </div>
