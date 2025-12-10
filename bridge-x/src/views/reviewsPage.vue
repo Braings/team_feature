@@ -186,12 +186,32 @@ function selectCategory(cat) {
   loadReviews();
 }
 
-function openPost(post) {
-  if (router) router.push({
-    name: 'reviewDetail',
-    params: { reviewID: post.reviewID } }).catch(()=>{});
-}
+// reviewsPage.vue 의 openPost 함수 교체
 
+function openPost(post) {
+  // 1. 실제 데이터에 들어있는 ID 찾기 (안전 장치)
+  // DB나 API에 따라 id, review_id, reviewId 중 하나로 들어옵니다.
+  const realId = post.reviewID || post.reviewId || post.review_id || post.id;
+
+  console.log('클릭한 게시글 데이터:', post); // F12 콘솔에서 확인 가능
+  console.log('추출된 ID:', realId);
+
+  // 2. ID가 없으면 경고 띄우고 중단
+  if (!realId) {
+    alert('게시글 ID를 찾을 수 없습니다. (데이터 오류)');
+    return;
+  }
+
+  // 3. 페이지 이동 (reviewID로 통일)
+  if (router) {
+    router.push({
+      name: 'reviewDetail',
+      params: { reviewID: realId } // 라우터 설정(:reviewID)과 철자 100% 일치
+    }).catch(err => {
+      console.error("페이지 이동 에러:", err);
+    });
+  }
+}
 function prevPage() {
   if (page.value > 1) {
     page.value -= 1;

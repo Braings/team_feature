@@ -1,7 +1,5 @@
 <template>
   <div class="signup-page">
-    <!-- moving background image -->
-    <div class="bg" :style="{ backgroundImage: `url(${bgImage})` }"></div>
     <div class="signup-card">
       <h1 class="title">BRIDGE-X</h1>
 
@@ -61,7 +59,6 @@ import router from '@/router';
 import FormField from '@/components/FormField.vue';
 import { useFormValidation } from '@/composables/useFormValidation';
 import { signupFormData } from '@/stores/signupStore';
-import bgImage from '@/img/gym.png';
 
 // ========================
 // Data
@@ -216,48 +213,32 @@ const handleNext = async () => {
 
 .signup-page {
   @include flex-center;
-  position: relative;
-  overflow: hidden;
   min-height: 100vh;
   background-color: map.get($colors, 'dark');
-
-  .bg {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    background-size: cover;
-    background-position: center;
-    filter: brightness(0.65) blur(1px);
-    transform-origin: center;
-
-    @keyframes bg-pan {
-      0% { transform: scale(1) translate3d(0,0,0); }
-      50% { transform: scale(1.06) translate3d(-4%, -2%, 0); }
-      100% { transform: scale(1) translate3d(0,0,0); }
-    }
-  }
+  background-image: url('@/img/bgGym.png');
+  background-size: cover;
+  background-position: center;
 
   .signup-card {
     @include card;
-    position: relative;
-    z-index: 2;
-    padding: map.get($spacing, '2xl') map.get($spacing, '3xl');
+    // 카드 내부 여백 (위아래는 적당히, 좌우는 넉넉히)
+    padding: map.get($spacing, 'xl') map.get($spacing, '2xl');
     width: map.get($sizes, 'card-width');
+    min-width: 400px;
+
+    // 카드 내부 요소 정렬
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: center; // 가로축 중앙 정렬
 
-    .title {
-      font-size: map.get($typography, 'title');
-      font-weight: bold;
-      margin-bottom: map.get($spacing, '2xl');
-      letter-spacing: 5px;
-    }
-
+    // 1. 폼 영역 스타일
     .input-area {
       @include flex-column;
       width: 100%;
-
+      display: flex;
+      flex-direction: column;
+      // [핵심] 입력창 사이의 간격을 좁게 설정 ('sm' 또는 'md')
+      gap: map.get($spacing, 'sm');
       .select-field {
         width: 100%;
         padding: map.get($spacing, 'lg') map.get($spacing, 'md');
@@ -341,6 +322,20 @@ const handleNext = async () => {
           background-color: map.get($colors, 'gray-hover');
         }
       }
+    }
+
+    // 2. 타이틀 스타일 (최상단 중앙)
+    .title {
+      position: relative;
+      font-size: map.get($typography, 'title');
+      font-weight: bold;
+      letter-spacing: 5px;
+      text-align: center; // 텍스트 중앙 정렬
+      width: 100%;        // 가로 꽉 채우기
+
+      // [핵심] 상단 여백 제거, 하단 여백 축소 (입력창과 가깝게)
+      margin-top: 0;
+      margin-bottom: map.get($spacing, 'lg');
     }
   }
 }

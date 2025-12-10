@@ -152,6 +152,12 @@ export async function deleteReview(reviewId) {
   });
 }
 
+// 추천(좋아요) 토글 API
+// 백엔드 로직: 이 유저가 이미 눌렀으면 취소(-1), 안 눌렀으면 추가(+1) 처리
+export async function toggleReviewRecommend(reviewId) {
+  return post(`/api/reviews/${reviewId}/recommend`);
+}
+
 // ===============================================================
 // 댓글 관련 API
 // ===============================================================
@@ -183,5 +189,5 @@ export default {
     API_BASE, request, post, get,
     getReviews, getReviewDetail, createReview, updateReview, deleteReview,
     getUserProfile, updateProfile, loadExerciseFacilities,
-    createComment, updateComment, deleteComment
+    createComment, updateComment, deleteComment, toggleReviewRecommend,
 };

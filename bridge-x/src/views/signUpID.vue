@@ -1,9 +1,9 @@
 <template>
   <div class="signup-page">
     <div class="signup-card">
-      <h1 class="title">BRIDGE-X</h1>
-
       <form class="input-area" @submit.prevent="handleNext">
+        <h1 class="title">BRIDGE-X</h1>
+
         <FormField
           v-model="formData.username"
           label="username"
@@ -149,45 +149,71 @@ const handleNext = async () => {
 <style lang="scss" scoped>
 @use 'sass:color';
 @use 'sass:map';
-@use '@/styles/_variables.scss'as *;
+@use '@/styles/_variables.scss' as *;
 
 .signup-page {
   @include flex-center;
   min-height: 100vh;
   background-color: map.get($colors, 'dark');
+  background-image: url('@/img/bgGym.png');
+  background-size: cover;
+  background-position: center;
 
   .signup-card {
     @include card;
-    padding: map.get($spacing, '2xl') map.get($spacing, '3xl');
+    // 카드 내부 여백 (위아래는 적당히, 좌우는 넉넉히)
+    padding: map.get($spacing, 'xl') map.get($spacing, '2xl');
     width: map.get($sizes, 'card-width');
+    min-width: 400px;
+
+    // 카드 내부 요소 정렬
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: center; // 가로축 중앙 정렬
 
+    // 1. 폼 영역 스타일
+    .input-area {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      // [핵심] 입력창 사이의 간격을 좁게 설정 ('sm' 또는 'md')
+      gap: map.get($spacing, 'sm');
+    }
+
+    // 2. 타이틀 스타일 (최상단 중앙)
     .title {
+      position: relative;
       font-size: map.get($typography, 'title');
       font-weight: bold;
-      margin-bottom: map.get($spacing, '2xl');
       letter-spacing: 5px;
+      text-align: center; // 텍스트 중앙 정렬
+      width: 100%;        // 가로 꽉 채우기
+
+      // [핵심] 상단 여백 제거, 하단 여백 축소 (입력창과 가깝게)
+      margin-top: 0;
+      margin-bottom: map.get($spacing, 'lg');
     }
 
-    .input-area {
-      @include flex-column;
-      width: 100%;
-    }
-
+    // 3. 버튼 스타일
     .next-button {
       @include button-base;
       @include flex-center;
       background-color: map.get($colors, 'black');
       color: map.get($colors, 'white');
-      padding: 15px 30px;
+
+      padding: 12px 0; // 높이 조절
       border-radius: map.get($radius, 'md');
       font-size: map.get($typography, 'button');
-      margin-top: map.get($spacing, 'xl');
-      align-self: flex-end;
+
+      // 버튼 위쪽 여백도 조금 줄임
+      margin-top: map.get($spacing, 'md');
+
+      align-self: flex-end; // 버튼만 오른쪽 정렬 유지 (원하면 center로 변경 가능)
       width: map.get($sizes, 'button-width');
       height: map.get($sizes, 'button-height');
+
+      cursor: pointer;
+      border: none;
 
       &:hover {
         background-color: map.get($colors, 'gray-hover');
