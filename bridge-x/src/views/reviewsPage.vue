@@ -62,7 +62,7 @@
             </tbody>
           </table>
 
-          <div class="pagination" v-if="pagedPosts.length > 0" >
+          <div class="pagination">
           <button @click="prevPage" :disabled="page === 1">이전</button>
           <span :style="{cursor: 'default'}"> {{ page }} / {{ totalPages }} </span>
           <button @click="nextPage" :disabled="page === totalPages">다음</button>

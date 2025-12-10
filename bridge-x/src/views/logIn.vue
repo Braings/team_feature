@@ -47,19 +47,45 @@
 
 <script setup>
 import { useRouter } from 'vue-router';
-import { ref, computed } from 'vue';
-// import { post } from '@/api.js';
+import { ref, computed, onMounted, reactive } from 'vue';
+import { post } from '@/api.js';
+import { useAuth } from '@/composables/useAuth';
 import FormField from '@/components/FormField.vue';
 import { useFormValidation } from '@/composables/useFormValidation';
-import { loginFormData, submitLogin } from '@/stores/loginStore';
 
 // ========================
 // Data & State
 // ========================
 const router = useRouter();
-const formData = loginFormData;
 const loading = ref(false);
 
+const { login } = useAuth();   // 공용 auth 사용
+
+// 폼 초기화 관련
+// 비어있는 폼 기본값 설정
+const createEmptyForm = () => ({
+  username: '',
+  password: ''
+});
+
+const formData = reactive(createEmptyForm());
+const resetForm = () => {
+  Object.assign(formData, createEmptyForm());
+};
+
+// onMounted 변경
+onMounted(() => {
+  formData.username = '';
+  formData.password = '';
+
+  // 에러 메시지도 같이 날리고 싶으면
+  if (errors && errors.value) {
+    Object.keys(errors.value).forEach((key) => {
+      errors.value[key] = null;
+    });
+  }
+});
+  
 // ========================
 // Validation Rules
 // ========================
@@ -117,6 +143,30 @@ const onPasswordInput = () => {
   formData.password = formData.password.replace(/[^\x20-\x7E]/g, '');
 };
 
+// handleLogin 로직 변경
+const handleLogin = async () => {
+  // 유효성 검사
+  const ok = validateForm ? validateForm(formData) : true;
+  if (!ok) return;
+
+  loading.value = true;
+
+  try {
+    // 로그인 요청
+    await post('/api/login', formData);
+    // 전역 로그인 상태 업데이트
+    login();
+    // 홈으로 이동
+    router.push({ name: 'homePage' });
+  } catch (e) {
+    console.error(e);
+    alert('아이디 또는 비밀번호를 다시 확인해 주세요.'); // 예외처리
+  } finally {
+    loading.value = false;
+  }
+};
+
+/*
 const handleLogin = async () => {
   if (!validateForm(formData)) {
     console.log('❌ 폼 검증 실패');
@@ -146,7 +196,7 @@ try {
     loading.value = false;
   }
 };
-
+*/
 const goToSignUp = () => {
   router.push({ name: 'sign.id' });
 };
