@@ -35,7 +35,7 @@ public class ReviewController {
 
     /* ---------------------------------------- Review ---------------------------------------- */
     
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<Void> create(@RequestBody ReviewCreateRequest request, @AuthenticationPrincipal UserDetails userDetails) {
         service.createPost(request, userDetails.getUsername());
         return ResponseEntity.status(HttpStatus.CREATED).build(); // 201

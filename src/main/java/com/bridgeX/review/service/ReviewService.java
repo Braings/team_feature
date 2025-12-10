@@ -80,7 +80,6 @@ public class ReviewService {
     	ReviewListResponse dto = ReviewListResponse.builder()
     			.id(entity.getId())
     			.title(entity.getTitle())
-    			.username(entity.getUser().getUsername())
     			.nickname(entity.getUser().getNickname())
     			.tag(entity.getTag().name())
     			.creationTime(entity.getDate())

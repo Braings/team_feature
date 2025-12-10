@@ -38,8 +38,9 @@ public class SecurityConfig {
 				.requestMatchers("/api/sign", "/api/sign/**", "/api/login").permitAll()
 				.requestMatchers("/test/**", "/h2_BX-console/**").permitAll()
 
-				// 프로필 조회는 로그인 필요
-				.requestMatchers("/api/users/**").authenticated()
+				// 프로필 조회는 상황따라
+				.requestMatchers("/api/users/profile").permitAll()
+				.requestMatchers("/api/users/body").authenticated()
 
 				// forum(reviews) read (GET) is public
 				.requestMatchers(HttpMethod.GET, "/api/reviews/**").permitAll()

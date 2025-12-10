@@ -13,7 +13,7 @@ public class ReviewListResponse {
 	private long id; // not user id!!! just Review's id (identifier)
     private String title;        
     private String tag;    
-    private String username; // Author identifier. Not displayed
+
     private String nickname; // Real Display
     
     private LocalDateTime creationTime;
