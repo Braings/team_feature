@@ -12,9 +12,9 @@
             <div class="form-header">
               <select class="form-tag" v-model="reviewData.tag" required>
                 <option value="" disabled selected hidden>말머리 선택</option>
-                <option value="질문">질문</option>
-                <option value="정보">정보</option>
-                <option value="잡담">잡담</option>
+                <option value="QUESTION">질문</option>
+                <option value="INFORMATION">정보</option>
+                <option value="TALK">잡담</option>
               </select>
               <input class="form-title" id="title" v-model="reviewData.title" placeholder="제목을 입력하세요" required/>
             </div>
