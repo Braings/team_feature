@@ -5,7 +5,9 @@
       <router-view />
     </div>
     <div class="header-bar" :style="headerBarStyle">
-      <div v-if="!isSignUpRoute" class="header-Text cc-font cursorPointer" @click="handleHeaderClick">{{ userDisplay }}</div>
+      <div v-if="!isSignUpRoute" class="header-Text cc-font cursorPointer" @click="handleHeaderClick">
+        {{ nickname }}
+      </div>
       <div class="header-Text cc-font cursorPointer" @click="goToPage('homePage')">Home</div>
      </div>
   </div>
