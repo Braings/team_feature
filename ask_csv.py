@@ -12,7 +12,7 @@ def get_exercise_recommendation(target_gender, target_height, target_weight, tar
 
     try:
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-2.0-flash')
+        model = genai.GenerativeModel('gemini-2.5-flash')
     except Exception as e:
         return f"API 설정 중 오류: {e}"
 
