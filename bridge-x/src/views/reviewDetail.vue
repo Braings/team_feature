@@ -153,22 +153,31 @@ const currentId = route.params.reviewID || route.params.reviewId || route.params
 // === [핵심] 데이터 로드 함수 ===
 const fetchReview = async () => {
   try {
-    // API 호출
-    const data = await getReviewDetail(currentId);
-    const commentList = await getComment(currentId)
+    // 1. 게시글 상세 정보와 댓글 목록을 동시에 요청 (Promise.all로 성능 최적화 가능)
+    // 순차적으로 호출해도 되지만, 여기서는 가독성을 위해 기존 흐름을 유지하며 수정합니다.
+    const postData = await getReviewDetail(currentId);
+    const commentList = await getComment(currentId);
+
     // 데이터 유효성 검사
-    if (!data) throw new Error("Invalid Data");
+    if (!postData) throw new Error("Invalid Data");
 
-    console.log("데이터 로드 성공:", data);
+    console.log("데이터 로드 성공:", postData);
+    console.log("댓글 로드 성공:", commentList);
 
-    // 데이터 적용
-    post.value = data;
+    // 2. [수정 포인트] 데이터를 상태 변수에 할당
+    // 받아온 댓글 리스트(commentList)를 post 객체 내부의 comments로 연결해줍니다.
+    postData.comments = commentList || [];
+
+    // 최종적으로 post 상태 업데이트
+    post.value = postData;
+
+    // comments ref도 혹시 다른데서 쓸 수 있으니 업데이트 (선택사항)
     comments.value = commentList;
+
     isDummy.value = false;
 
     // 추천(좋아요) 상태 동기화
-    // 서버 응답에 isLiked 키가 있으면 사용, 없으면 false (hasOwnProperty 제거됨)
-    isSuggestion.value = data.isLiked || false;
+    isSuggestion.value = postData.isLiked || false;
 
   } catch (error) {
     console.error("API 로드 실패, 더미 데이터 사용:", error);
