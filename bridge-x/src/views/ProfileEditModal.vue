@@ -8,8 +8,8 @@
       <div class="modal-body">
         <form @submit.prevent="saveChanges">
           <div class="form-group">
-            <label for="username">이름</label>
-            <input type="text" id="username" v-model="editableProfile.username" required>
+            <label for="nickname">이름</label>
+            <input type="text" id="nickname" v-model="editableProfile.nickname" required>
           </div>
 
           <div class="form-group">
@@ -55,7 +55,7 @@ const emit = defineEmits(['close', 'update-profile']);
 
 // prop을 직접 수정하지 않기 위해 reactive 복사본을 만듭니다.
 const editableProfile = reactive({
-  username: props.profileData.username || '',
+  nickname: props.profileData.nickname || '',
   email: props.profileData.email || '',
   height: props.profileData.height || 0,
   weight: props.profileData.weight || 0
@@ -64,7 +64,7 @@ const editableProfile = reactive({
 // 모달이 열릴 때(isOpen이 true가 될 때)마다 최신 데이터를 복사해 옵니다.
 watch(() => props.isOpen, (newVal) => {
   if (newVal) {
-    editableProfile.username = props.profileData.username;
+    editableProfile.nickname = props.profileData.nickname;
     editableProfile.email = props.profileData.email;
     editableProfile.height = props.profileData.height;
     editableProfile.weight = props.profileData.weight;

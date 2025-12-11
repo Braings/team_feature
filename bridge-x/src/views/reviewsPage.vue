@@ -51,7 +51,7 @@
             </thead>
             <tbody>
               <tr v-for="(post) in pagedPosts" :key="post.reviewID" :style="{ fontFamily: 'SCDream5'}"  @click="openPost(post)" >
-                <td class="col-no">{{ post.no }}</td>
+                <td class="col-no">{{ post.id }}</td>
                 <td class="col-tag">{{ post.tag }}</td>
                 <td class="col-title">{{ post.title }}</td>
                 <td class="col-nickname">{{ post.nickname }}</td>
