@@ -18,7 +18,6 @@
           <article class="post-card">
             <header class="post-header">
               <h1 class="post-title">
-                <span v-if="isDummy" class="test-badge">[TEST]</span>
                 {{ post.title }}
               </h1>
               <div class="post-meta">
@@ -58,7 +57,7 @@
                <button type="submit">등록</button>
             </form>
 
-            <div class="comment-list" v-if="currentId">
+            <div class="comment-list" v-if="currentId && post.comments && post.comments.length > 0">
               <div class="comment-item" v-for="comment in post.comments" :key="comment.id">
                  <div class="comment-header-row">
                     <span class="comment-nickname">{{ comment.nickname }}</span>
@@ -119,7 +118,6 @@ const post = ref(null);
 const comments = ref(null);
 const isSuggestion = ref(false);
 const newComment = ref('');
-const isDummy = ref(false);
 const isEditModalOpen = ref(false);
 
 // === 1. [권한 체크] 작성자 확인 로직 ===
@@ -133,74 +131,48 @@ const sanitizeContent = (content) => {
   return DOMPurify.sanitize(content);
 };
 
-// === 3. 더미 데이터 (서버 에러 시 비상용) ===
-const DUMMY_DATA = {
-  reviewId: 9999,
-  title: "데이터 로드 실패 - 테스트 모드",
-  nickname: "Bridge-Admin",
-  date: "2024-01-01",
-  views: 0,
-  tag: "시스템",
-  content: `<p>서버와 연결할 수 없어 <strong>더미 데이터</strong>를 표시합니다.</p>
-            <p>네트워크 상태를 확인해주세요.</p>`,
-  suggestion: 10,
-  comments: []
-};
-
 // URL 파라미터에서 ID 추출 (여러 케이스 대응)
 const currentId = route.params.reviewID || route.params.reviewId || route.params.id;
 
 // === [핵심] 데이터 로드 함수 ===
 const fetchReview = async () => {
   try {
-    // 1. 게시글 상세 정보와 댓글 목록을 동시에 요청 (Promise.all로 성능 최적화 가능)
-    // 순차적으로 호출해도 되지만, 여기서는 가독성을 위해 기존 흐름을 유지하며 수정합니다.
     const postData = await getReviewDetail(currentId);
-    const commentList = await getComment(currentId);
+    let commentList = await getComment(currentId);
 
     // 데이터 유효성 검사
     if (!postData) throw new Error("Invalid Data");
 
-    console.log("데이터 로드 성공:", postData);
-    console.log("댓글 로드 성공:", commentList);
+    // [수정됨] 댓글 최신순 정렬 (날짜 내림차순)
+    if (commentList && Array.isArray(commentList)) {
+        commentList.sort((a, b) => {
+            const dateA = new Date(a.date || 0);
+            const dateB = new Date(b.date || 0);
+            return dateB - dateA;
+        });
+    }
 
-    // 2. [수정 포인트] 데이터를 상태 변수에 할당
-    // 받아온 댓글 리스트(commentList)를 post 객체 내부의 comments로 연결해줍니다.
+    // 받아온 댓글 리스트를 post 객체 내부의 comments로 연결
     postData.comments = commentList || [];
 
     // 최종적으로 post 상태 업데이트
     post.value = postData;
-
-    // comments ref도 혹시 다른데서 쓸 수 있으니 업데이트 (선택사항)
     comments.value = commentList;
-
-    isDummy.value = false;
 
     // 추천(좋아요) 상태 동기화
     isSuggestion.value = postData.isLiked || false;
 
   } catch (error) {
-    console.error("API 로드 실패, 더미 데이터 사용:", error);
-    post.value = DUMMY_DATA;
-    isDummy.value = true;
-    isSuggestion.value = false;
+    console.error("API 로드 실패:", error);
+    alert("게시글을 불러오지 못했습니다.");
+    // 더미 데이터 로직 제거됨
   }
 };
 
 // === [핵심] 추천(좋아요) 토글 함수 ===
 const togglesuggestion = async () => {
-  // 1. 더미 데이터 모드 (테스트용)
-  if (isDummy.value) {
-    isSuggestion.value = !isSuggestion.value;
-    if(post.value) {
-        post.value.suggestion = (post.value.suggestion || 0) + (isSuggestion.value ? 1 : -1);
-    }
-    return;
-  }
-
-  // 2. 실제 서버 통신
   try {
-    // [낙관적 업데이트] UI 먼저 변경하여 반응 속도 향상
+    // [낙관적 업데이트] UI 먼저 변경
     isSuggestion.value = !isSuggestion.value;
 
     if (post.value) {
@@ -210,7 +182,7 @@ const togglesuggestion = async () => {
     // API 호출 (서버 DB 반영)
     const response = await toggleReviewRecommend(currentId);
 
-    // 만약 서버가 정확한 최신 추천 수를 반환한다면 덮어쓰기
+    // 서버 응답이 정확한 숫자를 준다면 반영
     if (response && typeof response.suggestion === 'number') {
        post.value.suggestion = response.suggestion;
     }
@@ -219,7 +191,7 @@ const togglesuggestion = async () => {
     console.error("추천 실패:", error);
     alert("추천을 반영하지 못했습니다.");
 
-    // 실패 시 롤백 (원래 상태로 복구)
+    // 실패 시 롤백
     isSuggestion.value = !isSuggestion.value;
     if (post.value) {
         post.value.suggestion += (isSuggestion.value ? 1 : -1);
@@ -229,7 +201,6 @@ const togglesuggestion = async () => {
 
 // === 수정 모달 관련 ===
 const openEditModal = () => {
-  if (isDummy.value) { alert("더미 데이터는 수정할 수 없습니다."); return; }
   isEditModalOpen.value = true;
 };
 
@@ -243,7 +214,6 @@ const onEditSuccess = () => {
 
 // === 게시글 삭제 ===
 const deletePost = async () => {
-  if (isDummy.value) { alert("더미 데이터는 삭제할 수 없습니다."); return; }
   if (!confirm("정말로 게시글을 삭제하시겠습니까?")) return;
 
   try {
@@ -262,22 +232,9 @@ const submitComment = async () => {
 
   const myNickname = localStorage.getItem('nickname') || "익명";
 
-  // 더미 모드일 때
-  if (isDummy.value) {
-    post.value.comments.push({
-      id: Date.now(),
-      nickname: myNickname,
-      date: new Date().toISOString().split('T')[0],
-      content: newComment.value
-    });
-    newComment.value = '';
-    return;
-  }
-
-  // 실제 서버 통신
   try {
     const commentData = {
-       reviewId: currentId, // API 필요에 따라 포함
+       reviewId: currentId,
        content: newComment.value,
        nickname: myNickname
     };
@@ -292,10 +249,6 @@ const submitComment = async () => {
 
 // === 댓글 삭제 ===
 const removeComment = async (commentId) => {
-  if (isDummy.value) {
-    post.value.comments = post.value.comments.filter(c => c.id !== commentId);
-    return;
-  }
   if(!confirm("댓글을 삭제하시겠습니까?")) return;
 
   try {
@@ -343,13 +296,6 @@ $radius: ('md': 8px);
     padding: 100px;
     font-size: 1.2rem;
     color: map.get($colors, 'muted');
-}
-
-.test-badge {
-    color: map.get($colors, 'danger');
-    font-size: 0.6em;
-    vertical-align: middle;
-    margin-right: 5px;
 }
 
 // 레이아웃
