@@ -62,10 +62,10 @@
             </tbody>
           </table>
 
-          <div class="pagination" v-if="pagedPosts.length > 0" >
-          <button @click="prevPage" :disabled="page === 1">이전</button>
+          <div class="pagination" >
+          <button v-if="pagedPosts.length > 0" @click="prevPage" :disabled="page === 1">이전</button>
           <span :style="{cursor: 'default'}"> {{ page }} / {{ totalPages }} </span>
-          <button @click="nextPage" :disabled="page === totalPages">다음</button>
+          <button v-if="pagedPosts.length > 0" @click="nextPage" :disabled="page === totalPages">다음</button>
           <button class="write-btn" @click="openWriteModal">글쓰기</button>
           <ReviewWriteModal
             :isOpen="isModalOpen"
@@ -73,7 +73,7 @@
             @submit-success="handleReviewSubmit"
             :initialData="defaultReviewData"
           />
-        </div>
+          </div>
 
       </section>
 
@@ -141,7 +141,7 @@ function formatDate(dateTimeStr) {
   if (!dateTimeStr) return '';
   return dateTimeStr.split('T')[0];
 }
-  
+
 // ========================
 // Data Loading
 // ========================
