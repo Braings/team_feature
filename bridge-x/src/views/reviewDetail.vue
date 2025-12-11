@@ -58,7 +58,7 @@
                <button type="submit">등록</button>
             </form>
 
-            <div class="comment-list" v-if="post.comments && post.comments.length > 0">
+            <div class="comment-list" v-if="currentId.length > 0">
               <div class="comment-item" v-for="comment in post.comments" :key="comment.id">
                  <div class="comment-header-row">
                     <span class="comment-nickname">{{ comment.nickname }}</span>
@@ -106,6 +106,7 @@ import {
   deleteReview,
   createComment,
   deleteComment,
+  getComment,
   toggleReviewRecommend
 } from '@/api';
 import ReviewModal from './reviewModal.vue';
@@ -115,6 +116,7 @@ const router = useRouter();
 
 // === 상태 변수들 ===
 const post = ref(null);
+const comments = ref(null);
 const isRecommended = ref(false);
 const newComment = ref('');
 const isDummy = ref(false);
@@ -153,7 +155,7 @@ const fetchReview = async () => {
   try {
     // API 호출
     const data = await getReviewDetail(currentId);
-
+    const commentList = await getComment(currentId)
     // 데이터 유효성 검사
     if (!data) throw new Error("Invalid Data");
 
@@ -161,6 +163,7 @@ const fetchReview = async () => {
 
     // 데이터 적용
     post.value = data;
+    comments.value = commentList;
     isDummy.value = false;
 
     // 추천(좋아요) 상태 동기화

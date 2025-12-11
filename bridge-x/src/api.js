@@ -168,6 +168,11 @@ export async function createComment(reviewId, data) {
   return post(`/api/reviews/${reviewId}/comments`, data);
 }
 
+export async function getComment(reviewId) {
+  // 예: /api/reviews/{reviewId}/comments 또는 data 안에 reviewId 포함
+  // 여기서는 data에 reviewId를 포함하여 전송하는 방식 예시
+  return get(`/api/reviews/${reviewId}/comments`);
+}
 export async function updateComment(commentId, data) {
   return request(`/api/comments/${commentId}`, {
     method: 'PUT',
