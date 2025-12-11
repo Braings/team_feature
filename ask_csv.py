@@ -2,6 +2,7 @@ import google.generativeai as genai
 import os
 import pandas as pd
 from dotenv import load_dotenv
+import random
 
 def get_exercise_recommendation(target_gender, target_height, target_weight, target_age):
     # --- 1. API 키 및 모델 설정 ---
@@ -96,9 +97,12 @@ def get_exercise_recommendation(target_gender, target_height, target_weight, tar
         if not example_exercises_list:
             example_exercises_string = "유사한 사용자를 CSV에서 찾지 못했습니다."
         else:
-            # 중복 제거 및 문자열로 결합 (API에 컨텍스트로 제공)
+            # 중복 제거
             unique_exercises = list(set(example_exercises_list))
-            example_exercises_string = "\n\n".join(unique_exercises)
+            # ⭐️ 최적화: 토큰 오버플로를 방지하기 위해 최대 5개의 예시만 랜덤으로 선택
+            sample_size = min(len(unique_exercises), 5)
+            sampled_exercises = random.sample(unique_exercises, sample_size)
+            example_exercises_string = "\n\n".join(sampled_exercises)
 
     except FileNotFoundError:
         return f"오류: '{csv_file_path}' 파일을 찾을 수 없습니다."
@@ -119,6 +123,10 @@ def get_exercise_recommendation(target_gender, target_height, target_weight, tar
     위 정보를 바탕으로 사용자에게 적합한 운동을 추천해주세요.
     특히, 위에서 제공된 '평균 운동 수행 능력'을 언급하며 사용자가 목표로 삼을 수 있는 수치를 제시해주세요.
     만약 유사한 운동 데이터가 없다면, 일반적인 운동을 추천하되, 사용자 정보에 맞춰 조언해주세요.
+    답변은 다음과 같은 형태로 작성해주세요
+    **중요** : 대답하는 형태에 '*' 기호를 사용하지 마세요.
+    첫 문장에 사용자의 나이, 성별, 몸무게, 키를 포함하며 적절한 운동을 추천해준다는 말을 하세요.
+    그 뒤로 추천운동들을 보기 좋기 정리해서 나열해주세요.
     """
 
     # --- 5. API 호출 및 응답 ---
@@ -127,6 +135,26 @@ def get_exercise_recommendation(target_gender, target_height, target_weight, tar
         response = model.generate_content(prompt)
         return response.text
 
+    except Exception as e:
+        return f"API 호출 중 오류 발생: {e}"
+
+def test_ai_response(prompt):
+    # --- 1. API 키 및 모델 설정 ---
+    load_dotenv()
+    api_key = os.getenv("GOOGLE_API_KEY")
+    if not api_key:
+        return "오류: GOOGLE_API_KEY를 .env 파일에서 찾을 수 없습니다."
+
+    try:
+        genai.configure(api_key=api_key)
+        model = genai.GenerativeModel('gemini-2.5-flash')
+    except Exception as e:
+        return f"API 설정 중 오류: {e}"
+
+    # --- 2. API 호출 및 응답 ---
+    try:
+        response = model.generate_content(prompt)
+        return response.text
     except Exception as e:
         return f"API 호출 중 오류 발생: {e}"
 
