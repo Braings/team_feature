@@ -149,10 +149,10 @@ export default {
 
       // 항목별 데이터 매핑
       const items = [
-        { label: '악력', user: userStats.grip, std: standard.grip },
-        { label: '유연성', user: userStats.flex, std: standard.flex },
-        { label: '윗몸', user: userStats.situp, std: standard.situp },
-        { label: '제자리', user: userStats.jump, std: standard.jump },
+        { label: 'Grip', user: userStats.grip, std: standard.grip },
+        { label: 'Flex', user: userStats.flex, std: standard.flex },
+        { label: 'Sit Up', user: userStats.situp, std: standard.situp },
+        { label: 'Jump', user: userStats.jump, std: standard.jump },
       ];
 
       return items.map(item => {
