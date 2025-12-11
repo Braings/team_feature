@@ -16,7 +16,7 @@
           <div :class="['tab', selectedCategory === 'all' ? 'active' : '']" @click="selectCategory('all')">전체글</div>
           <div :class="['tab', selectedCategory === 'question' ? 'active' : '']" @click="selectCategory('question')">질문</div>
           <div :class="['tab', selectedCategory === 'info' ? 'active' : '']" @click="selectCategory('info')">정보</div>
-          <div :class="['tab', selectedCategory === 'review' ? 'active' : '']" @click="selectCategory('review')">리뷰</div>
+          <!-- <div :class="['tab', selectedCategory === 'review' ? 'active' : '']" @click="selectCategory('review')">리뷰</div> -->
           <div :class="['tab', selectedCategory === 'chat' ? 'active' : '']" @click="selectCategory('chat')">잡담</div>
         </div>
 
@@ -52,10 +52,10 @@
             <tbody>
               <tr v-for="(post) in pagedPosts" :key="post.reviewID" :style="{ fontFamily: 'SCDream5'}"  @click="openPost(post)" >
                 <td class="col-no">{{ post.id }}</td>
-                <td class="col-tag">{{ post.tag }}</td>
+                <td class="col-tag">{{ getKoreanTag(post.tag) }}</td>
                 <td class="col-title">{{ post.title }}</td>
                 <td class="col-nickname">{{ post.nickname }}</td>
-                <td class="col-date">{{ post.date }}</td>
+                <td class="col-date">{{ formatDate(post.creationTime) }}</td>
                 <td class="col-views">{{ post.views }}</td>
                 <td class="col-rec">{{ post.recommend }}</td>
               </tr>
@@ -124,6 +124,24 @@ const error = ref(null);
 const page = ref(1);
 const pageSize = 10;
 
+// AddPoint : 매핑 추가
+const tagKoreanMap = {
+  'QUESTION': '질문',
+  'TALK': '잡담',
+  'INFORMATION': '정보',
+};
+
+// AddPoint : 태그 값을 받아 한글로 변환하는 함수
+function getKoreanTag(tag) {
+  return tagKoreanMap[tag] || tag;
+}
+
+// AddPoint : formatDate 추가
+function formatDate(dateTimeStr) {
+  if (!dateTimeStr) return '';
+  return dateTimeStr.split('T')[0];
+}
+  
 // ========================
 // Data Loading
 // ========================
