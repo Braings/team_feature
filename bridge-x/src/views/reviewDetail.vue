@@ -35,8 +35,8 @@
             </div>
 
             <div class="post-actions">
-              <button class="btn recommend-btn" :class="{ active: isRecommended }" @click="toggleRecommend">
-                추천 {{ post.recommend || 0 }}
+              <button class="btn suggestion-btn" :class="{ active: isSuggestion }" @click="togglesuggestion">
+                추천 {{ post.suggestion || 0 }}
               </button>
 
               <div class="owner-actions" v-if="isAuthor">
@@ -58,7 +58,7 @@
                <button type="submit">등록</button>
             </form>
 
-            <div class="comment-list" v-if="currentId.length > 0">
+            <div class="comment-list" v-if="currentId">
               <div class="comment-item" v-for="comment in post.comments" :key="comment.id">
                  <div class="comment-header-row">
                     <span class="comment-nickname">{{ comment.nickname }}</span>
@@ -107,7 +107,7 @@ import {
   createComment,
   deleteComment,
   getComment,
-  toggleReviewRecommend
+  toggleReviewRecommend,
 } from '@/api';
 import ReviewModal from './reviewModal.vue';
 
@@ -117,7 +117,7 @@ const router = useRouter();
 // === 상태 변수들 ===
 const post = ref(null);
 const comments = ref(null);
-const isRecommended = ref(false);
+const isSuggestion = ref(false);
 const newComment = ref('');
 const isDummy = ref(false);
 const isEditModalOpen = ref(false);
@@ -143,7 +143,7 @@ const DUMMY_DATA = {
   tag: "시스템",
   content: `<p>서버와 연결할 수 없어 <strong>더미 데이터</strong>를 표시합니다.</p>
             <p>네트워크 상태를 확인해주세요.</p>`,
-  recommend: 10,
+  suggestion: 10,
   comments: []
 };
 
@@ -168,23 +168,23 @@ const fetchReview = async () => {
 
     // 추천(좋아요) 상태 동기화
     // 서버 응답에 isLiked 키가 있으면 사용, 없으면 false (hasOwnProperty 제거됨)
-    isRecommended.value = data.isLiked || false;
+    isSuggestion.value = data.isLiked || false;
 
   } catch (error) {
     console.error("API 로드 실패, 더미 데이터 사용:", error);
     post.value = DUMMY_DATA;
     isDummy.value = true;
-    isRecommended.value = false;
+    isSuggestion.value = false;
   }
 };
 
 // === [핵심] 추천(좋아요) 토글 함수 ===
-const toggleRecommend = async () => {
+const togglesuggestion = async () => {
   // 1. 더미 데이터 모드 (테스트용)
   if (isDummy.value) {
-    isRecommended.value = !isRecommended.value;
+    isSuggestion.value = !isSuggestion.value;
     if(post.value) {
-        post.value.recommend = (post.value.recommend || 0) + (isRecommended.value ? 1 : -1);
+        post.value.suggestion = (post.value.suggestion || 0) + (isSuggestion.value ? 1 : -1);
     }
     return;
   }
@@ -192,18 +192,18 @@ const toggleRecommend = async () => {
   // 2. 실제 서버 통신
   try {
     // [낙관적 업데이트] UI 먼저 변경하여 반응 속도 향상
-    isRecommended.value = !isRecommended.value;
+    isSuggestion.value = !isSuggestion.value;
 
     if (post.value) {
-        post.value.recommend = (post.value.recommend || 0) + (isRecommended.value ? 1 : -1);
+        post.value.suggestion = (post.value.suggestion || 0) + (isSuggestion.value ? 1 : -1);
     }
 
     // API 호출 (서버 DB 반영)
     const response = await toggleReviewRecommend(currentId);
 
     // 만약 서버가 정확한 최신 추천 수를 반환한다면 덮어쓰기
-    if (response && typeof response.recommend === 'number') {
-       post.value.recommend = response.recommend;
+    if (response && typeof response.suggestion === 'number') {
+       post.value.suggestion = response.suggestion;
     }
 
   } catch (error) {
@@ -211,9 +211,9 @@ const toggleRecommend = async () => {
     alert("추천을 반영하지 못했습니다.");
 
     // 실패 시 롤백 (원래 상태로 복구)
-    isRecommended.value = !isRecommended.value;
+    isSuggestion.value = !isSuggestion.value;
     if (post.value) {
-        post.value.recommend += (isRecommended.value ? 1 : -1);
+        post.value.suggestion += (isSuggestion.value ? 1 : -1);
     }
   }
 };
@@ -474,7 +474,7 @@ $radius: ('md': 8px);
   }
 }
 
-.recommend-btn {
+.suggestion-btn {
   border-color: map.get($colors, 'success');
   color: map.get($colors, 'success');
 
