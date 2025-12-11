@@ -88,6 +88,8 @@ export default {
       // 헤더 스타일 변경 로직 (기존 코드 유지)
       if (route.name && route.name.toString().startsWith('sign')) {
         headerBarStyle.value.color = 'white';
+      } else if (route.name =='myPage') {
+        headerBarStyle.value.color = 'white';
       } else {
         headerBarStyle.value.backgroundColor = 'transparent';
         headerBarStyle.value.color = 'black';
