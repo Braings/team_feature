@@ -12,14 +12,14 @@ import lombok.Builder;
 @Builder
 @AllArgsConstructor
 public class UserBodyInfoResponse {
-	private Integer height;
-	private Integer weight;
+	private Double height;
+	private Double weight;
 	private String gender; // e-num { MALE, FEMALE }
 	
-	private Integer user_grip;
-	private Integer user_flex;
+	private Double user_grip;
+	private Double user_flex;
 	private Integer user_situp;
-	private Integer user_jump;
+	private Double user_jump;
 	
 	// Can add Other fields
 	public static UserBodyInfoResponse from(SiteUserBody body) {

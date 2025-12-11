@@ -28,48 +28,49 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/reviews")
+@RequestMapping("/api")
 public class ReviewController {
 
     private final ReviewService service;
 
     /* ---------------------------------------- Review ---------------------------------------- */
     
-    @PostMapping
+    @PostMapping("/reviews")
     public ResponseEntity<Void> create(@RequestBody ReviewCreateRequest request, @AuthenticationPrincipal UserDetails userDetails) {
         service.createPost(request, userDetails.getUsername());
         return ResponseEntity.status(HttpStatus.CREATED).build(); // 201
     }
 
 
-    @PutMapping("/edit/{id}")
-    public void edit(@PathVariable Long id, @RequestBody ReviewUpdateRequest request, @AuthenticationPrincipal UserDetails userDetails) {
+    @PutMapping("/reviews/{id}")
+    public void edit(@PathVariable("id") Long id, @RequestBody ReviewUpdateRequest request, @AuthenticationPrincipal UserDetails userDetails) {
         service.updatePost(id, request, userDetails.getUsername());
     }
 
     
-    @GetMapping
+    @GetMapping("/reviews")
     public List<ReviewListResponse> list() {
         return service.getAllPosts();
     }
 
     
-    @GetMapping("/{id}")
-    public ReviewResponse get(@PathVariable Long id) {
-        return service.getPost(id);
+    @GetMapping("/reviews/{id}")
+    public ReviewResponse get(@PathVariable("id") Long id, @AuthenticationPrincipal UserDetails userDetails) {
+    	String currentUserUsername = (userDetails != null) ? userDetails.getUsername() : null;
+        return service.getPost(id, currentUserUsername);
     }
 
     
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
+    @DeleteMapping("/reviews/{id}")
+    public void delete(@PathVariable("id") Long id, @AuthenticationPrincipal UserDetails userDetails) {
 
         String currentUser = userDetails.getUsername();
         service.deletePost(id, currentUser);
     }
     
     
-    @PostMapping("/{id}/suggest")
-    public ResponseEntity<Void> suggest(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
+    @PostMapping("/reviews/{id}/recommend")
+    public ResponseEntity<Void> suggest(@PathVariable("id") Long id, @AuthenticationPrincipal UserDetails userDetails) {
         service.suggestReview(id, userDetails.getUsername());
         return ResponseEntity.ok().build();
     }
@@ -77,20 +78,20 @@ public class ReviewController {
     /* ---------------------------------------- Comment ---------------------------------------- */
     
     // Comment List 조회하기
-    @GetMapping("/{id}/comment")
-    public List<CommentResponse> getComments(@PathVariable Long id) {
+    @GetMapping("/reviews/{id}/comments")
+    public List<CommentResponse> getComments(@PathVariable("id") Long id) {
         return service.getComments(id);
     }
     
     // Add Comment
-    @PostMapping("/{id}/comment")
-    public ResponseEntity<Void> addComment(@PathVariable Long id, @RequestBody CommentCreateRequest request, @AuthenticationPrincipal UserDetails userDetails) {
+    @PostMapping("/reviews/{id}/comments")
+    public ResponseEntity<Void> addComment(@PathVariable("id") Long id, @RequestBody CommentCreateRequest request, @AuthenticationPrincipal UserDetails userDetails) {
         service.addComment(id, userDetails.getUsername(), request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     // Edit Comment
-    @PutMapping("/{id}/comment/{commentId}")
+    @PutMapping("/reviews/{id}/comments/{commentId}")
     public ResponseEntity<Void> updateComment(@PathVariable Long id, @PathVariable Long commentId, @RequestBody CommentUpdateRequest request, @AuthenticationPrincipal UserDetails userDetails) {
         service.updateComment(id, commentId, userDetails.getUsername(), request);
         return ResponseEntity.ok().build();
@@ -98,9 +99,9 @@ public class ReviewController {
 
 
     // Delete Comment
-    @DeleteMapping("/{id}/comment/{commentId}")
-    public ResponseEntity<Void> deleteComment(@PathVariable Long id, @PathVariable Long commentId, @AuthenticationPrincipal UserDetails userDetails) {
-        service.deleteComment(id, commentId, userDetails.getUsername());
+    @DeleteMapping("/comments/{commentId}")
+    public ResponseEntity<Void> deleteComment(@PathVariable("commentId") Long commentId, @AuthenticationPrincipal UserDetails userDetails) {
+        service.deleteComment(commentId, userDetails.getUsername());
         return ResponseEntity.ok().build();
     }
 

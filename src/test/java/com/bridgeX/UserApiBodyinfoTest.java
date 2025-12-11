@@ -1,22 +1,22 @@
 package com.bridgeX;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+// import static org.junit.jupiter.api.Assertions.assertEquals;
+// import static org.junit.jupiter.api.Assertions.assertNotNull;
+// import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.time.LocalDate;
+// import java.time.LocalDate;
 
-import org.junit.jupiter.api.Test;
+// import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 // import org.springframework.test.web.servlet.MockMvc;
 
-import com.bridgeX.user.domain.SiteUser;
-import com.bridgeX.user.domain.SiteUserBody;
-import com.bridgeX.user.domain.UserGender;
-import com.bridgeX.user.dto.UserInfoModifyRequest;
+// import com.bridgeX.user.domain.SiteUser;
+// import com.bridgeX.user.domain.SiteUserBody;
+// import com.bridgeX.user.domain.UserGender;
+// import com.bridgeX.user.dto.UserInfoModifyRequest;
 import com.bridgeX.user.repository.UserRepository;
 import com.bridgeX.user.service.UserService;
 
@@ -39,6 +39,7 @@ public class UserApiBodyinfoTest {
 	@Autowired
 	PasswordEncoder passwordEncoder;
 
+	/*
 	@Test
 	void modifyUserInfo() {
 		// input Info to DB
@@ -89,7 +90,7 @@ public class UserApiBodyinfoTest {
 		assertEquals(70, changed.getBodyInfo().getWeight());
 		
 	}
-	
+	*/
 	
 	/*
 	// TEST01

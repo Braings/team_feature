@@ -10,8 +10,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
 import lombok.Builder;
 import lombok.Getter;
+
 
 @Entity
 @Table(
@@ -22,6 +27,8 @@ import lombok.Getter;
 )
 @Getter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ReviewSuggestion {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

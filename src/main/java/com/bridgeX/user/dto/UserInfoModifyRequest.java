@@ -37,16 +37,16 @@ public class UserInfoModifyRequest {
 	private String email;
 
 	@Min(value = 1, message = "[SERVER] 키는 0 이하일 수 없습니다.")
-	private Integer height;
+	private Double height;
 
 	@Min(value = 1, message = "[SERVER] 체중은 0 이하일 수 없습니다.")
-	private Integer weight;
+	private Double weight;
 	
-	private Integer user_grip;
+	private Double user_grip;
 	
-	private Integer user_flex;
+	private Double user_flex;
 	
 	private Integer user_situp;
 	
-	private Integer user_jump;
+	private Double user_jump;
 }
