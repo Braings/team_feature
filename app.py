@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from ask_csv import get_exercise_recommendation
+from ask_csv import get_exercise_recommendation, test_ai_response
 
 app = Flask(__name__)
 
@@ -29,6 +29,24 @@ def recommend():
         recommendation = get_exercise_recommendation(gender, height, weight, age)
         
         return jsonify({"recommendation": recommendation})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/test-ai', methods=['POST'])
+def test_ai():
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "No JSON data provided"}), 400
+
+        prompt = data.get('prompt')
+        if not prompt:
+            return jsonify({"error": "Missing required field: prompt"}), 400
+
+        response = test_ai_response(prompt)
+        
+        return jsonify({"response": response})
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500

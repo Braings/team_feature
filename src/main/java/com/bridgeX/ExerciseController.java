@@ -34,26 +34,34 @@ public class ExerciseController {
         String flaskApiUrl = "http://127.0.0.1:5000/recommend";
         Map<String, String> result = new HashMap<>();
 
-        // Set headers
+        // [중요] 1. 프론트엔드에서 온 잡다한 데이터를 거르고, 딱 필요한 것만 추출 (Payload Sanitization)
+        Map<String, Object> cleanData = new HashMap<>();
+        cleanData.put("gender", requestData.get("gender"));
+        cleanData.put("height", requestData.get("height"));
+        cleanData.put("weight", requestData.get("weight"));
+        cleanData.put("age", requestData.get("age"));
+
+        // [디버깅] 실제로 Flask에 뭘 보내는지 로그로 확인해보세요.
+        System.out.println(">>> Flask로 보내는 정제된 데이터: " + cleanData);
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        // Create entity
-        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestData, headers);
+        // [중요] 2. requestData 대신 cleanData를 넣어서 보냄
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(cleanData, headers);
 
-        // Call Flask API
         RestTemplate restTemplate = new RestTemplate();
         try {
             ResponseEntity<Map> response = restTemplate.postForEntity(flaskApiUrl, entity, Map.class);
-
+            
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-                String recommendation = (String) response.getBody().get("recommendation");
-                result.put("recommendation", recommendation);
+                result.put("recommendation", (String) response.getBody().get("recommendation"));
             } else {
-                result.put("error", "Failed to get recommendation from AI.");
+                result.put("error", "Flask API 응답 실패");
             }
         } catch (Exception e) {
-            result.put("error", "Error calling AI API: " + e.getMessage());
+            e.printStackTrace(); 
+            result.put("error", "Error: " + e.getMessage());
         }
 
         return result;
