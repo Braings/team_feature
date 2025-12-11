@@ -19,4 +19,6 @@ public class ReviewResponse {
     
     private Integer suggestion;
     private Integer views;
+    
+    private boolean suggestedByCurrentUser; // 좋아요 눌렀나 안했나 확인용
 }

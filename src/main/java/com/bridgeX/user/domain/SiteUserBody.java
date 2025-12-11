@@ -30,8 +30,8 @@ public class SiteUserBody {
 	
 	/* basic info field */
 	
-	private Integer height;
-	private Integer weight;
+	private Double height;
+	private Double weight;
 	
 	@Enumerated(EnumType.STRING) // Use e-num
     private UserGender gender;
@@ -39,8 +39,8 @@ public class SiteUserBody {
 	
 	/* athletic ability field */
 	
-	private Integer user_grip;
-	private Integer user_flex;
+	private Double user_grip;
+	private Double user_flex;
 	private Integer user_situp;
-	private Integer user_jump;
+	private Double user_jump;
 }

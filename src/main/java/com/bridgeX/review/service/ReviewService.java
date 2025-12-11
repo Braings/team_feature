@@ -92,7 +92,7 @@ public class ReviewService {
     
     
     // Review
-    public ReviewResponse getPost(Long id) {
+    public ReviewResponse getPost(Long id, String currentUserUsername) {
         ReviewInfo post = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("[SERVER] 리뷰를 찾을 수 없습니다."));
         
@@ -100,9 +100,16 @@ public class ReviewService {
         post.increaseViews();
         repository.save(post);
         
-        return convertToDetailDto(post);
+        return convertToDetailDto(post, currentUserUsername);
     }
-    private ReviewResponse convertToDetailDto(ReviewInfo entity) {
+    private ReviewResponse convertToDetailDto(ReviewInfo entity, String currentUserUsername) {
+    	SiteUser user = userRepository.findByUsername(currentUserUsername).orElse(null);
+    	boolean isSuggested = false;
+    	// 유저 엔티티가 존재할 경우에만 추천 여부를 확인
+    	if (user != null) {
+    		isSuggested = reviewSuggestionRepository.existsByReviewAndUser(entity, user);
+    	}
+    	
         try {
             // 원본 로직 유지: DTO를 생성하고 반환
             return ReviewResponse.builder()
@@ -114,6 +121,7 @@ public class ReviewService {
                     .creationTime(entity.getDate())
                     .suggestion(entity.getSuggestion())
                     .views(entity.getViews())
+                    .suggestedByCurrentUser(isSuggested)
                     .build();
         } catch (Exception e) {
             // 예외 발생 시 서버 콘솔에 상세 정보 출력
@@ -226,15 +234,11 @@ public class ReviewService {
 
     // 댓글 삭제
     @Transactional
-    public void deleteComment(Long reviewId, Long commentId, String currentUsername) {
+    public void deleteComment(Long commentId, String currentUsername) {
 
         ReviewComment comment = reviewCommentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("[SERVER] 댓글을 찾을 수 없습니다."));
         // 예외 처리
-        if (!comment.getReview().getId().equals(reviewId)) {
-            throw new RuntimeException("[SERVER] 이 리뷰의 댓글이 아닙니다.");
-        }
-
         if (!comment.getUser().getUsername().equals(currentUsername)) {
             throw new RuntimeException("[SERVER] 댓글을 삭제할 권한이 없습니다.");
         }
