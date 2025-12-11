@@ -165,7 +165,7 @@ const fetchReview = async () => {
   }
 };
 
-// === 4. 👍 [기능 수정] 추천(좋아요) 서버 저장 ===
+// === 4. [기능 수정] 추천(좋아요) 서버 저장 ===
 const toggleRecommend = async () => {
   // 더미 데이터일 경우 UI만 변경
   if (isDummy.value) {

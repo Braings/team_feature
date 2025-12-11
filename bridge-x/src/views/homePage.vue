@@ -14,7 +14,7 @@
       <div class="graph-area">
         <p class="graph-title">
           <span class="user-name">{{ userName }}</span>님의<br />
-          20대 평균 대비 건강 지표
+          성인 평균 대비 건강 지표
         </p>
 
         <div class="chart-mockup">
@@ -42,7 +42,7 @@
         </div>
 
         <div class="legend-area">
-          <span class="legend-item"><span class="dot pink"></span>20대 평균</span>
+          <span class="legend-item"><span class="dot pink"></span>성인 평균</span>
           <span class="legend-item"><span class="dot green"></span>나의 기록</span>
         </div>
       </div>
@@ -331,19 +331,34 @@ export default {
 
 /* 등급 텍스트 */
 .chart-mockup .great-label {
-  position: absolute;
-  top: 2vh;
-  right: 2vw;
-  font-size: 1.5vw;
+  position: relative;
+  top: 1vh;
+  right: 3vw;
+
+  text-align: right;
+
+  font-size: 1vw;
   color: #89FFB1;
   letter-spacing: 1px;
 }
 
 .chart-mockup .chart-status {
-  position: absolute;
-  top: 5vh;
-  right: 4vw;
-  font-size: 2.5vw;
+  position: relative;
+  right: 1vw;
+  bottom: 1vw;
+  text-align: right;
+
+  font-size: 2vw;
+  font-weight: 900;
+  color: #89FFB1;
+}
+
+.chart-mockup .chart-label {
+  position: relative;
+  right: 2.6vw;
+  text-align: right;
+
+  font-size: 2vw;
   font-weight: 900;
   color: #89FFB1;
 }
@@ -352,7 +367,7 @@ export default {
 .bar-container {
     display: flex;
     position: absolute;
-    bottom: 3vh;
+    bottom: 5vh;
     left: 2%;
     width: 96%;
     height: 70%;
@@ -378,7 +393,7 @@ export default {
     align-items: flex-start; /* 값 텍스트 상단 */
     font-size: 0.8vw;
     font-weight: bold;
-    padding-top: 5px;
+    padding-top:3px;
     transition: height 0.8s ease-in-out; /* 부드러운 애니메이션 */
     min-height: 25px; /* 값이 0이어도 텍스트가 보이도록 최소 높이 */
 }
@@ -390,9 +405,9 @@ export default {
 
 .bar-name {
     position: absolute;
-    bottom: -2.5vh;
+    bottom: -4.5vh;
     color: #cecece;
-    font-size: 0.9vw;
+    font-size: 1.5vw;
     font-weight: 500;
 }
 
