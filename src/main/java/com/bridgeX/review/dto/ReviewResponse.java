@@ -12,7 +12,7 @@ public class ReviewResponse {
     private String title;    
     private String content;    
     private String tag;    
-    private String username; // Author identifier. Not displayed
+    
     private String nickname; // Real Display
     
     private LocalDateTime creationTime;

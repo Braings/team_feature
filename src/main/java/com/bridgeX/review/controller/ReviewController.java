@@ -43,7 +43,7 @@ public class ReviewController {
 
 
     @PutMapping("/edit/{id}")
-    public void edit(@PathVariable Long id, @RequestBody ReviewUpdateRequest request, @AuthenticationPrincipal UserDetails userDetails) {
+    public void edit(@PathVariable("id") Long id, @RequestBody ReviewUpdateRequest request, @AuthenticationPrincipal UserDetails userDetails) {
         service.updatePost(id, request, userDetails.getUsername());
     }
 
@@ -55,7 +55,7 @@ public class ReviewController {
 
     
     @GetMapping("/{id}")
-    public ReviewResponse get(@PathVariable Long id) {
+    public ReviewResponse get(@PathVariable("id") Long id) {
         return service.getPost(id);
     }
 
@@ -68,8 +68,8 @@ public class ReviewController {
     }
     
     
-    @PostMapping("/{id}/suggest")
-    public ResponseEntity<Void> suggest(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
+    @PostMapping("/{id}/recommend")
+    public ResponseEntity<Void> suggest(@PathVariable("id") Long id, @AuthenticationPrincipal UserDetails userDetails) {
         service.suggestReview(id, userDetails.getUsername());
         return ResponseEntity.ok().build();
     }
@@ -77,20 +77,20 @@ public class ReviewController {
     /* ---------------------------------------- Comment ---------------------------------------- */
     
     // Comment List 조회하기
-    @GetMapping("/{id}/comment")
+    @GetMapping("/{id}/comments")
     public List<CommentResponse> getComments(@PathVariable Long id) {
         return service.getComments(id);
     }
     
     // Add Comment
-    @PostMapping("/{id}/comment")
-    public ResponseEntity<Void> addComment(@PathVariable Long id, @RequestBody CommentCreateRequest request, @AuthenticationPrincipal UserDetails userDetails) {
+    @PostMapping("/{id}/comments")
+    public ResponseEntity<Void> addComment(@PathVariable("id") Long id, @RequestBody CommentCreateRequest request, @AuthenticationPrincipal UserDetails userDetails) {
         service.addComment(id, userDetails.getUsername(), request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     // Edit Comment
-    @PutMapping("/{id}/comment/{commentId}")
+    @PutMapping("/{id}/comments/{commentId}")
     public ResponseEntity<Void> updateComment(@PathVariable Long id, @PathVariable Long commentId, @RequestBody CommentUpdateRequest request, @AuthenticationPrincipal UserDetails userDetails) {
         service.updateComment(id, commentId, userDetails.getUsername(), request);
         return ResponseEntity.ok().build();
@@ -98,7 +98,7 @@ public class ReviewController {
 
 
     // Delete Comment
-    @DeleteMapping("/{id}/comment/{commentId}")
+    @DeleteMapping("/{id}/comments/{commentId}")
     public ResponseEntity<Void> deleteComment(@PathVariable Long id, @PathVariable Long commentId, @AuthenticationPrincipal UserDetails userDetails) {
         service.deleteComment(id, commentId, userDetails.getUsername());
         return ResponseEntity.ok().build();
