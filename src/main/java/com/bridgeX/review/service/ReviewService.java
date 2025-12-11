@@ -150,6 +150,28 @@ public class ReviewService {
 
     
     // Delete Review
+    @Transactional
+    public void deletePost(Long id, String currentUser) {
+        ReviewInfo post = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("[SERVER] 리뷰를 찾을 수 없습니다."));
+
+        // 작성자 확인 (생략)
+        String author = post.getUser().getUsername();
+        if (!author.equals(currentUser)) {
+            throw new RuntimeException("[SERVER] 게시글 삭제 권한이 없습니다.");
+        }
+        
+        // ⭐ 1. 외래 키 문제 해결: ReviewSuggestion 데이터 먼저 삭제
+        reviewSuggestionRepository.deleteAllByReviewId(id);
+
+        // ⭐ 2. 외래 키 문제 해결: ReviewComment 데이터도 먼저 삭제 (새로운 문제점 해결)
+        reviewCommentRepository.deleteAllByReviewId(id); // 이 한 줄을 추가해야 합니다!
+
+        // 3. 부모 데이터(리뷰) 삭제
+        repository.delete(post);
+    }
+    /*
+    @Transactional
     public void deletePost(Long id, String currentUser) {
         ReviewInfo post = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("[SERVER] 리뷰를 찾을 수 없습니다."));
@@ -161,9 +183,10 @@ public class ReviewService {
             throw new RuntimeException("[SERVER] 게시글 삭제 권한이 없습니다.");
         }
 
+        reviewSuggestionRepository.deleteAllByReviewId(id);
         repository.delete(post);
     }
-
+	*/
     
     // Suggest Review
     @Transactional
