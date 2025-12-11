@@ -53,7 +53,7 @@
               <td class="col-nickname">{{ post.nickname }}</td>
               <td class="col-date">{{ formatDate(post.creationTime) }}</td>
               <td class="col-views">{{ post.views }}</td>
-              <td class="col-rec">{{ post.recommend }}</td>
+              <td class="col-rec">{{ post.suggestion|| 0 }}</td>
             </tr>
           </tbody>
         </table>
