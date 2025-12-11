@@ -100,8 +100,14 @@ import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 // DOMPurify 임포트
 import DOMPurify from 'dompurify';
-// API 함수들 임포트 (toggleReviewRecommend 추가됨)
-import { getReviewDetail, deleteReview, createComment, deleteComment, toggleReviewRecommend } from '@/api';
+// API 함수들 임포트
+import {
+  getReviewDetail,
+  deleteReview,
+  createComment,
+  deleteComment,
+  toggleReviewRecommend
+} from '@/api';
 import ReviewModal from './reviewModal.vue';
 
 const route = useRoute();
@@ -116,9 +122,7 @@ const isEditModalOpen = ref(false);
 
 // === 1. [권한 체크] 작성자 확인 로직 ===
 const isAuthor = computed(() => {
-  // 로컬 스토리지에 저장된 내 닉네임 가져오기
   const myNickname = localStorage.getItem('nickname');
-  // 게시글 작성자와 내 닉네임 비교
   return post.value && myNickname && (post.value.nickname === myNickname);
 });
 
@@ -136,62 +140,82 @@ const DUMMY_DATA = {
   views: 0,
   tag: "시스템",
   content: `<p>서버와 연결할 수 없어 <strong>더미 데이터</strong>를 표시합니다.</p>
-            <p>보안 스크립트 테스트: <script>alert('xss')<//script> (이 경고창이 뜨면 안됨) </p>`,
+            <p>네트워크 상태를 확인해주세요.</p>`,
   recommend: 10,
   comments: []
 };
 
-// ID 추출
-const currentId = route.params.reviewID || route.params.reviewId || route.params.id || route.params.username;
+// URL 파라미터에서 ID 추출 (여러 케이스 대응)
+const currentId = route.params.reviewID || route.params.reviewId || route.params.id;
 
-// === 데이터 로드 ===
+// === [핵심] 데이터 로드 함수 ===
 const fetchReview = async () => {
   try {
+    // API 호출
     const data = await getReviewDetail(currentId);
 
-    if (!data || (data.success === false)) throw new Error("Invalid Data");
+    // 데이터 유효성 검사
+    if (!data) throw new Error("Invalid Data");
 
     console.log("데이터 로드 성공:", data);
+
+    // 데이터 적용
     post.value = data;
     isDummy.value = false;
 
-    // 서버에서 '내가 좋아요 눌렀는지' 정보를 준다면 여기서 세팅
-    // isRecommended.value = data.isLiked || false;
+    // 추천(좋아요) 상태 동기화
+    // 서버 응답에 isLiked 키가 있으면 사용, 없으면 false (hasOwnProperty 제거됨)
+    isRecommended.value = data.isLiked || false;
 
   } catch (error) {
     console.error("API 로드 실패, 더미 데이터 사용:", error);
     post.value = DUMMY_DATA;
     isDummy.value = true;
+    isRecommended.value = false;
   }
 };
 
-// === 4. [기능 수정] 추천(좋아요) 서버 저장 ===
+// === [핵심] 추천(좋아요) 토글 함수 ===
 const toggleRecommend = async () => {
-  // 더미 데이터일 경우 UI만 변경
+  // 1. 더미 데이터 모드 (테스트용)
   if (isDummy.value) {
     isRecommended.value = !isRecommended.value;
-    if(post.value) post.value.recommend = (post.value.recommend || 0) + (isRecommended.value ? 1 : -1);
+    if(post.value) {
+        post.value.recommend = (post.value.recommend || 0) + (isRecommended.value ? 1 : -1);
+    }
     return;
   }
 
+  // 2. 실제 서버 통신
   try {
-    // 실제 API 호출 (서버에 저장)
+    // [낙관적 업데이트] UI 먼저 변경하여 반응 속도 향상
+    isRecommended.value = !isRecommended.value;
+
+    if (post.value) {
+        post.value.recommend = (post.value.recommend || 0) + (isRecommended.value ? 1 : -1);
+    }
+
+    // API 호출 (서버 DB 반영)
     const response = await toggleReviewRecommend(currentId);
 
-    // 서버가 최신 추천 수와 내 상태를 돌려준다고 가정
-    if (response) {
-       // 만약 서버가 숫자만 준다면: post.value.recommend = response.count;
-       // 토글 방식이라면 다시 로드하거나 수동 계산
-       isRecommended.value = !isRecommended.value;
-       post.value.recommend += (isRecommended.value ? 1 : -1);
+    // 만약 서버가 정확한 최신 추천 수를 반환한다면 덮어쓰기
+    if (response && typeof response.recommend === 'number') {
+       post.value.recommend = response.recommend;
     }
+
   } catch (error) {
     console.error("추천 실패:", error);
     alert("추천을 반영하지 못했습니다.");
+
+    // 실패 시 롤백 (원래 상태로 복구)
+    isRecommended.value = !isRecommended.value;
+    if (post.value) {
+        post.value.recommend += (isRecommended.value ? 1 : -1);
+    }
   }
 };
 
-// === 수정/삭제/댓글 등 나머지 기능 (기존 유지) ===
+// === 수정 모달 관련 ===
 const openEditModal = () => {
   if (isDummy.value) { alert("더미 데이터는 수정할 수 없습니다."); return; }
   isEditModalOpen.value = true;
@@ -202,9 +226,10 @@ const closeEditModal = () => { isEditModalOpen.value = false; };
 const onEditSuccess = () => {
   alert("수정이 완료되었습니다.");
   closeEditModal();
-  fetchReview();
+  fetchReview(); // 수정된 데이터 다시 불러오기
 };
 
+// === 게시글 삭제 ===
 const deletePost = async () => {
   if (isDummy.value) { alert("더미 데이터는 삭제할 수 없습니다."); return; }
   if (!confirm("정말로 게시글을 삭제하시겠습니까?")) return;
@@ -219,11 +244,13 @@ const deletePost = async () => {
   }
 };
 
+// === 댓글 작성 ===
 const submitComment = async () => {
   if (!newComment.value.trim()) return;
 
   const myNickname = localStorage.getItem('nickname') || "익명";
 
+  // 더미 모드일 때
   if (isDummy.value) {
     post.value.comments.push({
       id: Date.now(),
@@ -235,14 +262,15 @@ const submitComment = async () => {
     return;
   }
 
+  // 실제 서버 통신
   try {
     const commentData = {
-       reviewId: currentId,
+       reviewId: currentId, // API 필요에 따라 포함
        content: newComment.value,
        nickname: myNickname
     };
     await createComment(currentId, commentData);
-    await fetchReview();
+    await fetchReview(); // 댓글 목록 갱신을 위해 재호출
     newComment.value = '';
   } catch (error) {
     console.error("댓글 작성 실패:", error);
@@ -250,6 +278,7 @@ const submitComment = async () => {
   }
 };
 
+// === 댓글 삭제 ===
 const removeComment = async (commentId) => {
   if (isDummy.value) {
     post.value.comments = post.value.comments.filter(c => c.id !== commentId);
@@ -259,16 +288,20 @@ const removeComment = async (commentId) => {
 
   try {
     await deleteComment(commentId);
-    await fetchReview();
+    await fetchReview(); // 목록 갱신
   } catch (error) {
     alert("댓글 삭제 실패");
-    console("댓글 삭제 실패:",error);
+    console.error("댓글 삭제 실패:", error);
   }
 };
 
+// === 뒤로 가기 ===
 const goBack = () => { router.push({ name: 'reviews' }); };
 
-onMounted(() => { fetchReview(); });
+// === 초기화 ===
+onMounted(() => {
+    fetchReview();
+});
 </script>
 
 <style lang="scss" scoped>
