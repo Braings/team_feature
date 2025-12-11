@@ -102,7 +102,7 @@
         <!-- 버튼 영역 -->
         <div class="button-area">
           <button class="edit-button" @click="openEditModal">정보 수정</button>
-          <button class="logout-button" @click="handleLogout">로그아웃</button>
+          <button class="logout-button" @click="handleLogout">HOME</button>
         </div>
       </div>
     </div>
@@ -151,7 +151,7 @@ const loadProfile = async () => {
   try {
     const profile = await getUserProfile();
     const bodyInfo = await getUserBodyInfo(); // [FIX] 유저 신체 및 운동 정보 받기 위함
-    
+
     userProfile.username = profile.username || 'N/A';
     userProfile.nickname = profile.nickname || 'N/A';
 
@@ -170,7 +170,7 @@ const loadProfile = async () => {
       userProfile.user_situp = bodyInfo.user_situp || 'N/A';
       userProfile.user_jump = bodyInfo.user_jump || 'N/A';
     }
-    
+
   } catch (error) {
     console.error('프로필 로드 실패:', error);
   }
