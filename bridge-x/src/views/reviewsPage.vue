@@ -250,7 +250,7 @@ const filteredPosts = computed(() => {
 
   // 카테고리 필터
   if (selectedCategory.value !== 'all') {
-    const categoryMap = { question: '질문', info: '정보', review: '리뷰', chat: '잡담' };
+    const categoryMap = { question: 'QUESTION', info: 'INFORMATION', chat: 'TALK' };
     const cat = categoryMap[selectedCategory.value];
     if (cat) result = result.filter(p => p.tag === cat);
   }
