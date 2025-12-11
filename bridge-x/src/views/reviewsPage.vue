@@ -1,4 +1,3 @@
-
 <template>
   <div class="gallery-page">
     <div class="gallery-main">
@@ -10,16 +9,13 @@
       </header>
 
       <section class="controls">
-
         <div class="tabs">
           <div class="padding"></div>
           <div :class="['tab', selectedCategory === 'all' ? 'active' : '']" @click="selectCategory('all')">전체글</div>
           <div :class="['tab', selectedCategory === 'question' ? 'active' : '']" @click="selectCategory('question')">질문</div>
           <div :class="['tab', selectedCategory === 'info' ? 'active' : '']" @click="selectCategory('info')">정보</div>
-          <div :class="['tab', selectedCategory === 'review' ? 'active' : '']" @click="selectCategory('review')">리뷰</div>
           <div :class="['tab', selectedCategory === 'chat' ? 'active' : '']" @click="selectCategory('chat')">잡담</div>
         </div>
-
 
         <div class="search-area">
           <select v-model="search.type" class="select">
@@ -28,44 +24,44 @@
             <option value="nickname">작성자</option>
           </select>
           <input v-model="search.query" placeholder="검색어 입력" class="search-input"/>
-          <button class="search-btn" @click=handleSearchAndBlur($event)>검색</button>
+          <button class="search-btn" @click="handleSearchAndBlur($event)">검색</button>
         </div>
       </section>
 
       <section class="post-list">
         <div v-if="loading" class="list-status">게시물을 로드하는 중...</div>
-        <!-- <div v-else-if="error" class="list-status error">게시물을 로드하는 데 실패했습니다: **{{ error }}**</div> -->
+        <div v-else-if="error" class="list-status error">게시물을 로드하는 데 실패했습니다: {{ error }}</div>
         <div v-else-if="pagedPosts.length === 0" class="list-status no-posts">게시물이 없습니다.</div>
 
-          <table v-else class="posts-table" :style="{  boxShadow: '1px 1px 3px black'}">
-            <thead :style="{ borderBottom: '3px solid #ccc' }">
-              <tr>
-                <th class="col-no">번호</th>
-                <th class="col-tag">태그</th>
-                <th class="col-title" :style="{ textAlign: 'center' }" >제목</th>
-                <th class="col-nickname">글쓴이</th>
-                <th class="col-date">작성일</th>
-                <th class="col-views">조회</th>
-                <th class="col-rec">추천</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(post) in pagedPosts" :key="post.reviewID" :style="{ fontFamily: 'SCDream5'}"  @click="openPost(post)" >
-                <td class="col-no">{{ post.no }}</td>
-                <td class="col-tag">{{ post.tag }}</td>
-                <td class="col-title">{{ post.title }}</td>
-                <td class="col-nickname">{{ post.nickname }}</td>
-                <td class="col-date">{{ post.date }}</td>
-                <td class="col-views">{{ post.views }}</td>
-                <td class="col-rec">{{ post.recommend }}</td>
-              </tr>
-            </tbody>
-          </table>
+        <table v-else class="posts-table" :style="{ boxShadow: '1px 1px 3px black'}">
+          <thead :style="{ borderBottom: '3px solid #ccc' }">
+            <tr>
+              <th class="col-no">번호</th>
+              <th class="col-tag">태그</th>
+              <th class="col-title" :style="{ textAlign: 'center' }">제목</th>
+              <th class="col-nickname">글쓴이</th>
+              <th class="col-date">작성일</th>
+              <th class="col-views">조회</th>
+              <th class="col-rec">추천</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(post) in pagedPosts" :key="post.reviewID" :style="{ fontFamily: 'SCDream5'}" @click="openPost(post)">
+              <td class="col-no">{{ post.id }}</td>
+              <td class="col-tag">{{ getKoreanTag(post.tag) }}</td>
+              <td class="col-title">{{ post.title }}</td>
+              <td class="col-nickname">{{ post.nickname }}</td>
+              <td class="col-date">{{ formatDate(post.creationTime) }}</td>
+              <td class="col-views">{{ post.views }}</td>
+              <td class="col-rec">{{ post.suggestion|| 0 }}</td>
+            </tr>
+          </tbody>
+        </table>
 
-          <div class="pagination">
-          <button @click="prevPage" :disabled="page === 1">이전</button>
+        <div class="pagination">
+          <button v-if="pagedPosts.length > 0" @click="prevPage" :disabled="page === 1">이전</button>
           <span :style="{cursor: 'default'}"> {{ page }} / {{ totalPages }} </span>
-          <button @click="nextPage" :disabled="page === totalPages">다음</button>
+          <button v-if="pagedPosts.length > 0" @click="nextPage" :disabled="page === totalPages">다음</button>
           <button class="write-btn" @click="openWriteModal">글쓰기</button>
           <ReviewWriteModal
             :isOpen="isModalOpen"
@@ -74,16 +70,14 @@
             :initialData="defaultReviewData"
           />
         </div>
-
       </section>
-
     </div>
 
     <aside class="gallery-side">
       <div class="category-padding" :style="{ height: '9.8rem'}"></div>
 
-      <div class="trending-box" :style="{  boxShadow: '1px 1px 3px black'}">
-        <h3 :style="{ paddingBottom: '18px', borderBottom: '2px solid #ccc', fontSize: '20px' }" > &nbsp;&nbsp; 인기글</h3>
+      <div class="trending-box" :style="{ boxShadow: '1px 1px 3px black'}">
+        <h3 :style="{ paddingBottom: '18px', borderBottom: '2px solid #ccc', fontSize: '20px' }"> &nbsp;&nbsp; 인기글</h3>
         <ul class="trending-list">
           <li v-for="post in trendingPosts" :key="post.reviewID" @click="openPost(post)">
             <span class="trending-title" :style="{ fontFamily: 'SCDream5'}">{{ post.title }}</span>
@@ -94,12 +88,12 @@
 
       <div class="category-padding"></div>
 
-      <div class="recent-box" :style="{  boxShadow: '1px 1px 3px black'}">
-        <h3 :style="{ paddingBottom: '18px', borderBottom: '2px solid #ccc', fontSize: '20px'}" > &nbsp;&nbsp; 최근글</h3>
+      <div class="recent-box" :style="{ boxShadow: '1px 1px 3px black'}">
+        <h3 :style="{ paddingBottom: '18px', borderBottom: '2px solid #ccc', fontSize: '20px'}"> &nbsp;&nbsp; 최근글</h3>
         <ul class="recent-list">
           <li v-for="post in recentPosts" :key="post.reviewID" @click="openPost(post)">
             <span class="recent-title" :style="{ fontFamily: 'SCDream5'}">{{ post.title }}</span>
-            <span class="recent-date">{{ post.date }}</span>
+            <span class="recent-date">{{ formatDate(post.creationTime) }}</span>
           </li>
         </ul>
       </div>
@@ -124,6 +118,24 @@ const error = ref(null);
 const page = ref(1);
 const pageSize = 10;
 
+// AddPoint : 매핑 추가
+const tagKoreanMap = {
+  'QUESTION': '질문',
+  'TALK': '잡담',
+  'INFORMATION': '정보',
+};
+
+// AddPoint : 태그 값을 받아 한글로 변환하는 함수
+function getKoreanTag(tag) {
+  return tagKoreanMap[tag] || tag;
+}
+
+// AddPoint : formatDate 추가
+function formatDate(dateTimeStr) {
+  if (!dateTimeStr) return '';
+  return dateTimeStr.split('T')[0];
+}
+
 // ========================
 // Data Loading
 // ========================
@@ -140,29 +152,27 @@ async function loadReviews() {
       query: search.value.query
     });
 
-    posts.value = data.data || data || [];
+    let loadedPosts = data.data || data || [];
 
-  } catch (error) {
-    console.error('리뷰 목록 로드 실패:', error);
-    error.value = error.message;
+    // [수정됨] 최신순(작성일 역순)으로 정렬 강제
+    // creationTime이 문자열(ISO)이라고 가정하고 비교
+    loadedPosts.sort((a, b) => {
+      const dateA = new Date(a.creationTime || 0);
+      const dateB = new Date(b.creationTime || 0);
+      return dateB - dateA; // 내림차순
+    });
 
+    posts.value = loadedPosts;
 
-    // 이 샘플 데이터는 어떤 필터링 조건에서도 항상 동일하게 전체를 생성해야 합니다.
-    posts.value = Array.from({ length: 100  }).map((_, i) => ({
-      reviewId: 100 - i,
-      username: `nickname${i + 1}`,
-      no: 100 - i,
-      tag: i % 5 === 0 ? '질문' : i % 3 === 0 ? '정보' : '리뷰',
-      title: `샘플 게시물 제목 ${i + 1}`,
-      nickname: `운영자${(i % 6) + 1}`,
-      date: '25/11/' + ((i % 30) + 1).toString().padStart(2, '0'),
-      views: Math.floor(Math.random() * 500),
-      recommend: Math.floor(Math.random() * 50)
-    }));
+  } catch (err) {
+    console.error('리뷰 목록 로드 실패:', err);
+    error.value = err.message || '데이터를 불러오는 중 오류가 발생했습니다.';
+    posts.value = []; // 에러 시 빈 배열로 초기화 (더미 데이터 제거됨)
   } finally {
     loading.value = false;
   }
 }
+
 // ========================
 // Event Handlers
 // ========================
@@ -187,9 +197,24 @@ function selectCategory(cat) {
 }
 
 function openPost(post) {
-  if (router) router.push({
-    name: 'reviewDetail',
-    params: { reviewID: post.reviewID } }).catch(()=>{});
+  // 1. 실제 데이터에 들어있는 ID 찾기 (안전 장치)
+  const realId = post.reviewID || post.reviewId || post.review_id || post.id;
+
+  // 2. ID가 없으면 경고 띄우고 중단
+  if (!realId) {
+    alert('게시글 ID를 찾을 수 없습니다. (데이터 오류)');
+    return;
+  }
+
+  // 3. 페이지 이동
+  if (router) {
+    router.push({
+      name: 'reviewDetail',
+      params: { reviewID: realId }
+    }).catch(err => {
+      console.error("페이지 이동 에러:", err);
+    });
+  }
 }
 
 function prevPage() {
@@ -212,7 +237,7 @@ const filteredPosts = computed(() => {
 
   // 카테고리 필터
   if (selectedCategory.value !== 'all') {
-    const categoryMap = { question: '질문', info: '정보', review: '리뷰', chat: '잡담' };
+    const categoryMap = { question: 'QUESTION', info: 'INFORMATION', chat: 'TALK' };
     const cat = categoryMap[selectedCategory.value];
     if (cat) result = result.filter(p => p.tag === cat);
   }
@@ -233,15 +258,21 @@ const filteredPosts = computed(() => {
   return result;
 });
 
+// 인기글: 추천수(recommend) 내림차순
 const trendingPosts = computed(() => {
-  return [...posts.value].sort((a, b) => (b.recommend || 0) - (a.recommend || 0)).slice(0, 5);
+  return [...posts.value]
+    .sort((a, b) => (b.recommend || 0) - (a.recommend || 0))
+    .slice(0, 5);
 });
 
+// [수정됨] 최근글: creationTime 기준 내림차순 정렬 확실하게 보장
 const recentPosts = computed(() => {
-  return [...posts.value].slice(0, 5);
+  return [...posts.value]
+    .sort((a, b) => new Date(b.creationTime || 0) - new Date(a.creationTime || 0))
+    .slice(0, 5);
 });
 
-const totalPages = computed(() => Math.ceil(filteredPosts.value.length / pageSize));
+const totalPages = computed(() => Math.ceil(filteredPosts.value.length / pageSize) || 1);
 
 const pagedPosts = computed(() => {
   const start = (page.value - 1) * pageSize;
@@ -255,7 +286,6 @@ watch(search, () => {
 onMounted(() => {
   loadReviews();
 });
-
 
 // ========================
 // Modal State and Handlers
@@ -278,7 +308,6 @@ const handleReviewSubmit = (newReview) => {
   closeWriteModal();
   loadReviews();
 };
-
 </script>
 
 <style lang="scss" scoped>
@@ -286,18 +315,17 @@ const handleReviewSubmit = (newReview) => {
 @use 'sass:map';
 @use '@/styles/_variables' as *;
 
-
 .gallery-page {
   display: flex;
   gap: 2vw;
   padding: 2vh 3vw;
   font-family: 'TheJamsilOTF6ExtraBold', sans-serif;
   background-color: map.get($colors, 'table');
+
   .gallery-main {
     flex: 1 1 auto;
 
-
-  .write-btn {
+    .write-btn {
       position: absolute;
       right: 0;
       background-color: map.get($colors, 'black');
@@ -314,8 +342,6 @@ const handleReviewSubmit = (newReview) => {
         color: map.get($colors, 'white');
       }
     }
-
-
 
     .gallery-header {
       display: flex;
@@ -334,7 +360,6 @@ const handleReviewSubmit = (newReview) => {
 
       .gallery-title { font-size: 2.5rem; margin: 0; text-align: center;}
       .gallery-sub { color: map.get($colors, 'muted'); margin: 0; }
-
     }
 
     .controls {
@@ -403,7 +428,7 @@ const handleReviewSubmit = (newReview) => {
     .post-list { margin-top: map.get($spacing, 'md');
       .list-status {
         box-shadow: 1px 1px 2px black;
-        min-height: 200px; /* 메시지가 보일 영역의 최소 높이 */
+        min-height: 200px;
         display: flex;
         justify-content: center;
         align-items: center;

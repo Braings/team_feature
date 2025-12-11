@@ -1,5 +1,6 @@
 <template>
   <div class="login-container">
+
     <div class="left-section">
       <div class="content-wrapper">
         <p class="subtitle">맞춤형 운동 추천 솔루션</p>
@@ -47,283 +48,220 @@
 
 <script setup>
 import { useRouter } from 'vue-router';
-import { ref, computed, onMounted, reactive } from 'vue';
-import { post } from '@/api.js';
-import { useAuth } from '@/composables/useAuth';
-import FormField from '@/components/FormField.vue';
-import { useFormValidation } from '@/composables/useFormValidation';
+import { ref, reactive } from 'vue';
+import { loginFormData, submitLogin } from '@/stores/loginStore';
+import { getUserProfile } from '@/api'; // [기능 유지] 프로필 조회 API
+import FormField from '@/components/FormField.vue'; // 경로 확인 필요
 
-// ========================
-// Data & State
-// ========================
 const router = useRouter();
 const loading = ref(false);
+const passwordDisplay = ref('');
 
-const { login } = useAuth();   // 공용 auth 사용
+// 폼 데이터 (Store 연동)
+const formData = loginFormData;
 
-// 폼 초기화 관련
-// 비어있는 폼 기본값 설정
-const createEmptyForm = () => ({
+// 에러 상태
+const errors = reactive({
   username: '',
   password: ''
 });
 
-const formData = reactive(createEmptyForm());
-const resetForm = () => {
-  Object.assign(formData, createEmptyForm());
-};
-
-// onMounted 변경
-onMounted(() => {
-  formData.username = '';
-  formData.password = '';
-
-  // 에러 메시지도 같이 날리고 싶으면
-  if (errors && errors.value) {
-    Object.keys(errors.value).forEach((key) => {
-      errors.value[key] = null;
-    });
+// 유효성 검사
+const validateField = (field, data) => {
+  if (field === 'username') {
+    errors.username = !data.username ? '아이디를 입력해주세요.' : '';
   }
-});
-  
-// ========================
-// Validation Rules
-// ========================
-const VALIDATION_RULES = {
-  username: {
-    minLength: 4,
-    pattern: /^[a-zA-Z0-9_]*$/,
-    messages: {
-      empty: '아이디를 입력하세요.',
-      minLength: '아이디는 4자 이상이어야 합니다.',
-      pattern: '영문, 숫자, 언더스코어(_)만 사용 가능합니다.'
-    }
-  },
-  password: {
-    minLength: 1,//8로 추후 수정해야함
-    messages: {
-      empty: '비밀번호를 입력하세요.',
-      minLength: '비밀번호는 8자 이상이어야 합니다.'
-    }
+  if (field === 'password') {
+    errors.password = !data.password ? '비밀번호를 입력해주세요.' : '';
   }
 };
 
-// ========================
-// Form Validation
-// ========================
-const { errors, validateField, validateForm } = useFormValidation(VALIDATION_RULES);
-
-// ========================
-// Password Display Logic
-// ========================
-const passwordDisplay = computed({
-  get: () => '*'.repeat(formData.password.length),
-  set: (newVal) => {
-    const prevLength = formData.password.length;
-    const newLength = newVal.length;
-
-    if (newLength > prevLength) {
-      formData.password += newVal[newLength - 1];
-    } else if (newLength < prevLength) {
-      formData.password = formData.password.slice(0, newLength);
-    }
-  }
-});
-
-// ========================
-// Event Handlers
-// ========================
 const onUsernameInput = () => {
-  formData.username = formData.username.replace(/[^a-zA-Z0-9_]/g, '');
-
+  errors.username = '';
 };
 
 const onPasswordInput = () => {
-  // 비밀번호에서 비ASCII 문자 제거
-  formData.password = formData.password.replace(/[^\x20-\x7E]/g, '');
+  errors.password = '';
+  formData.password = passwordDisplay.value;
 };
 
-// handleLogin 로직 변경
-const handleLogin = async () => {
-  // 유효성 검사
-  const ok = validateForm ? validateForm(formData) : true;
-  if (!ok) return;
-
-  loading.value = true;
-
-  try {
-    // 로그인 요청
-    await post('/api/login', formData);
-    // 전역 로그인 상태 업데이트
-    login();
-    // 홈으로 이동
-    router.push({ name: 'homePage' });
-  } catch (e) {
-    console.error(e);
-    alert('아이디 또는 비밀번호를 다시 확인해 주세요.'); // 예외처리
-  } finally {
-    loading.value = false;
-  }
-};
-
-/*
-const handleLogin = async () => {
-  if (!validateForm(formData)) {
-    console.log('❌ 폼 검증 실패');
-    return;
-  }
-
-  loading.value = true;
-
-  loginFormData.username = formData.username;
-  loginFormData.password = formData.password;
-
-try {
-    // 3. Store의 API 호출 및 데이터 저장 로직 실행
-    await submitLogin();
-
-    loginFormData.reset();
-    localStorage.setItem('LogIn',true)
-    router.push({ name: 'homePage' });
-
-  } catch (error) {
-    const warningMessage = `로그인 실패! 서버 응답 오류. (상세: ${error.body?.message || error.message || '알 수 없는 오류'})`;
-    console.warn('[로그인 경고]', warningMessage);
-    console.error('로그인 실패:', error);
-
-  } finally {
-    // 6. 로딩 상태 해제
-    loading.value = false;
-  }
-};
-*/
+// 회원가입 페이지 이동
 const goToSignUp = () => {
   router.push({ name: 'sign.id' });
 };
 
+// [기능 유지] 로그인 처리 로직
+const handleLogin = async () => {
+  validateField('username', formData);
+  validateField('password', formData);
+
+  if (errors.username || errors.password) return;
+
+  loading.value = true;
+
+  try {
+    // 1. 로그인 요청
+    await submitLogin();
+
+    // 2. 로그인 성공 플래그
+    localStorage.setItem('LogIn', 'true');
+
+    // 3. 사용자 정보 가져오기 & 저장 (헤더 닉네임 표시용)
+    const userProfile = await getUserProfile();
+    if (userProfile) {
+      localStorage.setItem('username', userProfile.username || '');
+      localStorage.setItem('nickname', userProfile.nickname || '');
+    }
+
+    // 4. 홈으로 이동
+    router.push({ name: 'homePage' });
+
+  } catch (error) {
+    console.error(error);
+    alert(error.message || "아이디 또는 비밀번호를 확인해주세요.");
+  } finally {
+    loading.value = false;
+  }
+};
 </script>
 
-
 <style lang="scss" scoped>
-@use 'sass:color';
-@use 'sass:map';
-@use '@/styles/_variables.scss'as *;
-
+/* 원래 스타일 복구 */
 .login-container {
   display: flex;
   width: 100vw;
   height: 100vh;
-  font-family: 'TheJamsilOTF6ExtraBold', sans-serif;
   overflow: hidden;
-  background-color: map.get($colors, 'white');
+  font-family: sans-serif;
 }
 
-// ========================
-// Left Section (Banner)
-// ========================
+/* 왼쪽 섹션 스타일 (이미지, 오버레이, 텍스트 위치) */
 .left-section {
   width: 50vw;
-  background-color: map.get($colors, 'dark-gray');
-  color: map.get($colors, 'white');
-  position: relative;
-  background-image: url('@/img/gym.png');
-  background-size: 100%;
+  height: 100vh;
+  background-image: url('@/img/logInGym.jpg'); /* 이미지 경로 확인 */
+  background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  background-color: #333;
+  position: relative;
+  color: rgb(255, 255, 255);
 }
 
+/* 어두운 오버레이 효과 */
+.left-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+/* 텍스트 래퍼 (왼쪽 하단 고정) */
 .content-wrapper {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  padding: 0 3vw 3vh 3vw;
+  bottom: 11vh;
+  left: 3vw;
+  z-index: 1; /* 오버레이보다 위에 표시 */
 }
 
 .subtitle {
   font-size: 1.2vw;
-  margin-bottom: 0.5vh;
+
+  font-weight: 300;
 }
 
 .title {
-  font-size: 2.5vw;
-  font-weight: bold;
-  margin: 0;
-  line-height: 5vh;
-  letter-spacing: 2px;
+  font-size: 3.5vw;
+
+  font-weight: 900;
+  // line-height: 1.2;
+  // letter-spacing: 2px;
 }
 
 .footer-text {
   font-size: 0.8vw;
-  margin-top: 5vh;
+  opacity: 0.8;
+  margin-left: 0.3vw;
 }
 
-// ========================
-// Right Section (Form)
-// ========================
+/* 오른쪽 섹션 스타일 */
 .right-section {
   width: 50vw;
-  background-color: map.get($colors, 'white');
-  position: relative;
-  @include flex-center;
+  height: 100vh;
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   flex-direction: column;
-  padding: map.get($spacing, '3xl');
+  padding: 40px;
+  position: relative;
 }
 
 .login-header {
-  font-size: map.get($typography, 'button');
-  font-weight: bold;
-  margin-bottom: map.get($spacing, '3xl');
-  letter-spacing: 2px;
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 40px;
+  letter-spacing: 1px;
+  color: #333;
 }
 
 .form-area {
-  @include flex-column;
+  display: flex;
+  flex-direction: column;
   width: 100%;
   max-width: 350px;
-  gap: map.get($spacing, 'xl');
+  gap: 20px;
 }
 
 .login-button {
-  @include button-base;
-  @include flex-center;
-  background-color: map.get($colors, 'black');
-  color: map.get($colors, 'white');
-  padding: map.get($spacing, 'lg') map.get($spacing, 'xl');
-  border-radius: map.get($radius, 'md');
-  font-size: map.get($typography, 'button');
-  margin-top: map.get($spacing, 'xl');
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: black;
+  color: white;
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  margin-top: 20px;
   width: 100%;
+  border: none;
+  cursor: pointer;
+}
 
-  &:hover:not(:disabled) {
-    background-color: map.get($colors, 'gray-hover');
-  }
+.login-button:hover:not(:disabled) {
+  opacity: 0.8;
+}
 
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
+.login-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
 }
 
 .divider {
-  width: 100%;
+  width: 80%;
   max-width: 350px;
   height: 1px;
-  background-color: map.get($colors, 'border');
-  margin: map.get($spacing, '2xl') 0;
+  background-color: #eee;
+  margin: 30px 0;
 }
 
 .signup-prompt {
-  font-size: map.get($typography, 'base');
+  font-size: 0.9rem;
+  color: #666;
   cursor: pointer;
-  transition: opacity 0.2s ease;
-
-  &:hover {
-    opacity: 0.8;
-  }
 }
 
 .signup-link {
-  color: map.get($colors, 'error');
   font-weight: bold;
+  color: black;
+  text-decoration: underline;
+}
+
+.signup-link:hover {
+  color: #007bff;
 }
 </style>
