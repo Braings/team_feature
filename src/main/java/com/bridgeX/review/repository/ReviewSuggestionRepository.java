@@ -15,5 +15,8 @@ public interface ReviewSuggestionRepository extends JpaRepository<ReviewSuggesti
     long countByReview(ReviewInfo review);
     
     Optional<ReviewSuggestion> findByReviewAndUser(ReviewInfo review, SiteUser user);
+    
+    void deleteAllByReviewId(Long reviewId);
+    
 }
 

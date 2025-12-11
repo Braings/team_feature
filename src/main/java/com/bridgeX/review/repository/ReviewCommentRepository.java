@@ -9,5 +9,7 @@ import com.bridgeX.review.domain.ReviewInfo;
 
 public interface ReviewCommentRepository extends JpaRepository<ReviewComment, Long> {
     List<ReviewComment> findByReviewOrderByCreatedAtAsc(ReviewInfo review);
+    
+    void deleteAllByReviewId(Long reviewId);
 }
 
